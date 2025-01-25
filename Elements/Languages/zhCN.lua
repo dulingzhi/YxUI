@@ -1,6 +1,6 @@
-local HydraUI, L = select(2, ...):get()
+local YxUI, L = select(2, ...):get()
 
-if (HydraUI.UserLocale ~= "zhCN") then
+if (YxUI.UserLocale ~= "zhCN") then
 	return
 end
 
@@ -11,15 +11,15 @@ L["Display Welcome Message"] = "显示欢迎信息"
 L["Display a welcome message on login with UI information"] = "登录时显示带有UI信息的欢迎信息"
 L["Get Link"] = "获取链接"
 L["Join Discord"] = "加入Discord"
-L["Get a link to join the HydraUI Discord community"] = "获取加入HydraUI Discord社区的链接"
+L["Get a link to join the YxUI Discord community"] = "获取加入YxUI Discord社区的链接"
 L["Watch YouTube"] = "观看YouTube"
-L["Get a link for the HydraUI YouTube channel"] = "获取HydraUI YouTube频道的链接"
+L["Get a link for the YxUI YouTube channel"] = "获取YxUI YouTube频道的链接"
 L["Move UI"] = "移动UI"
 L["Toggle"] = "切换"
-L["While toggled, you can drag some elements of HydraUI around the screen"] = "切换后，您可以在屏幕上拖动HydraUI的一些元素"
+L["While toggled, you can drag some elements of YxUI around the screen"] = "切换后，您可以在屏幕上拖动YxUI的一些元素"
 L["Restore"] = "恢复"
 L["Restore To Defaults"] = "恢复默认"
-L["Restore all HydraUI movable frames to their default locations"] = "将所有HydraUI可移动框架恢复到默认位置"
+L["Restore all YxUI movable frames to their default locations"] = "将所有YxUI可移动框架恢复到默认位置"
 L["Settings Window"] = "设置窗口"
 L["Hide In Combat"] = "战斗中隐藏"
 L["Hide the settings window when engaging in combat"] = "战斗时隐藏设置窗口"
@@ -66,7 +66,7 @@ L["Set the font size of header elements in the UI"] = "设置UI中标题元素�
 L["Title Font Size"] = "标题字体大小"
 L["Set the font size of title elements in the UI"] = "设置UI中标题元素的字体大小"
 L["Welcome to |cFF%sHydra|r|cFFEFFFFFUI|r Shadowlands |cFF%s%s|r - https://discord.gg/XefDFa6nJR"] = "欢迎使用 |cFF%sHydra|r|cFFEFFFFFUI|r 暗影国度 |cFF%s%s|r - https://discord.gg/XefDFa6nJR"
-L["Type |cFF%s/hui|r to access the settings window, or click |cFF%s|Hcommand:/hui|h[here]|h|r."] = "输入 |cFF%s/hui|r 以访问设置窗口，或点击 |cFF%s|Hcommand:/hui|h[这里]|h|r。"
+L["Type |cFF%s/yxui|r to access the settings window, or click |cFF%s|Hcommand:/yxui|h[here]|h|r."] = "输入 |cFF%s/yxui|r 以访问设置窗口，或点击 |cFF%s|Hcommand:/yxui|h[这里]|h|r。"
 L["Join the Discord community for support and feedback https://discord.gg/XefDFa6nJR"] = "加入Discord社区以获取支持和反馈 https://discord.gg/XefDFa6nJR"
 L["Subscribe to YouTube to see new features https://www.youtube.com/c/HydraMods"] = "订阅YouTube以查看新功能 https://www.youtube.com/c/HydraMods"
 
@@ -135,7 +135,7 @@ L['No style exists with the name "%s"'] = '没有名为"%s"的样式'
 -- Auras
 L["Auras"] = "光环"
 L["Enable Auras Module"] = "启用光环模块"
-L["Enable the HydraUI auras module"] = "启用HydraUI光环模块"
+L["Enable the YxUI auras module"] = "启用YxUI光环模块"
 L["Styling"] = "样式"
 L["Size"] = "大小"
 L["Set the size of auras"] = "设置光环的大小"
@@ -193,7 +193,7 @@ L["Friend Tag: "] = "好友标签: "
 L["Chat"] = "聊天"
 L["Enable"] = "启用"
 L["Enable Chat Module"] = "启用聊天模块"
-L["Enable the HydraUI chat module"] = "启用HydraUI聊天模块"
+L["Enable the YxUI chat module"] = "启用YxUI聊天模块"
 L["Chat Width"] = "聊天宽度"
 L["Set the width of the chat frame"] = "设置聊天框的宽度"
 L["Chat Height"] = "聊天高度"
@@ -235,7 +235,7 @@ L["Set the color of the chat frame tab while mousing over it"] = "设置鼠标�
 -- Chat Bubbles
 L["Chat Bubbles"] = "聊天气泡"
 L["Enable Chat Bubbles"] = "启用聊天气泡"
-L["Enable the HydraUI chat bubbles module"] = "启用HydraUI聊天气泡模块"
+L["Enable the YxUI chat bubbles module"] = "启用YxUI聊天气泡模块"
 L["Set the opacity of the chat bubbles background"] = "设置聊天气泡背景的透明度"
 L["Set the font of the chat bubbles"] = "设置聊天气泡的字体"
 L["Set the font size of the chat bubbles"] = "设置聊天气泡的字体大小"
@@ -326,12 +326,12 @@ L["Interrupted"] = "打断"
 L["Uninterruptible"] = "不可打断"
 
 -- Commands
-L["|cFF%sHydraUI|r Commands"] = "|cFF%sHydraUI|r 命令"
-L["|Hcommand:/HydraUI|h|cFF%s/HydraUI|r|h - Toggle the settings window"] = "|Hcommand:/HydraUI|h|cFF%s/HydraUI|r|h - 切换设置窗口"
-L["|Hcommand:/HydraUI move|h|cFF%s/HydraUI move|r|h - Drag UI elements around the screen"] = "|Hcommand:/HydraUI move|h|cFF%s/HydraUI move|r|h - 在屏幕上拖动UI元素"
-L["|Hcommand:/HydraUI movereset|h|cFF%s/HydraUI movereset|r|h - Reposition all movers to their default locations"] = "|Hcommand:/HydraUI movereset|h|cFF%s/HydraUI movereset|r|h - 将所有移动框架重新定位到默认位置"
-L["|Hcommand:/HydraUI keybind|h|cFF%s/HydraUI keybind|r|h - Toggle mouseover keybinding"] = "|Hcommand:/HydraUI keybind|h|cFF%s/HydraUI keybind|r|h - 切换鼠标悬停按键绑定"
-L["|Hcommand:/HydraUI reset|h|cFF%s/HydraUI reset|r|h - Reset all stored UI information and settings"] = "|Hcommand:/HydraUI reset|h|cFF%s/HydraUI reset|r|h - 重置所有存储的UI信息和设置"
+L["|cFF%sYxUI|r Commands"] = "|cFF%sYxUI|r 命令"
+L["|Hcommand:/YxUI|h|cFF%s/YxUI|r|h - Toggle the settings window"] = "|Hcommand:/YxUI|h|cFF%s/YxUI|r|h - 切换设置窗口"
+L["|Hcommand:/YxUI move|h|cFF%s/YxUI move|r|h - Drag UI elements around the screen"] = "|Hcommand:/YxUI move|h|cFF%s/YxUI move|r|h - 在屏幕上拖动UI元素"
+L["|Hcommand:/YxUI movereset|h|cFF%s/YxUI movereset|r|h - Reposition all movers to their default locations"] = "|Hcommand:/YxUI movereset|h|cFF%s/YxUI movereset|r|h - 将所有移动框架重新定位到默认位置"
+L["|Hcommand:/YxUI keybind|h|cFF%s/YxUI keybind|r|h - Toggle mouseover keybinding"] = "|Hcommand:/YxUI keybind|h|cFF%s/YxUI keybind|r|h - 切换鼠标悬停按键绑定"
+L["|Hcommand:/YxUI reset|h|cFF%s/YxUI reset|r|h - Reset all stored UI information and settings"] = "|Hcommand:/YxUI reset|h|cFF%s/YxUI reset|r|h - 重置所有存储的UI信息和设置"
 
 -- Cooldowns
 L["|cff%s%s|r is ready!"] = "|cff%s%s|r 已准备好！"
@@ -458,7 +458,7 @@ L["Loaded Plugins"] = "已加载插件"
 L["Experience"] = "经验"
 L["Enable"] = "启用"
 L["Enable Experience Module"] = "启用经验模块"
-L["Enable the HydraUI experience module"] = "启用HydraUI经验模块"
+L["Enable the YxUI experience module"] = "启用YxUI经验模块"
 L["Display Level"] = "显示等级"
 L["Display your current level in the experience bar"] = "在经验条中显示当前等级"
 L["Display Progress Value"] = "显示进度值"
@@ -560,7 +560,7 @@ L["You require %s to repair all equipped items (costs %s total)"] = "您需要%s
 -- Minimap
 L["Minimap"] = "小地图"
 L["Enable Mini Map Module"] = "启用小地图模块"
-L["Enable the HydraUI mini map module"] = "启用HydraUI小地图模块"
+L["Enable the YxUI mini map module"] = "启用YxUI小地图模块"
 L["Mini Map Size"] = "小地图大小"
 L["Set the size of the mini map"] = "设置小地图的大小"
 L["Enable Top Bar"] = "启用顶部栏"
@@ -643,7 +643,7 @@ L["All"] = "全部"
 -- Reputation
 L["Reputation"] = "声望"
 L["Enable Reputation Module"] = "启用声望模块"
-L["Enable the HydraUI reputation module"] = "启用HydraUI声望模块"
+L["Enable the YxUI reputation module"] = "启用YxUI声望模块"
 L["Display Progress Value"] = "显示进度值"
 L["Display your current progress information in the reputation bar"] = "在声望条中显示当前进度信息"
 L["Display Percent Value"] = "显示百分比值"
@@ -703,7 +703,7 @@ L["This action will delete ALL saved UI information. Are you sure you wish to co
 -- Tooltips
 L["Tooltips"] = "工具提示"
 L["Enable Tooltips Module"] = "启用工具提示模块"
-L["Enable the HydraUI tooltips module"] = "启用HydraUI工具提示模块"
+L["Enable the YxUI tooltips module"] = "启用YxUI工具提示模块"
 L["Health Bar"] = "生命条"
 L["Display Health Bar"] = "显示生命条"
 L["Display the tooltip health bar"] = "显示工具提示生命条"
@@ -783,7 +783,7 @@ L["Display the timer on unit frame auras"] = "在单位框架光环上显示计�
 -- Individual unit frames not included yet, as options will be standardized
 
 -- Update
-L["You can get an updated version of HydraUI at https://www.curseforge.com/wow/addons/hydraui"] = "您可以在https://www.curseforge.com/wow/addons/hydraui获取更新版本的HydraUI"
+L["You can get an updated version of YxUI at https://www.curseforge.com/wow/addons/YxUI"] = "您可以在https://www.curseforge.com/wow/addons/YxUI获取更新版本的YxUI"
 L["Join the Discord community for support and feedback https://discord.gg/XefDFa6nJR"] = "加入Discord社区以获取支持和反馈 https://discord.gg/XefDFa6nJR"
 L["New Version!"] = "新版本！"
 L["Update to version |cFF%s%s|r"] = "更新到版本 |cFF%s%s|r"

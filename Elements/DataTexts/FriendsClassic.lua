@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetNumFriends = C_FriendList.GetNumFriends
 local GetNumOnlineFriends = C_FriendList.GetNumOnlineFriends
@@ -241,12 +241,12 @@ ClientInfo["WoW"] = function(name, id)
 		Class = GetClass(Class)
 	end
 
-	local ClassColor = HydraUI.ClassColors[Class]
+	local ClassColor = YxUI.ClassColors[Class]
 
-	ClassColor = HydraUI:RGBToHex(ClassColor[1], ClassColor[2], ClassColor[3])
+	ClassColor = YxUI:RGBToHex(ClassColor[1], ClassColor[2], ClassColor[3])
 
 	local LevelColor = GetQuestDifficultyColor(Level)
-	LevelColor = HydraUI:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
+	LevelColor = YxUI:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
 
 	if IsAFK then
 		name = format("|cFF00FFF6(%s)|r |cFFFFFF33%s|r", name, CHAT_FLAG_AFK)
@@ -341,9 +341,9 @@ local OnEnter = function(self)
 		CurrentZone = GetRealZoneText()
 	end
 
-	if HydraUI.IsTBC then
+	if YxUI.IsTBC then
 		ID = 5
-	elseif HydraUI.IsWrath then
+	elseif YxUI.IsWrath then
 		ID = 11
 	end
 
@@ -376,12 +376,12 @@ local OnEnter = function(self)
 				Class = "PRIEST"
 			end
 
-			local ClassColor = HydraUI.ClassColors[Class]
+			local ClassColor = YxUI.ClassColors[Class]
 
-			ClassColor = HydraUI:RGBToHex(ClassColor[1], ClassColor[2], ClassColor[3])
+			ClassColor = YxUI:RGBToHex(ClassColor[1], ClassColor[2], ClassColor[3])
 
 			local LevelColor = GetQuestDifficultyColor(FriendInfo.level)
-			LevelColor = HydraUI:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
+			LevelColor = YxUI:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
 
 			if FriendInfo.afk then
 				Name = format("%s |cFFFFFF33%s|r", FriendInfo.name, CHAT_FLAG_AFK)
@@ -446,7 +446,7 @@ local Update = function(self)
 	local NumBNFriends, NumBNOnline = BNGetNumFriends()
 	local Online = NumOnline + NumBNOnline
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, Online)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Online)
 
 	if self.TooltipShown then
 		OnLeave(self)
@@ -498,4 +498,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Friends", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Friends", OnEnable, OnDisable, Update)

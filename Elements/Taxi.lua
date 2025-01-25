@@ -1,9 +1,9 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local Taxi = HydraUI:NewModule("Vehicle")
+local Taxi = YxUI:NewModule("Vehicle")
 
 function Taxi:OnEnter()
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-widget-font-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-widget-font-color"])
 
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, -6)
 	GameTooltip:AddLine(TAXI_CANCEL_DESCRIPTION, R, G, B)
@@ -31,8 +31,8 @@ end
 
 function Taxi:Load()
 	self:SetSize(Settings["minimap-size"] + 8, 22)
-	self:SetBackdrop(HydraUI.BackdropAndBorder)
-	self:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-bg-color"]))
+	self:SetBackdrop(YxUI.BackdropAndBorder)
+	self:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-bg-color"]))
 	self:SetBackdropBorderColor(0, 0, 0)
 	self:SetFrameStrata("HIGH")
 	self:SetFrameLevel(10)
@@ -52,19 +52,19 @@ function Taxi:Load()
 	self.Texture:SetPoint("TOPLEFT", self, 1, -1)
 	self.Texture:SetPoint("BOTTOMRIGHT", self, -1, 1)
 	self.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-	self.Texture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-header-texture-color"]))
+	self.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-header-texture-color"]))
 
 	self.Text = self:CreateFontString(nil, "OVERLAY")
 	self.Text:SetPoint("CENTER", self, 0, -1)
-	HydraUI:SetFontInfo(self.Text, Settings["ui-header-font"], Settings["ui-font-size"])
+	YxUI:SetFontInfo(self.Text, Settings["ui-header-font"], Settings["ui-font-size"])
 	self.Text:SetSize(self:GetWidth() - 12, 20)
 	self.Text:SetText(Language["Land Early"])
 
 	if Settings["minimap-enable"] then
-		self:SetPoint("TOP", _G["HydraUI Minimap"], "BOTTOM", 0, -2)
+		self:SetPoint("TOP", _G["YxUI Minimap"], "BOTTOM", 0, -2)
 	else
-		self:SetPoint("TOP", HydraUI.UIParent, 0, -120)
+		self:SetPoint("TOP", YxUI.UIParent, 0, -120)
 	end
 
-	HydraUI:CreateMover(self)
+	YxUI:CreateMover(self)
 end

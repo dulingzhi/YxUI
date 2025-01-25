@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetContainerNumSlots = GetContainerNumSlots
 local GetContainerNumFreeSlots = GetContainerNumFreeSlots
@@ -23,7 +23,7 @@ local Update = function(self)
 		end
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, ShardCount)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, ShardCount)
 end
 
 local OnEnable = function(self)
@@ -40,4 +40,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Soul Shards", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Soul Shards", OnEnable, OnDisable, Update)

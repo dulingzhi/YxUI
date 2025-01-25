@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetRangedCritChance = GetRangedCritChance
 local GetSpellCritChance = GetSpellCritChance
@@ -12,7 +12,7 @@ local OnEnter = function(self)
 	local Spell = GetSpellCritChance()
 	local Melee = GetCritChance()
 
-	if (HydraUI.UserClass == "HUNTER") then
+	if (YxUI.UserClass == "HUNTER") then
 		GameTooltip:AddLine(format("%s %.2f%%", RANGED_CRIT_CHANCE, GetRangedCritChance()))
 		GameTooltip:AddLine(format(CR_CRIT_TOOLTIP, GetCombatRating(CR_CRIT_RANGED), GetCombatRatingBonus(CR_CRIT_RANGED)), 1, 1, 1)
 	elseif (Spell > Melee) then
@@ -47,7 +47,7 @@ local Update = function(self, event, unit)
 	local Spell = GetSpellCritChance()
 	local Melee = GetCritChance()
 
-	if (HydraUI.UserClass == "HUNTER") then
+	if (YxUI.UserClass == "HUNTER") then
 		Crit = GetRangedCritChance()
 	elseif (Spell > Melee) then
 		Crit = Spell
@@ -55,7 +55,7 @@ local Update = function(self, event, unit)
 		Crit = Melee
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.2f%%|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, Crit)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.2f%%|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Crit)
 end
 
 local OnEnable = function(self)
@@ -84,4 +84,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Crit", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Crit", OnEnable, OnDisable, Update)

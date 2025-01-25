@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 Defaults["party-pets-enable"] = true
 Defaults["party-pets-width"] = 78
@@ -9,9 +9,9 @@ Defaults["party-pets-health-orientation"] = "HORIZONTAL"
 Defaults["party-pets-health-smooth"] = true
 Defaults["party-pets-power-height"] = 0 -- NYI
 
-local UF = HydraUI:GetModule("Unit Frames")
+local UF = YxUI:GetModule("Unit Frames")
 
-HydraUI.StyleFuncs["partypet"] = function(self, unit)
+YxUI.StyleFuncs["partypet"] = function(self, unit)
 	-- General
 	self:RegisterForClicks("AnyUp")
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
@@ -26,7 +26,7 @@ HydraUI.StyleFuncs["partypet"] = function(self, unit)
 	local Threat = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	Threat:SetPoint("TOPLEFT", -1, 1)
 	Threat:SetPoint("BOTTOMRIGHT", 1, -1)
-	Threat:SetBackdrop(HydraUI.Outline)
+	Threat:SetBackdrop(YxUI.Outline)
 	Threat.PostUpdate = UF.ThreatPostUpdate
 
 	self.ThreatIndicator = Threat
@@ -55,7 +55,7 @@ HydraUI.StyleFuncs["partypet"] = function(self, unit)
 
 	self.HealBar = HealBar
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		local AbsorbsBar = CreateFrame("StatusBar", nil, Health)
 		AbsorbsBar:SetWidth(Settings["party-width"])
 		AbsorbsBar:SetHeight(Settings["party-health-height"])
@@ -93,7 +93,7 @@ HydraUI.StyleFuncs["partypet"] = function(self, unit)
 	end
 
 	local HealthMiddle = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthMiddle, Settings["party-font"], Settings["party-font-size"], Settings["party-font-flags"])
+	YxUI:SetFontInfo(HealthMiddle, Settings["party-font"], Settings["party-font-size"], Settings["party-font-flags"])
 	HealthMiddle:SetPoint("CENTER", Health, 0, 0)
 	HealthMiddle:SetJustifyH("CENTER")
 
@@ -124,11 +124,11 @@ HydraUI.StyleFuncs["partypet"] = function(self, unit)
 end
 
 local UpdateHealthTexture = function(value)
-	if HydraUI.UnitFrames["partypet"] then
+	if YxUI.UnitFrames["partypet"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["partypet"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["partypet"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["partypet"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["partypet"]:GetChildren())
 
 			if Unit then
 				Unit.Health:SetStatusBarTexture(Assets:GetTetxure(value))
@@ -144,11 +144,11 @@ local UpdateHealthTexture = function(value)
 end
 
 local UpdatePowerTexture = function(value)
-	if HydraUI.UnitFrames["partypet"] then
+	if YxUI.UnitFrames["partypet"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["partypet"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["partypet"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["partypet"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["partypet"]:GetChildren())
 
 			if Unit then
 				Unit.Power:SetStatusBarTexture(Assets:GetTexture(value))
@@ -158,7 +158,7 @@ local UpdatePowerTexture = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Party Pets"], Language["Unit Frames"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Party Pets"], Language["Unit Frames"], function(left, right)
 	left:CreateHeader(Language["Enable"])
 	left:CreateSwitch("party-pets-enable", Settings["party-pets-enable"], Language["Enable Party Pet Frames"], Language["Enable the party pet frames module"], ReloadUI):RequiresReload(true)
 

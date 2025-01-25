@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetNumSlots
 local GetNumFreeSlots
@@ -43,7 +43,7 @@ local OnEnter = function(self)
 		end
 	end
 
-	local Total, Profit = HydraUI:GetTrashValue()
+	local Total, Profit = YxUI:GetTrashValue()
 
 	if (Total > 0) then
 		GameTooltip:AddLine(" ")
@@ -70,7 +70,7 @@ local Update = function(self)
 		end
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s/%s|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, TotalSlots-FreeSlots, TotalSlots)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s/%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, TotalSlots-FreeSlots, TotalSlots)
 end
 
 local OnEnable = function(self)
@@ -93,4 +93,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Bag Slots", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Bag Slots", OnEnable, OnDisable, Update)

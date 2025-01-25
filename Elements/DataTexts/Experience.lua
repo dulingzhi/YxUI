@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local Message = BONUS_OBJECTIVE_EXPERIENCE_FORMAT
 
@@ -20,18 +20,18 @@ local OnEnter = function(self)
 	GameTooltip:AddLine(LEVEL .. " " .. UnitLevel("player"))
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddLine(Language["Current Experience"])
-	GameTooltip:AddDoubleLine(format("%s / %s", HydraUI:Comma(XP), HydraUI:Comma(Max)), format("%s%%", Percent), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(format("%s / %s", YxUI:Comma(XP), YxUI:Comma(Max)), format("%s%%", Percent), 1, 1, 1, 1, 1, 1)
 
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddLine(Language["Remaining Experience"])
-	GameTooltip:AddDoubleLine(format("%s", HydraUI:Comma(Remaining)), format("%s%%", RemainingPercent), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(format("%s", YxUI:Comma(Remaining)), format("%s%%", RemainingPercent), 1, 1, 1, 1, 1, 1)
 
 	if Rested then
 		local RestedPercent = floor((Rested / Max * 100 + 0.05) * 10) / 10
 
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(Language["Rested Experience"])
-		GameTooltip:AddDoubleLine(HydraUI:Comma(Rested), format("%s%%", RestedPercent), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(YxUI:Comma(Rested), format("%s%%", RestedPercent), 1, 1, 1, 1, 1, 1)
 	end
 
 	GameTooltip:Show()
@@ -51,7 +51,7 @@ local Update = function(self)
 
     local XP = UnitXP("player")
     local MaxXP = UnitXPMax("player")
-	local Value = "|cff" .. HydraUI.ValueColor .. floor((XP / MaxXP * 100 + 0.05) * 10) / 10 .. "%|r"
+	local Value = "|cff" .. YxUI.ValueColor .. floor((XP / MaxXP * 100 + 0.05) * 10) / 10 .. "%|r"
 
 	self.Text:SetFormattedText(Message, Value)
 end
@@ -86,4 +86,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText(POWER_TYPE_EXPERIENCE, OnEnable, OnDisable, Update)
+YxUI:AddDataText(POWER_TYPE_EXPERIENCE, OnEnable, OnDisable, Update)

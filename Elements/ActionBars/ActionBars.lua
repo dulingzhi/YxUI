@@ -1,7 +1,7 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-local AB = HydraUI:NewModule("Action Bars")
-local GUI = HydraUI:GetModule("GUI")
+local AB = YxUI:NewModule("Action Bars")
+local GUI = YxUI:GetModule("GUI")
 
 local IsUsableAction = IsUsableAction
 local NUM_PET_ACTION_SLOTS = NUM_PET_ACTION_SLOTS
@@ -41,7 +41,7 @@ Defaults["ab-bar2-button-max"] = 12
 Defaults["ab-bar2-per-row"] = 12
 Defaults["ab-bar2-alpha"] = 100
 
-Defaults["ab-bar3-enable"] = true
+Defaults["ab-bar3-enable"] = false
 Defaults["ab-bar3-hover"] = false
 Defaults["ab-bar3-button-size"] = 32
 Defaults["ab-bar3-button-gap"] = 2
@@ -49,7 +49,7 @@ Defaults["ab-bar3-button-max"] = 12
 Defaults["ab-bar3-per-row"] = 12
 Defaults["ab-bar3-alpha"] = 100
 
-Defaults["ab-bar4-enable"] = true
+Defaults["ab-bar4-enable"] = false
 Defaults["ab-bar4-hover"] = false
 Defaults["ab-bar4-button-size"] = 32
 Defaults["ab-bar4-button-gap"] = 2
@@ -57,7 +57,7 @@ Defaults["ab-bar4-button-max"] = 12
 Defaults["ab-bar4-per-row"] = 1
 Defaults["ab-bar4-alpha"] = 100
 
-Defaults["ab-bar5-enable"] = true
+Defaults["ab-bar5-enable"] = false
 Defaults["ab-bar5-hover"] = false
 Defaults["ab-bar5-button-size"] = 32
 Defaults["ab-bar5-button-gap"] = 2
@@ -232,7 +232,7 @@ function AB:StyleActionButton(button)
 	if button.HotKey then
 		button.HotKey:ClearAllPoints()
 		button.HotKey:SetPoint("TOPLEFT", button, 2, -3)
-		HydraUI:SetFontInfo(button.HotKey, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		YxUI:SetFontInfo(button.HotKey, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
 		button.HotKey:SetJustifyH("LEFT")
 		button.HotKey:SetTextColor(1, 1, 1)
 		button.HotKey.SetTextColor = function() end
@@ -266,7 +266,7 @@ function AB:StyleActionButton(button)
 		button.Name:ClearAllPoints()
 		button.Name:SetPoint("BOTTOMLEFT", button, 2, 2)
 		button.Name:SetWidth(button:GetWidth() - 4)
-		HydraUI:SetFontInfo(button.Name, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		YxUI:SetFontInfo(button.Name, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
 		button.Name:SetJustifyH("LEFT")
 		button.Name:SetTextColor(1, 1, 1)
 		button.Name.SetTextColor = function() end
@@ -279,7 +279,7 @@ function AB:StyleActionButton(button)
 	if button.Count then
 		button.Count:ClearAllPoints()
 		button.Count:SetPoint("BOTTOMRIGHT", button, -2, 2)
-		HydraUI:SetFontInfo(button.Count, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		YxUI:SetFontInfo(button.Count, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
 		button.Count:SetJustifyH("RIGHT")
 		button.Count:SetDrawLayer("OVERLAY")
 		button.Count:SetTextColor(1, 1, 1)
@@ -293,7 +293,7 @@ function AB:StyleActionButton(button)
 	button.Backdrop = CreateFrame("Frame", nil, button, "BackdropTemplate")
 	button.Backdrop:SetPoint("TOPLEFT", button, 0, 0)
 	button.Backdrop:SetPoint("BOTTOMRIGHT", button, 0, 0)
-	button.Backdrop:SetBackdrop(HydraUI.Backdrop)
+	button.Backdrop:SetBackdrop(YxUI.Backdrop)
 	button.Backdrop:SetBackdropColor(0, 0, 0)
 	button.Backdrop:SetFrameLevel(button:GetFrameLevel() - 1)
 
@@ -301,7 +301,7 @@ function AB:StyleActionButton(button)
 	button.Backdrop.Texture:SetPoint("TOPLEFT", button.Backdrop, 1, -1)
 	button.Backdrop.Texture:SetPoint("BOTTOMRIGHT", button.Backdrop, -1, 1)
 	button.Backdrop.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-	button.Backdrop.Texture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-window-main-color"]))
+	button.Backdrop.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
 
 	if button:GetCheckedTexture() then
 		local Checked = button:GetCheckedTexture()
@@ -352,7 +352,7 @@ function AB:StyleActionButton(button)
 		local FontString = button.cooldown:GetRegions()
 
 		if FontString then
-			HydraUI:SetFontInfo(FontString, Settings["ab-font"], Settings["ab-cd-size"], Settings["ab-font-flags"])
+			YxUI:SetFontInfo(FontString, Settings["ab-font"], Settings["ab-cd-size"], Settings["ab-font-flags"])
 		end
 	end
 
@@ -412,7 +412,7 @@ function AB:StylePetActionButton(button)
 	if button.HotKey then
 		button.HotKey:ClearAllPoints()
 		button.HotKey:SetPoint("TOPLEFT", button, 2, -3)
-		HydraUI:SetFontInfo(button.HotKey, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		YxUI:SetFontInfo(button.HotKey, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
 		button.HotKey:SetJustifyH("LEFT")
 		button.HotKey:SetDrawLayer("OVERLAY")
 		button.HotKey:SetTextColor(1, 1, 1)
@@ -438,7 +438,7 @@ function AB:StylePetActionButton(button)
 		button.Name:ClearAllPoints()
 		button.Name:SetPoint("BOTTOMLEFT", button, 2, 2)
 		button.Name:SetWidth(button:GetWidth() - 4)
-		HydraUI:SetFontInfo(button.Name, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		YxUI:SetFontInfo(button.Name, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
 		button.Name:SetJustifyH("LEFT")
 		button.Name:SetDrawLayer("OVERLAY")
 		button.Name:SetTextColor(1, 1, 1)
@@ -452,7 +452,7 @@ function AB:StylePetActionButton(button)
 	if button.Count then
 		button.Count:ClearAllPoints()
 		button.Count:SetPoint("BOTTOMRIGHT", button, -2, 2)
-		HydraUI:SetFontInfo(button.Count, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		YxUI:SetFontInfo(button.Count, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
 		button.Count:SetJustifyH("RIGHT")
 		button.Count:SetDrawLayer("OVERLAY")
 		button.Count:SetTextColor(1, 1, 1)
@@ -490,7 +490,7 @@ function AB:StylePetActionButton(button)
 	button.Backdrop = CreateFrame("Frame", nil, button, "BackdropTemplate")
 	button.Backdrop:SetPoint("TOPLEFT", button, 0, 0)
 	button.Backdrop:SetPoint("BOTTOMRIGHT", button, 0, 0)
-	button.Backdrop:SetBackdrop(HydraUI.Backdrop)
+	button.Backdrop:SetBackdrop(YxUI.Backdrop)
 	button.Backdrop:SetBackdropColor(0, 0, 0)
 	button.Backdrop:SetFrameLevel(button:GetFrameLevel() - 1)
 
@@ -498,7 +498,7 @@ function AB:StylePetActionButton(button)
 	button.Backdrop.Texture:SetPoint("TOPLEFT", button.Backdrop, 1, -1)
 	button.Backdrop.Texture:SetPoint("BOTTOMRIGHT", button.Backdrop, -1, 1)
 	button.Backdrop.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-	button.Backdrop.Texture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-window-main-color"]))
+	button.Backdrop.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
 
 	button.Styled = true
 end
@@ -532,14 +532,14 @@ function AB:UpdateButtonStatus(check, inrange)
 
 	if IsUsable then
 		if (inrange == false) then
-			self.icon:SetVertexColor(HydraUI:HexToRGB("FF4C19"))
+			self.icon:SetVertexColor(YxUI:HexToRGB("FF4C19"))
 		else
-			self.icon:SetVertexColor(HydraUI:HexToRGB("FFFFFF"))
+			self.icon:SetVertexColor(YxUI:HexToRGB("FFFFFF"))
 		end
 	elseif NoMana then
-		self.icon:SetVertexColor(HydraUI:HexToRGB("7F7FE1"))
+		self.icon:SetVertexColor(YxUI:HexToRGB("7F7FE1"))
 	else
-		self.icon:SetVertexColor(HydraUI:HexToRGB("4C4C4C"))
+		self.icon:SetVertexColor(YxUI:HexToRGB("4C4C4C"))
 	end
 end
 
@@ -597,8 +597,8 @@ end
 
 -- Bar 1
 function AB:CreateBar1()
-	self.Bar1 = CreateFrame("Frame", "HydraUI Action Bar 1", HydraUI.UIParent, "SecureHandlerStateTemplate")
-	self.Bar1:SetPoint("BOTTOM", HydraUI.UIParent, "BOTTOM", 0, 13)
+	self.Bar1 = CreateFrame("Frame", "YxUI Action Bar 1", YxUI.UIParent, "SecureHandlerStateTemplate")
+	self.Bar1:SetPoint("BOTTOM", YxUI.UIParent, "BOTTOM", 0, 13)
 	self.Bar1:SetAlpha(Settings["ab-bar1-alpha"] / 100)
 	self.Bar1.ShouldFade = Settings["ab-bar1-hover"]
 	self.Bar1.MaxAlpha = Settings["ab-bar1-alpha"]
@@ -642,9 +642,29 @@ function AB:CreateBar1()
 		end
 	]])
 
-	if HydraUI.IsClassic then
+	if YxUI.IsClassic then
 		self.Bar1:SetAttribute("_onstate-page", [[
 			if GetOverrideBarIndex and HasOverrideActionBar() then
+				newstate = GetOverrideBarIndex() or newstate
+			elseif HasTempShapeshiftActionBar() then
+				newstate = GetTempShapeshiftBarIndex() or newstate
+			elseif HasBonusActionBar() and GetActionBarPage() == 1 then
+				newstate = GetBonusBarIndex() or newstate
+			else
+				newstate = GetActionBarPage() or newstate
+			end
+
+			for i = 1, 12 do
+				Buttons[i]:SetAttribute("actionpage", newstate)
+			end
+		]])
+
+		RegisterAttributeDriver(self.Bar1, "state-page", "[overridebar] 14; [shapeshift] 13; [possessbar] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6; [bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10; [bonusbar:5] 11; [form] 1; 1")
+	elseif YxUI.IsWrath then
+		self.Bar1:SetAttribute("_onstate-page", [[
+			if GetVehicleBarIndex and HasVehicleActionBar() then
+				newstate = GetVehicleBarIndex()
+			elseif HasOverrideActionBar and HasOverrideActionBar() then
 				newstate = GetOverrideBarIndex() or newstate
 			elseif HasTempShapeshiftActionBar() then
 				newstate = GetTempShapeshiftBarIndex() or newstate
@@ -695,7 +715,7 @@ end
 
 -- Bar 2
 function AB:CreateBar2()
-	self.Bar2 = CreateFrame("Frame", "HydraUI Action Bar 2", HydraUI.UIParent, "SecureHandlerStateTemplate")
+	self.Bar2 = CreateFrame("Frame", "YxUI Action Bar 2", YxUI.UIParent, "SecureHandlerStateTemplate")
 	self.Bar2:SetPoint("BOTTOM", self.Bar1, "TOP", 0, Settings["ab-bar2-button-gap"])
 	self.Bar2:SetAlpha(Settings["ab-bar2-alpha"] / 100)
 	self.Bar2.ButtonParent = MultiBarBottomLeft
@@ -742,7 +762,7 @@ end
 
 -- Bar 3
 function AB:CreateBar3()
-	self.Bar3 = CreateFrame("Frame", "HydraUI Action Bar 3", HydraUI.UIParent, "SecureHandlerStateTemplate")
+	self.Bar3 = CreateFrame("Frame", "YxUI Action Bar 3", YxUI.UIParent, "SecureHandlerStateTemplate")
 	self.Bar3:SetPoint("BOTTOM", self.Bar2, "TOP", 0, Settings["ab-bar3-button-gap"])
 	self.Bar3:SetAlpha(Settings["ab-bar3-alpha"] / 100)
 	self.Bar3.ButtonParent = MultiBarBottomRight
@@ -789,8 +809,8 @@ end
 
 -- Bar 4
 function AB:CreateBar4()
-	self.Bar4 = CreateFrame("Frame", "HydraUI Action Bar 4", HydraUI.UIParent, "SecureHandlerStateTemplate")
-	self.Bar4:SetPoint("RIGHT", HydraUI.UIParent, -12, 0)
+	self.Bar4 = CreateFrame("Frame", "YxUI Action Bar 4", YxUI.UIParent, "SecureHandlerStateTemplate")
+	self.Bar4:SetPoint("RIGHT", YxUI.UIParent, -12, 0)
 	self.Bar4:SetAlpha(Settings["ab-bar4-alpha"] / 100)
 	self.Bar4.ButtonParent = MultiBarRight
 	self.Bar4.ShouldFade = Settings["ab-bar4-hover"]
@@ -836,7 +856,7 @@ end
 
 -- Bar 5
 function AB:CreateBar5()
-	self.Bar5 = CreateFrame("Frame", "HydraUI Action Bar 5", HydraUI.UIParent, "SecureHandlerStateTemplate")
+	self.Bar5 = CreateFrame("Frame", "YxUI Action Bar 5", YxUI.UIParent, "SecureHandlerStateTemplate")
 	self.Bar5:SetPoint("RIGHT", self.Bar4, "LEFT", -Settings["ab-bar5-button-gap"], 0)
 	self.Bar5:SetAlpha(Settings["ab-bar5-alpha"] / 100)
 	self.Bar5.ButtonParent = MultiBarLeft
@@ -883,7 +903,7 @@ end
 
 -- Bar 6
 function AB:CreateBar6()
-	self.Bar6 = CreateFrame("Frame", "HydraUI Action Bar 6", HydraUI.UIParent, "SecureHandlerStateTemplate")
+	self.Bar6 = CreateFrame("Frame", "YxUI Action Bar 6", YxUI.UIParent, "SecureHandlerStateTemplate")
 	self.Bar6:SetPoint("RIGHT", self.Bar5, "LEFT", -Settings["ab-bar6-button-gap"], 0)
 	self.Bar6:SetAlpha(Settings["ab-bar6-alpha"] / 100)
 	self.Bar6.ButtonParent = MultiBar5
@@ -930,7 +950,7 @@ end
 
 -- Bar 7
 function AB:CreateBar7()
-	self.Bar7 = CreateFrame("Frame", "HydraUI Action Bar 7", HydraUI.UIParent, "SecureHandlerStateTemplate")
+	self.Bar7 = CreateFrame("Frame", "YxUI Action Bar 7", YxUI.UIParent, "SecureHandlerStateTemplate")
 	self.Bar7:SetPoint("RIGHT", self.Bar6, "LEFT", -Settings["ab-bar7-button-gap"], 0)
 	self.Bar7:SetAlpha(Settings["ab-bar7-alpha"] / 100)
 	self.Bar7.ButtonParent = MultiBar6
@@ -977,7 +997,7 @@ end
 
 -- Bar 8
 function AB:CreateBar8()
-	self.Bar8 = CreateFrame("Frame", "HydraUI Action Bar 8", HydraUI.UIParent, "SecureHandlerStateTemplate")
+	self.Bar8 = CreateFrame("Frame", "YxUI Action Bar 8", YxUI.UIParent, "SecureHandlerStateTemplate")
 	self.Bar8:SetPoint("RIGHT", self.Bar7, "LEFT", -Settings["ab-bar8-button-gap"], 0)
 	self.Bar8:SetAlpha(Settings["ab-bar8-alpha"] / 100)
 	self.Bar8.ButtonParent = MultiBar7
@@ -1032,7 +1052,7 @@ end
 
 -- Pet
 function AB:CreatePetBar()
-	self.PetBar = CreateFrame("Frame", "HydraUI Pet Bar", HydraUI.UIParent, "SecureHandlerStateTemplate")
+	self.PetBar = CreateFrame("Frame", "YxUI Pet Bar", YxUI.UIParent, "SecureHandlerStateTemplate")
 	self.PetBar:SetPoint("RIGHT", self.Bar5, "LEFT", -Settings["ab-pet-button-gap"], 0)
 	self.PetBar:SetAlpha(Settings["ab-pet-alpha"] / 100)
 	self.PetBar.ButtonParent = PetActionBar or PetActionBarFrame
@@ -1105,8 +1125,8 @@ local StanceBarUpdateGridLayout = function()
 end
 
 function AB:CreateStanceBar()
-	self.StanceBar = CreateFrame("Frame", "HydraUI Stance Bar", HydraUI.UIParent, "SecureHandlerStateTemplate")
-	self.StanceBar:SetPoint("TOPLEFT", HydraUI.UIParent, 10, -10)
+	self.StanceBar = CreateFrame("Frame", "YxUI Stance Bar", YxUI.UIParent, "SecureHandlerStateTemplate")
+	self.StanceBar:SetPoint("TOPLEFT", YxUI.UIParent, 10, -10)
 	self.StanceBar:SetAlpha(Settings["ab-stance-alpha"] / 100)
 	self.StanceBar.ButtonParent = StanceBar or StanceBarFrame
 	self.StanceBar.ShouldFade = Settings["ab-stance-hover"]
@@ -1209,7 +1229,7 @@ local SkinZoneAbilityButtons = function()
 			Button.Backdrop = CreateFrame("Frame", nil, Button, "BackdropTemplate")
 			Button.Backdrop:SetPoint("TOPLEFT", Button, -1, 1)
 			Button.Backdrop:SetPoint("BOTTOMRIGHT", Button, 1, -1)
-			Button.Backdrop:SetBackdrop(HydraUI.Backdrop)
+			Button.Backdrop:SetBackdrop(YxUI.Backdrop)
 			Button.Backdrop:SetBackdropColor(0, 0, 0)
 			Button.Backdrop:SetFrameLevel(Button:GetFrameLevel() - 1)
 
@@ -1235,9 +1255,9 @@ end
 
 -- Extra Bar
 function AB:CreateExtraBar()
-	self.ExtraBar = CreateFrame("Frame", "HydraUI Extra Action", HydraUI.UIParent, "SecureHandlerStateTemplate")
+	self.ExtraBar = CreateFrame("Frame", "YxUI Extra Action", YxUI.UIParent, "SecureHandlerStateTemplate")
 	self.ExtraBar:SetSize(Settings["ab-extra-button-size"], Settings["ab-extra-button-size"])
-	self.ExtraBar:SetPoint("CENTER", HydraUI.UIParent, 0, -220)
+	self.ExtraBar:SetPoint("CENTER", YxUI.UIParent, 0, -220)
 
 	ExtraActionBarFrame:ClearAllPoints()
 	ExtraActionBarFrame:SetAllPoints(self.ExtraBar)
@@ -1296,7 +1316,7 @@ function AB:CreateBars()
 		self:CreateStanceBar()
 	end
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		self:CreateExtraBar()
 	end
 
@@ -1314,7 +1334,7 @@ local Bar1PreMove = function(self)
 
 	AB.Bar1:Hide()
 	AB.Bar1:ClearAllPoints() -- Clear the bar from the mover
-	AB.Bar1:SetPoint(A1, HydraUI.UIParent, A2, X, Y)
+	AB.Bar1:SetPoint(A1, YxUI.UIParent, A2, X, Y)
 end
 
 local Bar1PostMove = function(self)
@@ -1326,36 +1346,36 @@ local Bar1PostMove = function(self)
 	AB.Bar1:SetPoint("CENTER", self, 0, 0) -- Position the frame to the mover again
 	AB.Bar1:Show()
 
-	self:SetPoint(A1, HydraUI.UIParent, A2, X, Y)
+	self:SetPoint(A1, YxUI.UIParent, A2, X, Y)
 end
 
 function AB:CreateMovers()
-	self.Bar1Mover = HydraUI:CreateMover(self.Bar1)
-	HydraUI:CreateMover(self.Bar2)
-	HydraUI:CreateMover(self.Bar3)
-	HydraUI:CreateMover(self.Bar4)
-	HydraUI:CreateMover(self.Bar5)
+	self.Bar1Mover = YxUI:CreateMover(self.Bar1)
+	YxUI:CreateMover(self.Bar2)
+	YxUI:CreateMover(self.Bar3)
+	YxUI:CreateMover(self.Bar4)
+	YxUI:CreateMover(self.Bar5)
 
 	if self.Bar6 then
-		HydraUI:CreateMover(self.Bar6)
-		HydraUI:CreateMover(self.Bar7)
-		HydraUI:CreateMover(self.Bar8)
+		YxUI:CreateMover(self.Bar6)
+		YxUI:CreateMover(self.Bar7)
+		YxUI:CreateMover(self.Bar8)
 	end
 
 	if self.StanceBar then
-		HydraUI:CreateMover(self.StanceBar)
+		YxUI:CreateMover(self.StanceBar)
 	end
 
 	if self.PetBar then
-		HydraUI:CreateMover(self.PetBar)
+		YxUI:CreateMover(self.PetBar)
 	end
 
 	if self.TotemBar then
-		HydraUI:CreateMover(self.TotemBar)
+		YxUI:CreateMover(self.TotemBar)
 	end
 
-	if HydraUI.IsMainline then
-		self.ExtraBarMover = HydraUI:CreateMover(self.ExtraBar)
+	if YxUI.IsMainline then
+		self.ExtraBarMover = YxUI:CreateMover(self.ExtraBar)
 	end
 
 	self.Bar1Mover.PreMove = Bar1PreMove
@@ -1407,7 +1427,7 @@ function AB:UpdateEmptyButtons()
 						Button:ShowGrid(ACTION_BUTTON_SHOW_GRID_REASON_EVENT)
 					end
 
-					if HydraUI.IsMainline then
+					if YxUI.IsMainline then
 						Button:SetAttribute("showgrid", 1)
 					else
 						Button:SetAttribute("showgrid", 2)
@@ -1482,7 +1502,7 @@ local MultiCastFlyoutFrame_LoadSlotSpells = function(parent, slotid)
 		FlyoutButton.Backdrop = CreateFrame("Frame", nil, FlyoutButton, "BackdropTemplate")
 		FlyoutButton.Backdrop:SetPoint("TOPLEFT", FlyoutButton, -1, 1)
 		FlyoutButton.Backdrop:SetPoint("BOTTOMRIGHT", FlyoutButton, 1, -1)
-		FlyoutButton.Backdrop:SetBackdrop(HydraUI.Backdrop)
+		FlyoutButton.Backdrop:SetBackdrop(YxUI.Backdrop)
 		FlyoutButton.Backdrop:SetBackdropColor(0, 0, 0)
 		FlyoutButton.Backdrop:SetFrameLevel(FlyoutButton:GetFrameLevel() - 1)
 
@@ -1490,7 +1510,7 @@ local MultiCastFlyoutFrame_LoadSlotSpells = function(parent, slotid)
 		FlyoutButton.Backdrop.Texture:SetPoint("TOPLEFT", FlyoutButton.Backdrop, 1, -1)
 		FlyoutButton.Backdrop.Texture:SetPoint("BOTTOMRIGHT", FlyoutButton.Backdrop, -1, 1)
 		FlyoutButton.Backdrop.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-		FlyoutButton.Backdrop.Texture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-window-main-color"]))
+		FlyoutButton.Backdrop.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
 
 		local Highlight = FlyoutButton:GetHighlightTexture()
 		Highlight:SetTexture(Assets:GetTexture(Settings["action-bars-button-highlight"]))
@@ -1514,8 +1534,8 @@ local MultiCastFlyoutFrame_LoadSlotSpells = function(parent, slotid)
 end
 
 function AB:StyleTotemBar()
-	self.TotemBar = CreateFrame("Frame", "HydraUI Totem Bar", HydraUI.UIParent, "SecureHandlerStateTemplate")
-	self.TotemBar:SetPoint("BOTTOMLEFT", HydraUI.UIParent, 408, 13)
+	self.TotemBar = CreateFrame("Frame", "YxUI Totem Bar", YxUI.UIParent, "SecureHandlerStateTemplate")
+	self.TotemBar:SetPoint("BOTTOMLEFT", YxUI.UIParent, 408, 13)
 	self.TotemBar:SetSize((30 * 6) + (2 * 5), 30)
 
 	MultiCastActionBarFrame:SetParent(self.TotemBar)
@@ -1607,7 +1627,7 @@ function AB:Load()
 	self:CreateMovers()
 	self:UpdateEmptyButtons()
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		MainMenuBar.GetBottomAnchoredHeight = GetBarHeight
 		OverrideActionBar.GetBottomAnchoredHeight = GetBarHeight
 		MultiBarBottomLeft.GetBottomAnchoredHeight = GetBarHeight
@@ -1895,22 +1915,22 @@ end
 
 function AB:UpdateButtonFont(button)
 	if button.HotKey then
-		HydraUI:SetFontInfo(button.HotKey, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		YxUI:SetFontInfo(button.HotKey, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
 	end
 
 	if button.Name then
-		HydraUI:SetFontInfo(button.Name, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		YxUI:SetFontInfo(button.Name, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
 	end
 
 	if button.Count then
-		HydraUI:SetFontInfo(button.Count, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		YxUI:SetFontInfo(button.Count, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
 	end
 
 	if button.cooldown then
 		local Cooldown = button.cooldown:GetRegions()
 
 		if Cooldown then
-			HydraUI:SetFontInfo(Cooldown, Settings["ab-font"], Settings["ab-cd-size"], Settings["ab-font-flags"])
+			YxUI:SetFontInfo(Cooldown, Settings["ab-font"], Settings["ab-cd-size"], Settings["ab-font-flags"])
 		end
 	end
 end
@@ -2303,7 +2323,7 @@ GUI:AddWidgets(Language["General"], Language["Bar 5"], Language["Action Bars"], 
 	right:CreateSlider("ab-bar5-button-gap", Settings["ab-bar5-button-gap"], -1, 8, 1, Language["Button Spacing"], Language["Set the spacing between action buttons"], UpdateBar5)
 end)
 
-if HydraUI.IsMainline then
+if YxUI.IsMainline then
 	GUI:AddWidgets(Language["General"], Language["Bar 6"], Language["Action Bars"], function(left, right)
 		left:CreateHeader(Language["Enable"])
 		left:CreateSwitch("ab-bar6-enable", Settings["ab-bar6-enable"], Language["Enable Bar"], Language["Enable action bar 6"], UpdateEnableBar6)

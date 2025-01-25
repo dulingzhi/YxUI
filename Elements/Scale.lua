@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 Defaults["enable-scale"] = true
 
@@ -7,13 +7,13 @@ local ScaleOnAccept = function()
 
 	C_CVar.SetCVar("uiScale", Scale)
 
-	local Widget = HydraUI:GetModule("GUI"):GetWidget("ui-scale")
+	local Widget = YxUI:GetModule("GUI"):GetWidget("ui-scale")
 	Widget.Slider:SetValue(Scale)
 	Widget.Slider.EditBox:SetText(Scale)
 end
 
 local SetSuggestedScale = function()
-	HydraUI:DisplayPopup(Language["Attention"], format(Language["Are you sure you would like to change your UI scale to %s?"], (768 / select(2, GetPhysicalScreenSize()))), ACCEPT, ScaleOnAccept, CANCEL)
+	YxUI:DisplayPopup(Language["Attention"], format(Language["Are you sure you would like to change your UI scale to %s?"], (768 / select(2, GetPhysicalScreenSize()))), ACCEPT, ScaleOnAccept, CANCEL)
 end
 
 local UpdateScaleCVar = function(value)
@@ -21,14 +21,14 @@ local UpdateScaleCVar = function(value)
 end
 
 local SetScaleFromSlider = function(value)
-	HydraUI:DisplayPopup(Language["Attention"], format(Language["Are you sure you would like to change your UI scale to %s?"], value), ACCEPT, UpdateScaleCVar, CANCEL, nil, value)
+	YxUI:DisplayPopup(Language["Attention"], format(Language["Are you sure you would like to change your UI scale to %s?"], value), ACCEPT, UpdateScaleCVar, CANCEL, nil, value)
 end
 
 local UseUIScale = function(value)
 	C_CVar.SetCVar("useUiScale", value == true and "1" or "0")
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
 	right:CreateHeader(Language["Scale"])
 	right:CreateSwitch("enable-scale", C_CVar.GetCVar("useUiScale") == "1" and true or false, USE_UISCALE, OPTION_TOOLTIP_USE_UISCALE, UseUIScale)
 	right:CreateButton("", Language["Apply"], Language["Set Suggested Scale"], Language["Apply the recommended scale based on your resolution"], SetSuggestedScale)

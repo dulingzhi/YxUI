@@ -1,11 +1,11 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local UnitArmor = UnitArmor
 local Label = Language["Armor"]
 
 local OnEnter
 
-if HydraUI.IsMainline then
+if YxUI.IsMainline then
 	OnEnter = function(self)
 		self:SetTooltip()
 
@@ -13,7 +13,7 @@ if HydraUI.IsMainline then
 		local ArmorReduction = PaperDollFrame_GetArmorReduction(EffectiveArmor, UnitEffectiveLevel("player"))
 		local AgainstTarget = PaperDollFrame_GetArmorReductionAgainstTarget(EffectiveArmor)
 
-		GameTooltip:AddLine(format("%s %s", Label, HydraUI:Comma(EffectiveArmor)), 1, 1, 1)
+		GameTooltip:AddLine(format("%s %s", Label, YxUI:Comma(EffectiveArmor)), 1, 1, 1)
 		GameTooltip:AddLine(format(STAT_ARMOR_TOOLTIP, ArmorReduction), nil, nil, nil, true)
 
 		if AgainstTarget then
@@ -31,7 +31,7 @@ else
 		local ArmorReduction = EffectiveArmor / ((85 * Level) + 400)
 		ArmorReduction = 100 * (ArmorReduction / (ArmorReduction + 1))
 
-		GameTooltip:AddLine(format("%s %s", Label, HydraUI:Comma(EffectiveArmor)), 1, 1, 1)
+		GameTooltip:AddLine(format("%s %s", Label, YxUI:Comma(EffectiveArmor)), 1, 1, 1)
 		GameTooltip:AddLine(format(STAT_ARMOR_TOOLTIP, ArmorReduction), nil, nil, nil, true)
 
 		GameTooltip:Show()
@@ -57,7 +57,7 @@ local Update = function(self, event, unit)
 
 	local Base, EffectiveArmor = UnitArmor("player")
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, HydraUI:Comma(EffectiveArmor))
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, YxUI:Comma(EffectiveArmor))
 end
 
 local OnEnable = function(self)
@@ -80,4 +80,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Armor", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Armor", OnEnable, OnDisable, Update)

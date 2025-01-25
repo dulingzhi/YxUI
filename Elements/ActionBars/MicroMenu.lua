@@ -1,8 +1,8 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-local MicroButtons = HydraUI:NewModule("Micro Buttons")
+local MicroButtons = YxUI:NewModule("Micro Buttons")
 
-if HydraUI.IsMainline then
+if YxUI.IsMainline then
 	MicroButtons.Buttons = {
 		CharacterMicroButton,
 		ProfessionMicroButton,
@@ -16,7 +16,7 @@ if HydraUI.IsMainline then
 		StoreMicroButton,
 		MainMenuMicroButton,
 	}
-elseif HydraUI.IsTBC then
+elseif YxUI.IsTBC then
 	MicroButtons.Buttons = {
 		CharacterMicroButton,
 		SpellbookMicroButton,
@@ -28,7 +28,7 @@ elseif HydraUI.IsTBC then
 		MainMenuMicroButton,
 		HelpMicroButton,
 	}
-elseif HydraUI.IsWrath then
+elseif YxUI.IsWrath then
 	MicroButtons.Buttons = {
 		CharacterMicroButton,
 		SpellbookMicroButton,
@@ -42,7 +42,7 @@ elseif HydraUI.IsWrath then
 		MainMenuMicroButton,
 		HelpMicroButton,
 	}
-elseif HydraUI.IsCata then
+elseif YxUI.IsCata then
 	MicroButtons.Buttons = {
 		CharacterMicroButton,
 		SpellbookMicroButton,
@@ -157,35 +157,35 @@ function MicroButtons:Load()
 	end
 
 	if MicroMenu then
-		MicroMenu:SetParent(HydraUI.UIParent)
+		MicroMenu:SetParent(YxUI.UIParent)
 	end
 
-	self.Panel = CreateFrame("Frame", "HydraUI Micro Buttons", HydraUI.UIParent, "BackdropTemplate")
-	self.Panel:SetBackdrop(HydraUI.BackdropAndBorder)
-	self.Panel:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-bg-color"]))
+	self.Panel = CreateFrame("Frame", "YxUI Micro Buttons", YxUI.UIParent, "BackdropTemplate")
+	self.Panel:SetBackdrop(YxUI.BackdropAndBorder)
+	self.Panel:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-bg-color"]))
 	self.Panel:SetBackdropBorderColor(0, 0, 0)
 	self.Panel:SetFrameStrata("LOW")
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		self.Panel:SetSize(312, 40)
 	else
 		self.Panel:SetSize(228, 40)
 	end
 
 	if Settings["right-window-enable"] then
-		self.Panel:SetPoint("BOTTOMRIGHT", HydraUI:GetModule("Right Window"), "TOPRIGHT", 0, 3)
+		self.Panel:SetPoint("BOTTOMRIGHT", YxUI:GetModule("Right Window"), "TOPRIGHT", 0, 3)
 	else
-		self.Panel:SetPoint("BOTTOMRIGHT", HydraUI.UIParent, -10, 10)
+		self.Panel:SetPoint("BOTTOMRIGHT", YxUI.UIParent, -10, 10)
 	end
 
-	HydraUI:CreateMover(self.Panel)
+	YxUI:CreateMover(self.Panel)
 
 	for i = 1, #self.Buttons do
 		self.Buttons[i]:SetParent(self.Panel)
 		self.Buttons[i]:ClearAllPoints()
 		self.Buttons[i]:SetHitRectInsets(0, 0, 0, 0)
 
-		if (not HydraUI.IsMainline) then
+		if (not YxUI.IsMainline) then
 			self.Buttons[i]:SetSize(28, 36) -- 10.1.0 Fix required
 		end
 
@@ -230,7 +230,7 @@ function MicroButtons:Load()
 			Disabled:SetPoint("BOTTOMRIGHT", self.Buttons[i], -2, 2)
 		end
 
-		if (not HydraUI.IsMainline) then
+		if (not YxUI.IsMainline) then
 			if Normal then
 				Normal:SetTexCoord(0.2, 0.85, 0.5, 0.9)
 			end
@@ -259,7 +259,7 @@ function MicroButtons:Load()
 		MicroButtonPortrait:SetPoint("BOTTOMRIGHT", CharacterMicroButton, -2, 2)
 	end
 
-	if (HydraUI.IsWrath or HydraUI.IsCata) then
+	if (YxUI.IsWrath or YxUI.IsCata) then
 		PVPMicroButtonTexture:ClearAllPoints()
 		PVPMicroButtonTexture:SetPoint("TOP", PVPMicroButton, 6, -6)
 	end
@@ -292,7 +292,7 @@ local UpdateMicroPositions = function()
 	MicroButtons:PositionButtons()
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Action Bars"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Action Bars"], function(left, right)
 	right:CreateHeader(Language["Micro Menu Buttons"])
 	right:CreateDropdown("micro-buttons-visiblity", Settings["micro-buttons-visiblity"], {[Language["Hide"]] = "HIDE", [Language["Mouseover"]] = "MOUSEOVER", [Language["Show"]] = "SHOW"}, Language["Set Visibility"], Language["Set the visibility of the micro menu buttons"], UpdateMicroVisibility)
 	right:CreateSlider("micro-buttons-opacity", Settings["micro-buttons-opacity"], 0, 100, 10, Language["Set Faded Opacity"], Language["Set the opacity of the micro menu buttons when visiblity is set to Mouseover"], UpdateMicroVisibility, nil, "%")

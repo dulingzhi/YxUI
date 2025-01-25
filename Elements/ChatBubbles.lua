@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-local Bubbles = HydraUI:NewModule("Chat Bubbles")
+local Bubbles = YxUI:NewModule("Chat Bubbles")
 
 local next = next
 local select = select
@@ -13,9 +13,9 @@ Defaults["chat-bubbles-font-size"] = 14
 Defaults["chat-bubbles-font-flags"] = ""
 
 function Bubbles:RefreshBubble(bubble)
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 
-	HydraUI:SetFontInfo(bubble:GetChildren().Text, Settings["chat-bubbles-font"], Settings["chat-bubbles-font-size"], Settings["chat-bubbles-font-flags"])
+	YxUI:SetFontInfo(bubble:GetChildren().Text, Settings["chat-bubbles-font"], Settings["chat-bubbles-font-size"], Settings["chat-bubbles-font-flags"])
 	bubble:SetBackdropColor(R, G, B, Settings["chat-bubbles-opacity"] / 100)
 
 	self.NeedsRefresh = false
@@ -35,14 +35,14 @@ function Bubbles:SkinBubble(bubble)
 		Child:SetBackdrop(nil)
 	end
 
-	HydraUI:SetFontInfo(Child.String, Settings["chat-bubbles-font"], Settings["chat-bubbles-font-size"], Settings["chat-bubbles-font-flags"])
+	YxUI:SetFontInfo(Child.String, Settings["chat-bubbles-font"], Settings["chat-bubbles-font-size"], Settings["chat-bubbles-font-flags"])
 
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 
 	bubble.Backdrop = CreateFrame("Frame", nil, Child, "BackdropTemplate")
 	bubble.Backdrop:SetPoint("TOPLEFT", Child, 4, -4)
 	bubble.Backdrop:SetPoint("BOTTOMRIGHT", Child, -4, 4)
-	bubble.Backdrop:SetBackdrop(HydraUI.BackdropAndBorder)
+	bubble.Backdrop:SetBackdrop(YxUI.BackdropAndBorder)
 	bubble.Backdrop:SetBackdropColor(R, G, B, Settings["chat-bubbles-opacity"] / 100)
 	bubble.Backdrop:SetBackdropBorderColor(0, 0, 0)
 	bubble.Backdrop:SetFrameStrata("LOW")
@@ -117,9 +117,9 @@ local UpdateShowBubbles = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Chat"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Chat"], function(left, right)
 	right:CreateHeader(Language["Chat Bubbles"])
-	right:CreateSwitch("chat-bubbles-enable", Settings["chat-bubbles-enable"], Language["Enable Chat Bubbles"], Language["Enable the HydraUI chat bubbles module"], ReloadUI):RequiresReload(true)
+	right:CreateSwitch("chat-bubbles-enable", Settings["chat-bubbles-enable"], Language["Enable Chat Bubbles"], Language["Enable the YxUI chat bubbles module"], ReloadUI):RequiresReload(true)
 	right:CreateSlider("chat-bubbles-opacity", Settings["chat-bubbles-opacity"], 0, 100, 5, Language["Background Opacity"], Language["Set the opacity of the chat bubbles background"], SetToRefresh, nil, "%")
 	right:CreateDropdown("chat-bubbles-font", Settings["chat-bubbles-font"], Assets:GetFontList(), Language["Font"], Language["Set the font of the chat bubbles"], SetToRefresh, "Font")
 	right:CreateSlider("chat-bubbles-font-size", Settings["chat-bubbles-font-size"], 8, 32, 1, Language["Font Size"], Language["Set the font size of the chat bubbles"], SetToRefresh)

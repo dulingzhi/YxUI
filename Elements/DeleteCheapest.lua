@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 --[[
 	Delete cheapest item
@@ -21,7 +21,7 @@ if C_Container then
 	GetContainerItemInfo = C_Container.GetContainerItemInfo	
 end
 
-local Delete = HydraUI:NewModule("Delete")
+local Delete = YxUI:NewModule("Delete")
 
 Delete.FilterIDs = {}
 Delete.FilterClassIDs = {}
@@ -106,12 +106,12 @@ function Delete:PrintCheapestItem()
 
 	if (Item and Value) then
 		if (Count > 1) then
-			HydraUI:print(format(Language["The cheapest sellable item in your inventory is currently %sx%s worth %s"], Item, Count, GetCoinTextureString(Value)))
+			YxUI:print(format(Language["The cheapest sellable item in your inventory is currently %sx%s worth %s"], Item, Count, GetCoinTextureString(Value)))
 		else
-			HydraUI:print(format(Language["The cheapest sellable item in your inventory is currently %s worth %s"], Item, GetCoinTextureString(Value)))
+			YxUI:print(format(Language["The cheapest sellable item in your inventory is currently %s worth %s"], Item, GetCoinTextureString(Value)))
 		end
 	else
-		HydraUI:print(Language["No valid items were found"])
+		YxUI:print(Language["No valid items were found"])
 	end
 end
 
@@ -123,12 +123,12 @@ function Delete:DeleteCheapestItem()
 		DeleteCursorItem()
 
 		if (Count > 1) then
-			HydraUI:print(format(Language["Deleted %sx%s worth %s"], Item, Count, GetCoinTextureString(Value)))
+			YxUI:print(format(Language["Deleted %sx%s worth %s"], Item, Count, GetCoinTextureString(Value)))
 		else
-			HydraUI:print(format(Language["Deleted %s worth %s"], Item, GetCoinTextureString(Value)))
+			YxUI:print(format(Language["Deleted %s worth %s"], Item, GetCoinTextureString(Value)))
 		end
 	else
-		HydraUI:print(Language["No valid items were found"])
+		YxUI:print(Language["No valid items were found"])
 	end
 end
 
@@ -183,14 +183,14 @@ local DeleteCheapest = function()
 
 	if (Item and Count) then
 		if (Count > 1) then
-			HydraUI:DisplayPopup(Language["Attention"], format(Language["Are you sure that you want to delete %sx%s?"], Item, Count), "Accept", OnAccept, "Cancel", nil)
+			YxUI:DisplayPopup(Language["Attention"], format(Language["Are you sure that you want to delete %sx%s?"], Item, Count), "Accept", OnAccept, "Cancel", nil)
 		else
-			HydraUI:DisplayPopup(Language["Attention"], format(Language["Are you sure that you want to delete %s?"], Item), "Accept", OnAccept, "Cancel", nil)
+			YxUI:DisplayPopup(Language["Attention"], format(Language["Are you sure that you want to delete %s?"], Item), "Accept", OnAccept, "Cancel", nil)
 		end
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
 	right:CreateHeader(Language["Inventory"])
 	right:CreateButton("", Language["Search"], Language["Find Cheapest Item"], Language["Find the cheapest item currently in your inventory"], PrintCheapest)
 	right:CreateButton("", Language["Delete"], Language["Delete Cheapest Item"], Language["Delete the cheapest item currently in your inventory"], DeleteCheapest)

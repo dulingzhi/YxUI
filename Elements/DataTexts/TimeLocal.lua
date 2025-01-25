@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local gsub = gsub
 local format = format
@@ -46,7 +46,7 @@ local Update = function(self, elapsed)
 	if (self.Elapsed > 10) then
 		local Time = GameTime_GetLocalTime(true)
 
-		Time = gsub(Time, "%a+", format("|cFF%s%s|r", HydraUI.ValueColor, "%1"))
+		Time = gsub(Time, "%a+", format("|cFF%s%s|r", YxUI.ValueColor, "%1"))
 
 		self.Text:SetText(Time)
 
@@ -74,4 +74,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Time - Local", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Time - Local", OnEnable, OnDisable, Update)

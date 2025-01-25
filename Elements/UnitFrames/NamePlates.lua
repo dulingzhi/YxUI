@@ -1,5 +1,5 @@
 local addon, ns = ...
-local HydraUI, Language, Assets, Settings, Defaults = ns:get()
+local YxUI, Language, Assets, Settings, Defaults = ns:get()
 
 Defaults["nameplates-enable"] = true
 Defaults["nameplates-width"] = 138
@@ -29,15 +29,15 @@ Defaults["nameplates-unselected-alpha"] = 40
 Defaults["nameplates-enable-auras"] = true
 Defaults["nameplates-buffs-direction"] = "LTR"
 Defaults["nameplates-debuffs-direction"] = "RTL"
-Defaults.NPHealthTexture = "HydraUI 4"
-Defaults.NPCastTexture = "HydraUI 4"
+Defaults.NPHealthTexture = "YxUI 4"
+Defaults.NPCastTexture = "YxUI 4"
 
 local oUF = ns.oUF or oUF
-local UF = HydraUI:GetModule("Unit Frames")
+local UF = YxUI:GetModule("Unit Frames")
 
 local GetNamePlates = C_NamePlate.GetNamePlates
 
-HydraUI.StyleFuncs["nameplate"] = function(self, unit)
+YxUI.StyleFuncs["nameplate"] = function(self, unit)
 	self:SetScale(UIParent:GetScale())
 	self:SetSize(Settings["nameplates-width"], Settings["nameplates-height"])
 	self:SetPoint("CENTER", 0, 0)
@@ -47,7 +47,7 @@ HydraUI.StyleFuncs["nameplate"] = function(self, unit)
 	Backdrop:SetTexture(Assets:GetTexture("Blank"))
 	Backdrop:SetVertexColor(0, 0, 0)
 
-	self.colors.debuff = HydraUI.DebuffColors
+	self.colors.debuff = YxUI.DebuffColors
 
 	-- Health Bar
 	local Health = CreateFrame("StatusBar", nil, self)
@@ -65,7 +65,7 @@ HydraUI.StyleFuncs["nameplate"] = function(self, unit)
 
 	self.HealBar = HealBar
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		local AbsorbsBar = CreateFrame("StatusBar", nil, Health)
 		AbsorbsBar:SetWidth(Settings["nameplates-width"])
 		AbsorbsBar:SetHeight(Settings["nameplates-height"])
@@ -87,37 +87,37 @@ HydraUI.StyleFuncs["nameplate"] = function(self, unit)
 	RaidTargetIndicator:SetPoint("LEFT", Health, "RIGHT", 5, 0)
 
 	local Top = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(Top, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(Top, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
 	Top:SetPoint("CENTER", Health, "TOP", 0, 3)
 	Top:SetJustifyH("CENTER")
 
 	local TopLeft = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(TopLeft, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(TopLeft, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
 	TopLeft:SetPoint("LEFT", Health, "TOPLEFT", 4, 3)
 	TopLeft:SetJustifyH("LEFT")
 
 	local TopRight = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(TopRight, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(TopRight, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
 	TopRight:SetPoint("RIGHT", Health, "TOPRIGHT", -4, 3)
 	TopRight:SetJustifyH("RIGHT")
 
 	local Bottom = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(Bottom, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(Bottom, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
 	Bottom:SetPoint("CENTER", Health, "BOTTOM", 0, -3)
 	Bottom:SetJustifyH("CENTER")
 
 	local BottomRight = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(BottomRight, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(BottomRight, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
 	BottomRight:SetPoint("RIGHT", Health, "BOTTOMRIGHT", -4, -3)
 	BottomRight:SetJustifyH("RIGHT")
 
 	local BottomLeft = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(BottomLeft, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(BottomLeft, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
 	BottomLeft:SetPoint("LEFT", Health, "BOTTOMLEFT", 4, -3)
 	BottomLeft:SetJustifyH("LEFT")
 
 	--[[local InsideCenter = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(InsideCenter, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(InsideCenter, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
 	InsideCenter:SetPoint("CENTER", Health, 0, 0)
 	InsideCenter:SetJustifyH("CENTER")]]
 
@@ -219,12 +219,12 @@ HydraUI.StyleFuncs["nameplate"] = function(self, unit)
     Background:SetVertexColor(0, 0, 0)
 
     local Time = Castbar:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(Time, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(Time, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
 	Time:SetPoint("RIGHT", Castbar, "BOTTOMRIGHT", -4, -3)
 	Time:SetJustifyH("RIGHT")
 
     local Text = Castbar:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(Text, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(Text, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
 	Text:SetPoint("LEFT", Castbar, "BOTTOMLEFT", 4, -3)
 	Text:SetWidth(Settings["nameplates-width"] / 2 + 4)
 	Text:SetJustifyH("LEFT")
@@ -268,12 +268,12 @@ HydraUI.StyleFuncs["nameplate"] = function(self, unit)
 	TargetIndicator.Left = TargetIndicator:CreateTexture(nil, "ARTWORK")
 	TargetIndicator.Left:SetSize(16, 16)
 	TargetIndicator.Left:SetPoint("RIGHT", TargetIndicator, "LEFT", 2, 0)
-	TargetIndicator.Left:SetVertexColor(HydraUI:HexToRGB(Settings["ui-widget-color"]))
+	TargetIndicator.Left:SetVertexColor(YxUI:HexToRGB(Settings["ui-widget-color"]))
 
 	TargetIndicator.Right = TargetIndicator:CreateTexture(nil, "ARTWORK")
 	TargetIndicator.Right:SetSize(16, 16)
 	TargetIndicator.Right:SetPoint("LEFT", TargetIndicator, "RIGHT", -3, 0)
-	TargetIndicator.Right:SetVertexColor(HydraUI:HexToRGB(Settings["ui-widget-color"]))
+	TargetIndicator.Right:SetVertexColor(YxUI:HexToRGB(Settings["ui-widget-color"]))
 
 	if (Settings["nameplates-target-indicator-size"] == "SMALL") then
 		TargetIndicator.Left:SetTexture(Assets:GetTexture("Arrow Left"))
@@ -396,14 +396,14 @@ UF.NamePlateCallback = function(plate)
 		plate.AbsorbsBar:SetStatusBarTexture(Assets:GetTexture(Settings.NPHealthTexture))
 	end
 
-	HydraUI:SetFontInfo(plate.Top, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
-	HydraUI:SetFontInfo(plate.TopLeft, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
-	HydraUI:SetFontInfo(plate.TopRight, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
-	HydraUI:SetFontInfo(plate.Bottom, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
-	HydraUI:SetFontInfo(plate.BottomRight, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
-	HydraUI:SetFontInfo(plate.BottomLeft, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
-	HydraUI:SetFontInfo(plate.Castbar.Time, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
-	HydraUI:SetFontInfo(plate.Castbar.Text, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(plate.Top, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(plate.TopLeft, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(plate.TopRight, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(plate.Bottom, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(plate.BottomRight, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(plate.BottomLeft, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(plate.Castbar.Time, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(plate.Castbar.Text, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
 end
 
 local RunForAllNamePlates = function(func, value)
@@ -477,14 +477,14 @@ local UpdateNamePlatesTargetHighlight = function(value)
 end
 
 local NamePlateSetFont = function(self)
-	HydraUI:SetFontInfo(self.Top, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
-	HydraUI:SetFontInfo(self.TopLeft, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
-	HydraUI:SetFontInfo(self.TopRight, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
-	HydraUI:SetFontInfo(self.Bottom, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
-	HydraUI:SetFontInfo(self.BottomRight, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
-	HydraUI:SetFontInfo(self.BottomLeft, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
-	HydraUI:SetFontInfo(self.Castbar.Time, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
-	HydraUI:SetFontInfo(self.Castbar.Text, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(self.Top, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(self.TopLeft, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(self.TopRight, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(self.Bottom, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(self.BottomRight, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(self.BottomLeft, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(self.Castbar.Time, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
+	YxUI:SetFontInfo(self.Castbar.Text, Settings["nameplates-font"], Settings["nameplates-font-size"], Settings["nameplates-font-flags"])
 end
 
 local UpdateNamePlatesFont = function()
@@ -592,9 +592,9 @@ local UpdateCastTexture = function(value)
 	RunForAllNamePlates(SetCastTexture, value)
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Name Plates"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Name Plates"], function(left, right)
 	left:CreateHeader(Language["Enable"])
-	left:CreateSwitch("nameplates-enable", Settings["nameplates-enable"], Language["Enable Name Plates"], Language["Enable the HydraUI name plates module"], ReloadUI):RequiresReload(true)
+	left:CreateSwitch("nameplates-enable", Settings["nameplates-enable"], Language["Enable Name Plates"], Language["Enable the YxUI name plates module"], ReloadUI):RequiresReload(true)
 
 	left:CreateHeader(Language["Font"])
 	left:CreateDropdown("nameplates-font", Settings["nameplates-font"], Assets:GetFontList(), Language["Font"], Language["Set the font of the name plates"], UpdateNamePlatesFont, "Font")

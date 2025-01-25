@@ -1,6 +1,6 @@
-local HydraUI, L = select(2, ...):get()
+local YxUI, L = select(2, ...):get()
 
-if (HydraUI.UserLocale ~= "ptBR") then
+if (YxUI.UserLocale ~= "ptBR") then
 	return
 end
 
@@ -11,15 +11,15 @@ L["Display Welcome Message"] = "Display Welcome Message"
 L["Display a welcome message on login with UI information"] = "Display a welcome message on login with UI information"
 L["Get Link"] = "Get Link"
 L["Join Discord"] = "Join Discord"
-L["Get a link to join the HydraUI Discord community"] = "Get a link to join the HydraUI Discord community"
+L["Get a link to join the YxUI Discord community"] = "Get a link to join the YxUI Discord community"
 L["Watch YouTube"] = "Watch YouTube"
-L["Get a link for the HydraUI YouTube channel"] = "Get a link for the HydraUI YouTube channel"
+L["Get a link for the YxUI YouTube channel"] = "Get a link for the YxUI YouTube channel"
 L["Move UI"] = "Move UI"
 L["Toggle"] = "Toggle"
-L["While toggled, you can drag some elements of HydraUI around the screen"] = "While toggled, you can drag some elements of HydraUI around the screen"
+L["While toggled, you can drag some elements of YxUI around the screen"] = "While toggled, you can drag some elements of YxUI around the screen"
 L["Restore"] = "Restore"
 L["Restore To Defaults"] = "Restore To Defaults"
-L["Restore all HydraUI movable frames to their default locations"] = "Restore all HydraUI movable frames to their default locations"
+L["Restore all YxUI movable frames to their default locations"] = "Restore all YxUI movable frames to their default locations"
 L["Settings Window"] = "Settings Window"
 L["Hide In Combat"] = "Hide In Combat"
 L["Hide the settings window when engaging in combat"] = "Hide the settings window when engaging in combat"
@@ -66,7 +66,7 @@ L["Set the font size of header elements in the UI"] = "Set the font size of head
 L["Title Font Size"] = "Title Font Size"
 L["Set the font size of title elements in the UI"] = "Set the font size of title elements in the UI"
 L["Welcome to |cFF%sHydra|r|cFFEFFFFFUI|r Shadowlands |cFF%s%s|r - https://discord.gg/XefDFa6nJR"] = "Welcome to |cFF%sHydra|r|cFFEFFFFFUI|r Shadowlands |cFF%s%s|r - https://discord.gg/XefDFa6nJR"
-L["Type |cFF%s/hui|r to access the settings window, or click |cFF%s|Hcommand:/hui|h[here]|h|r."] = "Type |cFF%s/hui|r to access the settings window, or click |cFF%s|Hcommand:/hui|h[here]|h|r."
+L["Type |cFF%s/yxui|r to access the settings window, or click |cFF%s|Hcommand:/yxui|h[here]|h|r."] = "Type |cFF%s/yxui|r to access the settings window, or click |cFF%s|Hcommand:/yxui|h[here]|h|r."
 L["Join the Discord community for support and feedback https://discord.gg/XefDFa6nJR"] = "Join the Discord community for support and feedback https://discord.gg/XefDFa6nJR"
 L["Subscribe to YouTube to see new features https://www.youtube.com/c/HydraMods"] = "Subscribe to YouTube to see new features https://www.youtube.com/c/HydraMods"
 
@@ -135,7 +135,7 @@ L['No style exists with the name "%s"'] = 'No style exists with the name "%s"'
 -- Auras
 L["Auras"] = "Auras"
 L["Enable Auras Module"] = "Enable Auras Module"
-L["Enable the HydraUI auras module"] = "Enable the HydraUI auras module"
+L["Enable the YxUI auras module"] = "Enable the YxUI auras module"
 L["Styling"] = "Styling"
 L["Size"] = "Size"
 L["Set the size of auras"] = "Set the size of auras"
@@ -193,7 +193,7 @@ L["Friend Tag: "] = "Friend Tag: "
 L["Chat"] = "Chat"
 L["Enable"] = "Enable"
 L["Enable Chat Module"] = "Enable Chat Module"
-L["Enable the HydraUI chat module"] = "Enable the HydraUI chat module"
+L["Enable the YxUI chat module"] = "Enable the YxUI chat module"
 L["Chat Width"] = "Chat Width"
 L["Set the width of the chat frame"] = "Set the width of the chat frame"
 L["Chat Height"] = "Chat Height"
@@ -235,7 +235,7 @@ L["Set the color of the chat frame tab while mousing over it"] = "Set the color 
 -- Chat Bubbles
 L["Chat Bubbles"] = "Chat Bubbles"
 L["Enable Chat Bubbles"] = "Enable Chat Bubbles"
-L["Enable the HydraUI chat bubbles module"] = "Enable the HydraUI chat bubbles module"
+L["Enable the YxUI chat bubbles module"] = "Enable the YxUI chat bubbles module"
 L["Set the opacity of the chat bubbles background"] = "Set the opacity of the chat bubbles background"
 L["Set the font of the chat bubbles"] = "Set the font of the chat bubbles"
 L["Set the font size of the chat bubbles"] = "Set the font size of the chat bubbles"
@@ -327,12 +327,12 @@ L["Interrupted"] = "Interrupted"
 L["Uninterruptible"] = "Uninterruptible"
 
 -- Commands
-L["|cFF%sHydraUI|r Commands"] = "|cFF%sHydraUI|r Commands"
-L["|Hcommand:/HydraUI|h|cFF%s/HydraUI|r|h - Toggle the settings window"] = "|Hcommand:/HydraUI|h|cFF%s/HydraUI|r|h - Toggle the settings window"
-L["|Hcommand:/HydraUI move|h|cFF%s/HydraUI move|r|h - Drag UI elements around the screen"] = "|Hcommand:/HydraUI move|h|cFF%s/HydraUI move|r|h - Drag UI elements around the screen"
-L["|Hcommand:/HydraUI movereset|h|cFF%s/HydraUI movereset|r|h - Reposition all movers to their default locations"] = "|Hcommand:/HydraUI movereset|h|cFF%s/HydraUI movereset|r|h - Reposition all movers to their default locations"
-L["|Hcommand:/HydraUI keybind|h|cFF%s/HydraUI keybind|r|h - Toggle mouseover keybinding"] = "|Hcommand:/HydraUI keybind|h|cFF%s/HydraUI keybind|r|h - Toggle mouseover keybinding"
-L["|Hcommand:/HydraUI reset|h|cFF%s/HydraUI reset|r|h - Reset all stored UI information and settings"] = "|Hcommand:/HydraUI reset|h|cFF%s/HydraUI reset|r|h - Reset all stored UI information and settings"
+L["|cFF%sYxUI|r Commands"] = "|cFF%sYxUI|r Commands"
+L["|Hcommand:/YxUI|h|cFF%s/YxUI|r|h - Toggle the settings window"] = "|Hcommand:/YxUI|h|cFF%s/YxUI|r|h - Toggle the settings window"
+L["|Hcommand:/YxUI move|h|cFF%s/YxUI move|r|h - Drag UI elements around the screen"] = "|Hcommand:/YxUI move|h|cFF%s/YxUI move|r|h - Drag UI elements around the screen"
+L["|Hcommand:/YxUI movereset|h|cFF%s/YxUI movereset|r|h - Reposition all movers to their default locations"] = "|Hcommand:/YxUI movereset|h|cFF%s/YxUI movereset|r|h - Reposition all movers to their default locations"
+L["|Hcommand:/YxUI keybind|h|cFF%s/YxUI keybind|r|h - Toggle mouseover keybinding"] = "|Hcommand:/YxUI keybind|h|cFF%s/YxUI keybind|r|h - Toggle mouseover keybinding"
+L["|Hcommand:/YxUI reset|h|cFF%s/YxUI reset|r|h - Reset all stored UI information and settings"] = "|Hcommand:/YxUI reset|h|cFF%s/YxUI reset|r|h - Reset all stored UI information and settings"
 
 -- Cooldowns
 L["|cff%s%s|r is ready!"] = "|cff%s%s|r is ready!"
@@ -459,7 +459,7 @@ L["Loaded Plugins"] = "Loaded Plugins"
 L["Experience"] = "Experience"
 L["Enable"] = "Enable"
 L["Enable Experience Module"] = "Enable Experience Module"
-L["Enable the HydraUI experience module"] = "Enable the HydraUI experience module"
+L["Enable the YxUI experience module"] = "Enable the YxUI experience module"
 L["Display Level"] = "Display Level"
 L["Display your current level in the experience bar"] = "Display your current level in the experience bar"
 L["Display Progress Value"] = "Display Progress Value"
@@ -561,7 +561,7 @@ L["You require %s to repair all equipped items (costs %s total)"] = "You require
 -- Minimap
 L["Minimap"] = "Minimap"
 L["Enable Mini Map Module"] = "Enable Mini Map Module"
-L["Enable the HydraUI mini map module"] = "Enable the HydraUI mini map module"
+L["Enable the YxUI mini map module"] = "Enable the YxUI mini map module"
 L["Mini Map Size"] = "Mini Map Size"
 L["Set the size of the mini map"] = "Set the size of the mini map"
 L["Enable Top Bar"] = "Enable Top Bar"
@@ -644,7 +644,7 @@ L["All"] = "All"
 -- Reputation
 L["Reputation"] = "Reputation"
 L["Enable Reputation Module"] = "Enable Reputation Module"
-L["Enable the HydraUI reputation module"] = "Enable the HydraUI reputation module"
+L["Enable the YxUI reputation module"] = "Enable the YxUI reputation module"
 L["Display Progress Value"] = "Display Progress Value"
 L["Display your current progress information in the reputation bar"] = "Display your current progress information in the reputation bar"
 L["Display Percent Value"] = "Display Percent Value"
@@ -704,7 +704,7 @@ L["This action will delete ALL saved UI information. Are you sure you wish to co
 -- Tooltips
 L["Tooltips"] = "Tooltips"
 L["Enable Tooltips Module"] = "Enable Tooltips Module"
-L["Enable the HydraUI tooltips module"] = "Enable the HydraUI tooltips module"
+L["Enable the YxUI tooltips module"] = "Enable the YxUI tooltips module"
 L["Health Bar"] = "Health Bar"
 L["Display Health Bar"] = "Display Health Bar"
 L["Display the tooltip health bar"] = "Display the tooltip health bar"
@@ -784,7 +784,7 @@ L["Display the timer on unit frame auras"] = "Display the timer on unit frame au
 -- Individual unit frames not included yet, as options will be standardized
 
 -- Update
-L["You can get an updated version of HydraUI at https://www.curseforge.com/wow/addons/hydraui"] = "You can get an updated version of HydraUI at https://www.curseforge.com/wow/addons/hydraui"
+L["You can get an updated version of YxUI at https://www.curseforge.com/wow/addons/YxUI"] = "You can get an updated version of YxUI at https://www.curseforge.com/wow/addons/YxUI"
 L["Join the Discord community for support and feedback https://discord.gg/XefDFa6nJR"] = "Join the Discord community for support and feedback https://discord.gg/XefDFa6nJR"
 L["New Version!"] = "New Version!"
 L["Update to version |cFF%s%s|r"] = "Update to version |cFF%s%s|r"

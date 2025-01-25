@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-local BagsFrame = HydraUI:NewModule("Bags Frame")
+local BagsFrame = YxUI:NewModule("Bags Frame")
 
 -- Default settings values
 Defaults["bags-loot-from-left"] = false
@@ -9,7 +9,7 @@ Defaults["bags-frame-opacity"] = 40
 Defaults["bags-frame-max"] = 100
 Defaults["bags-frame-size"] = 32
 
-local IsClassic = HydraUI.IsClassic
+local IsClassic = YxUI.IsClassic
 
 if IsClassic then
 	BagsFrame.Objects = {
@@ -74,17 +74,17 @@ function BagsFrame:Load()
 		return
 	end
 
-	if (HydraUI.ClientVersion >= 100000) then
+	if (YxUI.ClientVersion >= 100000) then
 		MainMenuBarBackpackButton:ClearAllPoints()
-		MainMenuBarBackpackButton:SetPoint("BOTTOMRIGHT", HydraUI:GetModule("Micro Buttons").Panel, "TOPRIGHT", 0, 5)
+		MainMenuBarBackpackButton:SetPoint("BOTTOMRIGHT", YxUI:GetModule("Micro Buttons").Panel, "TOPRIGHT", 0, 5)
 
 		return
 	end
 
-	self.Panel = CreateFrame("Frame", "HydraUI Bags Window", HydraUI.UIParent, "BackdropTemplate")
-	self.Panel:SetPoint("BOTTOMRIGHT", HydraUI:GetModule("Micro Buttons").Panel, "TOPRIGHT", 0, 3)
-	self.Panel:SetBackdrop(HydraUI.BackdropAndBorder)
-	self.Panel:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-bg-color"]))
+	self.Panel = CreateFrame("Frame", "YxUI Bags Window", YxUI.UIParent, "BackdropTemplate")
+	self.Panel:SetPoint("BOTTOMRIGHT", YxUI:GetModule("Micro Buttons").Panel, "TOPRIGHT", 0, 3)
+	self.Panel:SetBackdrop(YxUI.BackdropAndBorder)
+	self.Panel:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-bg-color"]))
 	self.Panel:SetBackdropBorderColor(0, 0, 0)
 	self.Panel:SetFrameStrata("LOW")
 
@@ -94,7 +94,7 @@ function BagsFrame:Load()
 		self.Panel:SetSize(((Settings["bags-frame-size"] + 4) * #self.Objects) + 4, Settings["bags-frame-size"] + 8)
 	end
 
-	HydraUI:CreateMover(self.Panel)
+	YxUI:CreateMover(self.Panel)
 
 	local Object
 
@@ -124,14 +124,14 @@ function BagsFrame:Load()
 			Count:ClearAllPoints()
 			Count:SetPoint("BOTTOMRIGHT", 0, 2)
 			Count:SetJustifyH("RIGHT")
-			HydraUI:SetFontInfo(Count, Settings["ui-widget-font"], Settings["ui-font-size"])
+			YxUI:SetFontInfo(Count, Settings["ui-widget-font"], Settings["ui-font-size"])
 		end
 
 		if Stock then
 			Stock:ClearAllPoints()
 			Stock:SetPoint("TOPLEFT", 0, -2)
 			Stock:SetJustifyH("LEFT")
-			HydraUI:SetFontInfo(Stock, Settings["ui-widget-font"], Settings["ui-font-size"])
+			YxUI:SetFontInfo(Stock, Settings["ui-widget-font"], Settings["ui-font-size"])
 		end
 
 		if Object.icon then
@@ -143,7 +143,7 @@ function BagsFrame:Load()
 		Object.BG:SetPoint("BOTTOMRIGHT", Object, 1, -1)
 		Object.BG:SetColorTexture(0, 0, 0)
 
-		if HydraUI.IsMainline then
+		if YxUI.IsMainline then
 			Object.SlotHighlightTexture:SetTexture(Assets:GetTexture("Blank"))
 			Object.SlotHighlightTexture:SetVertexColor(0.9, 0.9, 0.1, 0.2)
 		else
@@ -226,7 +226,7 @@ local UpdateBagFrameSize = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Action Bars"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Action Bars"], function(left, right)
 	right:CreateHeader(Language["Bags Frame"])
 	right:CreateDropdown("bags-frame-visiblity", Settings["bags-frame-visiblity"], {[Language["Hide"]] = "HIDE", [Language["Mouseover"]] = "MOUSEOVER", [Language["Show"]] = "SHOW"}, Language["Set Visibility"], Language["Set the visibility of the bag frame"], UpdateBagVisibility)
 	right:CreateSlider("bags-frame-size", Settings["bags-frame-size"], 12, 60, 2, Language["Set Bag Size"], Language["Set the size of the bag frame slots"], UpdateBagFrameSize)

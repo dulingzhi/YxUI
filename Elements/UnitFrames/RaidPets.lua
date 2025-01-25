@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 Defaults["raid-pets-enable"] = true
 Defaults["raid-pets-width"] = 78
@@ -9,9 +9,9 @@ Defaults["raid-pets-health-orientation"] = "HORIZONTAL"
 Defaults["raid-pets-health-smooth"] = true
 Defaults["raid-pets-power-height"] = 0 -- NYI
 
-local UF = HydraUI:GetModule("Unit Frames")
+local UF = YxUI:GetModule("Unit Frames")
 
-HydraUI.StyleFuncs["raidpet"] = function(self, unit)
+YxUI.StyleFuncs["raidpet"] = function(self, unit)
 	-- General
 	self:RegisterForClicks("AnyUp")
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
@@ -26,7 +26,7 @@ HydraUI.StyleFuncs["raidpet"] = function(self, unit)
 	local Threat = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	Threat:SetPoint("TOPLEFT", -1, 1)
 	Threat:SetPoint("BOTTOMRIGHT", 1, -1)
-	Threat:SetBackdrop(HydraUI.Outline)
+	Threat:SetBackdrop(YxUI.Outline)
 	Threat.PostUpdate = UF.ThreatPostUpdate
 
 	self.ThreatIndicator = Threat
@@ -54,7 +54,7 @@ HydraUI.StyleFuncs["raidpet"] = function(self, unit)
 
 	self.HealBar = HealBar
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		local AbsorbsBar = CreateFrame("StatusBar", nil, Health)
 		AbsorbsBar:SetWidth(Settings["raid-width"])
 		AbsorbsBar:SetHeight(Settings["raid-pets-health-height"])
@@ -92,7 +92,7 @@ HydraUI.StyleFuncs["raidpet"] = function(self, unit)
 	end
 
 	local HealthMiddle = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthMiddle, Settings["raid-font"], Settings["raid-font-size"], Settings["raid-font-flags"])
+	YxUI:SetFontInfo(HealthMiddle, Settings["raid-font"], Settings["raid-font-size"], Settings["raid-font-flags"])
 	HealthMiddle:SetPoint("CENTER", Health, 0, 0)
 	HealthMiddle:SetJustifyH("CENTER")
 
@@ -122,7 +122,7 @@ HydraUI.StyleFuncs["raidpet"] = function(self, unit)
 	self.RaidTargetIndicator = RaidTarget
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Raid Pets"], Language["Unit Frames"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Raid Pets"], Language["Unit Frames"], function(left, right)
 	left:CreateHeader(Language["Enable"])
 	left:CreateSwitch("raid-pets-enable", Settings["raid-pets-enable"], Language["Enable Raid Pet Frames"], Language["Enable the Raid pet frames module"], ReloadUI):RequiresReload(true)
 

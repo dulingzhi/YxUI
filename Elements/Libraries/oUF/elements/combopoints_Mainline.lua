@@ -1,6 +1,6 @@
 local _, ns = ...
 local oUF = ns.oUF
-local HydraUI, Language, Assets, Settings = ns:get()
+local YxUI, Language, Assets, Settings = ns:get()
 
 local GetShapeshiftForm = GetShapeshiftForm
 local GetComboPoints = GetComboPoints
@@ -99,7 +99,7 @@ local Enable = function(self)
 		self:RegisterEvent("PLAYER_ENTERING_WORLD", Path, true)
 		self:RegisterEvent("UNIT_POWER_UPDATE", Path, true)
 
-		if (HydraUI.UserClass == "DRUID") then
+		if (YxUI.UserClass == "DRUID") then
 			self:RegisterEvent("UPDATE_SHAPESHIFT_FORM", UpdateForm, true)
 			self:RegisterEvent("PLAYER_ENTERING_WORLD", UpdateForm, true)
 		else
@@ -128,7 +128,7 @@ local Disable = function(self)
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD", Path)
 		self:UnregisterEvent("UNIT_POWER_UPDATE", Path)
 
-		if (HydraUI.UserClass == "DRUID") then
+		if (YxUI.UserClass == "DRUID") then
 			self:UnregisterEvent("UPDATE_SHAPESHIFT_FORM", UpdateForm)
 			self:UnregisterEvent("PLAYER_ENTERING_WORLD", UpdateForm)
 		else

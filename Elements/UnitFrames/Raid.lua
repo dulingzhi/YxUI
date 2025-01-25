@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 Defaults["raid-enable"] = true
 Defaults["raid-width"] = 78
@@ -28,15 +28,15 @@ Defaults["raid-show-solo"] = false
 Defaults["raid-font"] = "Roboto"
 Defaults["raid-font-size"] = 12
 Defaults["raid-font-flags"] = ""
-Defaults.RaidHealthTexture = "HydraUI 4"
-Defaults.RaidPowerTexture = "HydraUI 4"
+Defaults.RaidHealthTexture = "YxUI 4"
+Defaults.RaidPowerTexture = "YxUI 4"
 Defaults.RaidEnableMouseover = true
 
-local UF = HydraUI:GetModule("Unit Frames")
+local UF = YxUI:GetModule("Unit Frames")
 
 local Ignore = {}
 
-if HydraUI.IsWrath then
+if YxUI.IsWrath then
 	Ignore[GetSpellInfo(69127)] = true -- Chill of the Throne
 end
 
@@ -50,7 +50,7 @@ local RaidDebuffFilter = function(self, unit, icon, name, texture, count, dtype,
 	end
 end
 
-HydraUI.StyleFuncs["raid"] = function(self, unit)
+YxUI.StyleFuncs["raid"] = function(self, unit)
 	-- General
 	self:RegisterForClicks("AnyUp")
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
@@ -65,7 +65,7 @@ HydraUI.StyleFuncs["raid"] = function(self, unit)
 	local Threat = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	Threat:SetPoint("TOPLEFT", -1, 1)
 	Threat:SetPoint("BOTTOMRIGHT", 1, -1)
-	Threat:SetBackdrop(HydraUI.Outline)
+	Threat:SetBackdrop(YxUI.Outline)
 	Threat.PostUpdate = UF.ThreatPostUpdate
 
 	self.ThreatIndicator = Threat
@@ -94,7 +94,7 @@ HydraUI.StyleFuncs["raid"] = function(self, unit)
 
 	self.HealBar = HealBar
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		local AbsorbsBar = CreateFrame("StatusBar", nil, Health)
 		AbsorbsBar:SetWidth(Settings["raid-width"])
 		AbsorbsBar:SetHeight(Settings["raid-health-height"])
@@ -155,12 +155,12 @@ HydraUI.StyleFuncs["raid"] = function(self, unit)
 	Health.DeadAnim.Out:SetOrder(2)
 
 	local HealthName = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthName, Settings["raid-font"], Settings["raid-font-size"], Settings["raid-font-flags"])
+	YxUI:SetFontInfo(HealthName, Settings["raid-font"], Settings["raid-font-size"], Settings["raid-font-flags"])
 	HealthName:SetPoint("BOTTOM", Health, "CENTER", 0, 1)
 	HealthName:SetJustifyH("CENTER")
 
 	local HealthBottom = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthBottom, Settings["raid-font"], Settings["raid-font-size"], Settings["raid-font-flags"])
+	YxUI:SetFontInfo(HealthBottom, Settings["raid-font"], Settings["raid-font-size"], Settings["raid-font-flags"])
 	HealthBottom:SetPoint("TOP", Health, "CENTER", 0, -1)
 	HealthBottom:SetJustifyH("CENTER")
 
@@ -188,7 +188,7 @@ HydraUI.StyleFuncs["raid"] = function(self, unit)
 
 	UF:SetPowerAttributes(Power, Settings["raid-power-color"])
 
-	if UF.BuffIDs[HydraUI.UserClass] then
+	if UF.BuffIDs[YxUI.UserClass] then
 		local Auras = CreateFrame("Frame", nil, Health)
 		Auras:SetPoint("TOPLEFT", Health)
 		Auras:SetPoint("BOTTOMRIGHT", Health)
@@ -200,7 +200,7 @@ HydraUI.StyleFuncs["raid"] = function(self, unit)
 		Auras.icons = {}
 		Auras.PostCreateIcon = UF.PostCreateAuraWatchIcon
 
-		for key, spell in next, UF.BuffIDs[HydraUI.UserClass] do
+		for key, spell in next, UF.BuffIDs[YxUI.UserClass] do
 			local Icon = CreateFrame("Frame", nil, Auras)
 			Icon.spellID = spell[1]
 			Icon.anyUnit = spell[4]
@@ -225,7 +225,7 @@ HydraUI.StyleFuncs["raid"] = function(self, unit)
 			end
 
 			local Count = Icon:CreateFontString(nil, "OVERLAY")
-			HydraUI:SetFontInfo(Count, Settings["raid-font"], 10)
+			YxUI:SetFontInfo(Count, Settings["raid-font"], 10)
 			Count:SetPoint("CENTER", unpack(UF.AuraOffsets[spell[2]]))
 			Icon.count = Count
 
@@ -257,7 +257,7 @@ HydraUI.StyleFuncs["raid"] = function(self, unit)
     Leader:SetSize(16, 16)
     Leader:SetPoint("LEFT", Health, "TOPLEFT", 3, 0)
     Leader:SetTexture(Assets:GetTexture("Leader"))
-    Leader:SetVertexColor(HydraUI:HexToRGB("FFEB3B"))
+    Leader:SetVertexColor(YxUI:HexToRGB("FFEB3B"))
     Leader:Hide()
 
 	-- Assist
@@ -265,7 +265,7 @@ HydraUI.StyleFuncs["raid"] = function(self, unit)
     Assist:SetSize(16, 16)
     Assist:SetPoint("LEFT", Health, "TOPLEFT", 3, 0)
     Assist:SetTexture(Assets:GetTexture("Assist"))
-    Assist:SetVertexColor(HydraUI:HexToRGB("FFEB3B"))
+    Assist:SetVertexColor(YxUI:HexToRGB("FFEB3B"))
     Assist:Hide()
 
 	-- Ready Check
@@ -301,7 +301,7 @@ HydraUI.StyleFuncs["raid"] = function(self, unit)
 	Dispel:SetSize(22, 22)
 	Dispel:SetPoint("CENTER", Health, 0, 0)
 	Dispel:SetFrameLevel(Health:GetFrameLevel() + 20)
-	Dispel:SetBackdrop(HydraUI.BackdropAndBorder)
+	Dispel:SetBackdrop(YxUI.BackdropAndBorder)
 	Dispel:SetBackdropColor(0, 0, 0)
 	Dispel:SetFrameStrata("HIGH")
 	Dispel:SetFrameLevel(10)
@@ -318,7 +318,7 @@ HydraUI.StyleFuncs["raid"] = function(self, unit)
 	Dispel.cd:SetDrawEdge(false)
 
 	Dispel.count = Dispel.cd:CreateFontString(nil, "ARTWORK")
-	HydraUI:SetFontInfo(Dispel.count, Settings["raid-font"], Settings["raid-font-size"], Settings["raid-font-flags"])
+	YxUI:SetFontInfo(Dispel.count, Settings["raid-font"], Settings["raid-font-size"], Settings["raid-font-flags"])
 	Dispel.count:SetPoint("BOTTOMRIGHT", Dispel, "BOTTOMRIGHT", -3, 3)
 	Dispel.count:SetTextColor(1, 1, 1)
 	Dispel.count:SetJustifyH("RIGHT")
@@ -362,11 +362,11 @@ local UpdateRaidAnchorSize = function()
 end
 
 local UpdateRaidWidth = function(value)
-	if HydraUI.UnitFrames["raid"] then
+	if YxUI.UnitFrames["raid"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["raid"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["raid"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
 
 			if Unit then
 				Unit:SetWidth(value)
@@ -378,11 +378,11 @@ local UpdateRaidWidth = function(value)
 end
 
 local UpdateRaidHealthHeight = function(value)
-	if HydraUI.UnitFrames["raid"] then
+	if YxUI.UnitFrames["raid"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["raid"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["raid"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
 
 			if Unit then
 				Unit:SetHeight(value + Settings["raid-power-height"] + 3)
@@ -395,11 +395,11 @@ local UpdateRaidHealthHeight = function(value)
 end
 
 local UpdateRaidHealthColor = function(value)
-	if HydraUI.UnitFrames["raid"] then
+	if YxUI.UnitFrames["raid"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["raid"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["raid"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
 
 			if Unit then
 				UF:SetHealthAttributes(Unit.Health, value)
@@ -411,11 +411,11 @@ local UpdateRaidHealthColor = function(value)
 end
 
 local UpdateRaidHealthOrientation = function(value)
-	if HydraUI.UnitFrames["raid"] then
+	if YxUI.UnitFrames["raid"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["raid"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["raid"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
 
 			if Unit then
 				Unit.Health:SetOrientation(value)
@@ -425,11 +425,11 @@ local UpdateRaidHealthOrientation = function(value)
 end
 
 local UpdateRaidHealthReverseFill = function(value)
-	if HydraUI.UnitFrames["raid"] then
+	if YxUI.UnitFrames["raid"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["raid"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["raid"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
 
 			if Unit then
 				Unit.Health:SetReverseFill(value)
@@ -459,11 +459,11 @@ local UpdateRaidHealthReverseFill = function(value)
 end
 
 local UpdateEnableRaidPower = function(value)
-	if HydraUI.UnitFrames["raid"] then
+	if YxUI.UnitFrames["raid"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["raid"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["raid"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
 
 			if Unit then
 				if value then
@@ -479,11 +479,11 @@ local UpdateEnableRaidPower = function(value)
 end
 
 local UpdateRaidPowerHeight = function(value)
-	if HydraUI.UnitFrames["raid"] then
+	if YxUI.UnitFrames["raid"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["raid"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["raid"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
 
 			if Unit then
 				Unit:SetHeight(value + Settings["raid-health-height"] + 3)
@@ -496,11 +496,11 @@ local UpdateRaidPowerHeight = function(value)
 end
 
 local UpdateRaidPowerReverseFill = function(value)
-	if HydraUI.UnitFrames["raid"] then
+	if YxUI.UnitFrames["raid"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["raid"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["raid"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
 
 			if Unit then
 				Unit.Power:SetReverseFill(value)
@@ -510,11 +510,11 @@ local UpdateRaidPowerReverseFill = function(value)
 end
 
 local UpdateRaidPowerColor = function(value)
-	if HydraUI.UnitFrames["raid"] then
+	if YxUI.UnitFrames["raid"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["raid"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["raid"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
 
 			if Unit then
 				UF:SetPowerAttributes(Unit.Power, value)
@@ -526,11 +526,11 @@ local UpdateRaidPowerColor = function(value)
 end
 
 local UpdateRaidShowHighlight = function(value)
-	if HydraUI.UnitFrames["raid"] then
+	if YxUI.UnitFrames["raid"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["raid"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["raid"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
 
 			if Unit then
 				if value then
@@ -541,8 +541,8 @@ local UpdateRaidShowHighlight = function(value)
 			end
 		end
 
-		for i = 1, HydraUI.UnitFrames["raid-pets"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["raid-pets"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["raid-pets"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["raid-pets"]:GetChildren())
 
 			if Unit then
 				if value then
@@ -556,76 +556,76 @@ local UpdateRaidShowHighlight = function(value)
 end
 
 local UpdateRaidXOffset = function(value)
-	HydraUI.UnitFrames["raid"]:SetAttribute("xoffset", value)
+	YxUI.UnitFrames["raid"]:SetAttribute("xoffset", value)
 
 	UpdateRaidAnchorSize()
 end
 
 local UpdateRaidYOffset = function(value)
-	HydraUI.UnitFrames["raid"]:SetAttribute("yoffset", value)
+	YxUI.UnitFrames["raid"]:SetAttribute("yoffset", value)
 
 	UpdateRaidAnchorSize()
 end
 
 local UpdateRaidUnitsPerColumn = function(value)
-	HydraUI.UnitFrames["raid"]:SetAttribute("unitsPerColumn", value)
+	YxUI.UnitFrames["raid"]:SetAttribute("unitsPerColumn", value)
 
 	UpdateRaidAnchorSize()
 end
 
 local UpdateRaidMaxColumns = function(value)
-	HydraUI.UnitFrames["raid"]:SetAttribute("maxColumns", value)
+	YxUI.UnitFrames["raid"]:SetAttribute("maxColumns", value)
 
 	UpdateRaidAnchorSize()
 end
 
 local UpdateRaidColumnSpacing = function(value)
-	HydraUI.UnitFrames["raid"]:SetAttribute("columnSpacing", value)
+	YxUI.UnitFrames["raid"]:SetAttribute("columnSpacing", value)
 
 	UpdateRaidAnchorSize()
 end
 
 local UpdateRaidColumnAnchor = function(value)
-	HydraUI.UnitFrames["raid"]:SetAttribute("columnAnchorPoint", value)
+	YxUI.UnitFrames["raid"]:SetAttribute("columnAnchorPoint", value)
 
 	UpdateRaidAnchorSize()
 end
 
 local UpdateRaidPoint = function(value)
-	HydraUI.UnitFrames["raid"]:SetAttribute("point", value)
+	YxUI.UnitFrames["raid"]:SetAttribute("point", value)
 
 	UpdateRaidAnchorSize()
 end
 
 local UpdateRaidSortingMethod = function(value)
 	if (value == "CLASS") then
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "DEATHKNIGHT,DEMONHUNTER,DRUID,HUNTER,MAGE,MONK,PALADIN,PRIEST,SHAMAN,WARLOCK,WARRIOR")
-		HydraUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupBy", "CLASS")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "DEATHKNIGHT,DEMONHUNTER,DRUID,HUNTER,MAGE,MONK,PALADIN,PRIEST,SHAMAN,WARLOCK,WARRIOR")
+		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "CLASS")
 	elseif (value == "ROLE") then
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "TANK,HEALER,DAMAGER,NONE")
-		HydraUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupBy", "ASSIGNEDROLE")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "TANK,HEALER,DAMAGER,NONE")
+		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "ASSIGNEDROLE")
 	elseif (value == "NAME") then
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
-		HydraUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupBy", nil)
+		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
+		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", nil)
 	elseif (value == "MTMA") then
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "MAINTANK,MAINASSIST,NONE")
-		HydraUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupBy", "ROLE")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "MAINTANK,MAINASSIST,NONE")
+		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "ROLE")
 	else -- GROUP
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
-		HydraUI.UnitFrames["raid"]:SetAttribute("sortMethod", "INDEX")
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupBy", "GROUP")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
+		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "INDEX")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "GROUP")
 	end
 end
 
 local Testing = false
 
 local TestRaid = function()
-	local Header = _G["HydraUI Raid"]
-	local Pets = _G["HydraUI Raid Pets"]
+	local Header = _G["YxUI Raid"]
+	local Pets = _G["YxUI Raid Pets"]
 
 	if Testing then
 		if Header then
@@ -699,15 +699,15 @@ local TestRaid = function()
 end
 
 local UpdateShowSolo = function(value)
-	_G["HydraUI Raid"]:SetAttribute("showSolo", value)
+	_G["YxUI Raid"]:SetAttribute("showSolo", value)
 end
 
 local UpdateHealthTexture = function(value)
-	if HydraUI.UnitFrames["raid"] then
+	if YxUI.UnitFrames["raid"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["raid"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["raid"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
 
 			Unit.Health:SetStatusBarTexture(Assets:GetTexture(value))
 			Unit.Health.bg:SetTexture(Assets:GetTexture(value))
@@ -721,11 +721,11 @@ local UpdateHealthTexture = function(value)
 end
 
 local UpdatePowerTexture = function(value)
-	if HydraUI.UnitFrames["raid"] then
+	if YxUI.UnitFrames["raid"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["raid"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["raid"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
 
 			Unit.Power:SetStatusBarTexture(Assets:GetTexture(value))
 			Unit.Power.bg:SetTexture(Assets:GetTexture(value))
@@ -733,7 +733,7 @@ local UpdatePowerTexture = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Raid"], Language["Unit Frames"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Raid"], Language["Unit Frames"], function(left, right)
 	left:CreateHeader(Language["Enable"])
 	left:CreateSwitch("raid-enable", Settings["raid-enable"], Language["Enable Raid Module"], Language["Enable the raid frames module"], ReloadUI):RequiresReload(true)
 

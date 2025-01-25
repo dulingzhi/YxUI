@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 Defaults["party-enable"] = true
 Defaults["party-width"] = 78
@@ -25,11 +25,11 @@ Defaults["party-show-solo"] = false
 Defaults["party-font"] = "Roboto"
 Defaults["party-font-size"] = 12
 Defaults["party-font-flags"] = ""
-Defaults.PartyHealthTexture = "HydraUI 4"
-Defaults.PartyPowerTexture = "HydraUI 4"
+Defaults.PartyHealthTexture = "YxUI 4"
+Defaults.PartyPowerTexture = "YxUI 4"
 Defaults.PartyEnableMouseover = true
 
-local UF = HydraUI:GetModule("Unit Frames")
+local UF = YxUI:GetModule("Unit Frames")
 
 local PartyDebuffFilter = function(self, unit, icon, name, texture, count, dtype, duration, timeLeft, caster, stealable, nameplateshow, id, canapply, boss, player)
 	local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(id, "RAID_INCOMBAT")
@@ -45,7 +45,7 @@ local PartyBuffFilter = function(self, unit, icon, name, texture, count, dtype, 
 
 end
 
-HydraUI.StyleFuncs["party"] = function(self, unit)
+YxUI.StyleFuncs["party"] = function(self, unit)
 	-- General
 	self:RegisterForClicks("AnyUp")
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
@@ -60,7 +60,7 @@ HydraUI.StyleFuncs["party"] = function(self, unit)
 	local Threat = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	Threat:SetPoint("TOPLEFT", -1, 1)
 	Threat:SetPoint("BOTTOMRIGHT", 1, -1)
-	Threat:SetBackdrop(HydraUI.Outline)
+	Threat:SetBackdrop(YxUI.Outline)
 	Threat.PostUpdate = UF.ThreatPostUpdate
 
 	self.ThreatIndicator = Threat
@@ -89,7 +89,7 @@ HydraUI.StyleFuncs["party"] = function(self, unit)
 
 	self.HealBar = HealBar
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		local AbsorbsBar = CreateFrame("StatusBar", nil, Health)
 		AbsorbsBar:SetWidth(Settings["party-width"])
 		AbsorbsBar:SetHeight(Settings["party-health-height"])
@@ -150,12 +150,12 @@ HydraUI.StyleFuncs["party"] = function(self, unit)
 	Health.DeadAnim.Out:SetOrder(2)
 
 	local HealthName = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthName, Settings["party-font"], Settings["party-font-size"], Settings["party-font-flags"])
+	YxUI:SetFontInfo(HealthName, Settings["party-font"], Settings["party-font-size"], Settings["party-font-flags"])
 	HealthName:SetPoint("BOTTOM", Health, "CENTER", 0, 1)
 	HealthName:SetJustifyH("CENTER")
 
 	local HealthBottom = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthBottom, Settings["party-font"], Settings["party-font-size"], Settings["party-font-flags"])
+	YxUI:SetFontInfo(HealthBottom, Settings["party-font"], Settings["party-font-size"], Settings["party-font-flags"])
 	HealthBottom:SetPoint("TOP", Health, "CENTER", 0, -1)
 	HealthBottom:SetJustifyH("CENTER")
 
@@ -210,7 +210,7 @@ HydraUI.StyleFuncs["party"] = function(self, unit)
 		Debuffs["growth-y"] = "DOWN"
 	end
 
-	if UF.BuffIDs[HydraUI.UserClass] then
+	if UF.BuffIDs[YxUI.UserClass] then
 		local Auras = CreateFrame("Frame", nil, Health)
 		Auras:SetPoint("TOPLEFT", Health)
 		Auras:SetPoint("BOTTOMRIGHT", Health)
@@ -222,7 +222,7 @@ HydraUI.StyleFuncs["party"] = function(self, unit)
 		Auras.icons = {}
 		Auras.PostCreateIcon = UF.PostCreateAuraWatchIcon
 
-		for key, spell in pairs(UF.BuffIDs[HydraUI.UserClass]) do
+		for key, spell in pairs(UF.BuffIDs[YxUI.UserClass]) do
 			local Icon = CreateFrame("Frame", nil, Auras)
 			Icon.spellID = spell[1]
 			Icon.anyUnit = spell[4]
@@ -247,7 +247,7 @@ HydraUI.StyleFuncs["party"] = function(self, unit)
 			end
 
 			local Count = Icon:CreateFontString(nil, "OVERLAY")
-			HydraUI:SetFontInfo(Count, Settings["party-font"], 10)
+			YxUI:SetFontInfo(Count, Settings["party-font"], 10)
 			Count:SetPoint("CENTER", unpack(UF.AuraOffsets[spell[2]]))
 			Icon.count = Count
 
@@ -262,7 +262,7 @@ HydraUI.StyleFuncs["party"] = function(self, unit)
     Leader:SetSize(16, 16)
     Leader:SetPoint("LEFT", Health, "TOPLEFT", 0, 0)
     Leader:SetTexture(Assets:GetTexture("Leader"))
-    Leader:SetVertexColor(HydraUI:HexToRGB("FFEB3B"))
+    Leader:SetVertexColor(YxUI:HexToRGB("FFEB3B"))
     Leader:Hide()
 
 	-- Assist
@@ -270,7 +270,7 @@ HydraUI.StyleFuncs["party"] = function(self, unit)
     Assist:SetSize(16, 16)
     Assist:SetPoint("LEFT", Health, "TOPLEFT", 3, 0)
     Assist:SetTexture(Assets:GetTexture("Assist"))
-    Assist:SetVertexColor(HydraUI:HexToRGB("FFEB3B"))
+    Assist:SetVertexColor(YxUI:HexToRGB("FFEB3B"))
     Assist:Hide()
 
 	-- Ready Check
@@ -310,7 +310,7 @@ HydraUI.StyleFuncs["party"] = function(self, unit)
 	Dispel:SetSize(20, 20)
 	Dispel:SetPoint("CENTER", Health, 0, 0)
 	Dispel:SetFrameLevel(Health:GetFrameLevel() + 20)
-	Dispel:SetBackdrop(HydraUI.BackdropAndBorder)
+	Dispel:SetBackdrop(YxUI.BackdropAndBorder)
 	Dispel:SetBackdropColor(0, 0, 0)
 	Dispel:SetFrameLevel(Debuffs:GetFrameLevel() + 1)
 
@@ -326,7 +326,7 @@ HydraUI.StyleFuncs["party"] = function(self, unit)
 	Dispel.cd:SetDrawEdge(false)
 
 	Dispel.count = Dispel.cd:CreateFontString(nil, "ARTWORK")
-	HydraUI:SetFontInfo(Dispel.count, Settings["party-font"], Settings["party-font-size"], Settings["party-font-flags"])
+	YxUI:SetFontInfo(Dispel.count, Settings["party-font"], Settings["party-font-size"], Settings["party-font-flags"])
 	Dispel.count:SetPoint("BOTTOMRIGHT", Dispel, "BOTTOMRIGHT", -3, 3)
 	Dispel.count:SetTextColor(1, 1, 1)
 	Dispel.count:SetJustifyH("RIGHT")
@@ -363,11 +363,11 @@ HydraUI.StyleFuncs["party"] = function(self, unit)
 end
 
 local UpdatePartyWidth = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			if Unit then
 				Unit:SetWidth(value)
@@ -377,11 +377,11 @@ local UpdatePartyWidth = function(value)
 end
 
 local UpdatePartyHealthHeight = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			if Unit then
 				Unit:SetHeight(value + Settings["party-power-height"] + 3)
@@ -392,11 +392,11 @@ local UpdatePartyHealthHeight = function(value)
 end
 
 local UpdatePartyHealthColor = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			if Unit then
 				UF:SetHealthAttributes(Unit.Health, value)
@@ -408,11 +408,11 @@ local UpdatePartyHealthColor = function(value)
 end
 
 local UpdateEnablePartyPower = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			if Unit then
 				if value then
@@ -428,11 +428,11 @@ local UpdateEnablePartyPower = function(value)
 end
 
 local UpdatePartyPowerHeight = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			if Unit then
 				Unit:SetHeight(value + Settings["party-health-height"] + 3)
@@ -443,11 +443,11 @@ local UpdatePartyPowerHeight = function(value)
 end
 
 local UpdatePartyHealthOrientation = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			if Unit then
 				Unit.Health:SetOrientation(value)
@@ -457,11 +457,11 @@ local UpdatePartyHealthOrientation = function(value)
 end
 
 local UpdatePartyHealthReverseFill = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			if Unit then
 				Unit.Health:SetReverseFill(value)
@@ -491,11 +491,11 @@ local UpdatePartyHealthReverseFill = function(value)
 end
 
 local UpdatePartyPowerReverseFill = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			if Unit then
 				Unit.Power:SetReverseFill(value)
@@ -505,11 +505,11 @@ local UpdatePartyPowerReverseFill = function(value)
 end
 
 local UpdatePartyPowerColor = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			if Unit then
 				UF:SetPowerAttributes(Unit.Power, value)
@@ -521,11 +521,11 @@ local UpdatePartyPowerColor = function(value)
 end
 
 local UpdatePartyShowDebuffs = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			if Unit then
 				if value then
@@ -539,11 +539,11 @@ local UpdatePartyShowDebuffs = function(value)
 end
 
 local UpdatePartyShowHighlight = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			if Unit then
 				if value then
@@ -554,8 +554,8 @@ local UpdatePartyShowHighlight = function(value)
 			end
 		end
 
-		for i = 1, HydraUI.UnitFrames["party-pets"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party-pets"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party-pets"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party-pets"]:GetChildren())
 
 			if Unit then
 				if value then
@@ -569,11 +569,11 @@ local UpdatePartyShowHighlight = function(value)
 end
 
 local UpdatePartyShowRole = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			if Unit then
 				if value then
@@ -589,36 +589,36 @@ local UpdatePartyShowRole = function(value)
 end
 
 local UpdatePartySpacing = function(value)
-	if HydraUI.UnitFrames["party"] then
-		local Point = HydraUI.UnitFrames["party"]:GetAttribute("point")
+	if YxUI.UnitFrames["party"] then
+		local Point = YxUI.UnitFrames["party"]:GetAttribute("point")
 
 		if (Point == "LEFT") then
-			HydraUI.UnitFrames["party"]:SetAttribute("xOffset", value)
-			HydraUI.UnitFrames["party"]:SetAttribute("yOffset", 0)
+			YxUI.UnitFrames["party"]:SetAttribute("xOffset", value)
+			YxUI.UnitFrames["party"]:SetAttribute("yOffset", 0)
 		elseif (Point == "RIGHT") then
-			HydraUI.UnitFrames["party"]:SetAttribute("xOffset", -value)
-			HydraUI.UnitFrames["party"]:SetAttribute("yOffset", 0)
+			YxUI.UnitFrames["party"]:SetAttribute("xOffset", -value)
+			YxUI.UnitFrames["party"]:SetAttribute("yOffset", 0)
 		elseif (Point == "TOP") then
-			HydraUI.UnitFrames["party"]:SetAttribute("xOffset", 0)
-			HydraUI.UnitFrames["party"]:SetAttribute("yOffset", -value)
+			YxUI.UnitFrames["party"]:SetAttribute("xOffset", 0)
+			YxUI.UnitFrames["party"]:SetAttribute("yOffset", -value)
 		elseif (Point == "BOTTOM") then
-			HydraUI.UnitFrames["party"]:SetAttribute("xOffset", 0)
-			HydraUI.UnitFrames["party"]:SetAttribute("yOffset", value)
+			YxUI.UnitFrames["party"]:SetAttribute("xOffset", 0)
+			YxUI.UnitFrames["party"]:SetAttribute("yOffset", value)
 		end
 
-		if HydraUI.UnitFrames["party-pets"] then
+		if YxUI.UnitFrames["party-pets"] then
 			if (Point == "LEFT") then
-				HydraUI.UnitFrames["party-pets"]:SetAttribute("xOffset", value)
-				HydraUI.UnitFrames["party-pets"]:SetAttribute("yOffset", 0)
+				YxUI.UnitFrames["party-pets"]:SetAttribute("xOffset", value)
+				YxUI.UnitFrames["party-pets"]:SetAttribute("yOffset", 0)
 			elseif (Point == "RIGHT") then
-				HydraUI.UnitFrames["party-pets"]:SetAttribute("xOffset", -value)
-				HydraUI.UnitFrames["party-pets"]:SetAttribute("yOffset", 0)
+				YxUI.UnitFrames["party-pets"]:SetAttribute("xOffset", -value)
+				YxUI.UnitFrames["party-pets"]:SetAttribute("yOffset", 0)
 			elseif (Point == "TOP") then
-				HydraUI.UnitFrames["party-pets"]:SetAttribute("xOffset", 0)
-				HydraUI.UnitFrames["party-pets"]:SetAttribute("yOffset", -value)
+				YxUI.UnitFrames["party-pets"]:SetAttribute("xOffset", 0)
+				YxUI.UnitFrames["party-pets"]:SetAttribute("yOffset", -value)
 			elseif (Point == "BOTTOM") then
-				HydraUI.UnitFrames["party-pets"]:SetAttribute("xOffset", 0)
-				HydraUI.UnitFrames["party-pets"]:SetAttribute("yOffset", value)
+				YxUI.UnitFrames["party-pets"]:SetAttribute("xOffset", 0)
+				YxUI.UnitFrames["party-pets"]:SetAttribute("yOffset", value)
 			end
 		end
 	end
@@ -627,8 +627,8 @@ end
 local Testing = false
 
 local TestParty = function()
-	local Header = _G["HydraUI Party"]
-	local Pets = _G["HydraUI Party Pets"]
+	local Header = _G["YxUI Party"]
+	local Pets = _G["YxUI Party Pets"]
 
 	if Testing then
 		if Header then
@@ -702,15 +702,15 @@ local TestParty = function()
 end
 
 local UpdateShowSolo = function(value)
-	_G["HydraUI Party"]:SetAttribute("showSolo", value)
+	_G["YxUI Party"]:SetAttribute("showSolo", value)
 end
 
 local UpdateHealthTexture = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			Unit.Health:SetStatusBarTexture(Assets:GetTexture(value))
 			Unit.Health.bg:SetTexture(Assets:GetTexture(value))
@@ -724,11 +724,11 @@ local UpdateHealthTexture = function(value)
 end
 
 local UpdatePowerTexture = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			Unit.Power:SetStatusBarTexture(Assets:GetTexture(value))
 			Unit.Power.bg:SetTexture(Assets:GetTexture(value))
@@ -736,7 +736,7 @@ local UpdatePowerTexture = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Party"], Language["Unit Frames"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Party"], Language["Unit Frames"], function(left, right)
 	left:CreateHeader(Language["Enable"])
 	left:CreateSwitch("party-enable", Settings["party-enable"], Language["Enable Party Module"], Language["Enable the party frames module"], ReloadUI):RequiresReload(true)
 

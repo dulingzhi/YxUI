@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 Defaults["unitframes-player-width"] = 240
 Defaults["unitframes-player-health-height"] = 32
@@ -33,15 +33,15 @@ Defaults.PlayerBuffSize = 28
 Defaults.PlayerBuffSpacing = 2
 Defaults.PlayerDebuffSize = 28
 Defaults.PlayerDebuffSpacing = 2
-Defaults.PlayerHealthTexture = "HydraUI 4"
-Defaults.PlayerPowerTexture = "HydraUI 4"
-Defaults.PlayerResourceTexture = "HydraUI 4"
+Defaults.PlayerHealthTexture = "YxUI 4"
+Defaults.PlayerPowerTexture = "YxUI 4"
+Defaults.PlayerResourceTexture = "YxUI 4"
 
 -- Can do textures for health/power/castbar/player resources. That's only 4 settings, and only player needs the resources setting
 
-local UF = HydraUI:GetModule("Unit Frames")
+local UF = YxUI:GetModule("Unit Frames")
 
-HydraUI.StyleFuncs["player"] = function(self, unit)
+YxUI.StyleFuncs["player"] = function(self, unit)
 	-- General
 	self:RegisterForClicks("AnyUp")
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
@@ -78,7 +78,7 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 
 	self.HealBar = HealBar
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		local AbsorbsBar = CreateFrame("StatusBar", nil, Health)
 		AbsorbsBar:SetWidth(Settings["unitframes-player-width"])
 		AbsorbsBar:SetHeight(Settings["unitframes-player-health-height"])
@@ -102,12 +102,12 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 	HealthBG.multiplier = 0.2
 
 	local HealthLeft = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthLeft, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+	YxUI:SetFontInfo(HealthLeft, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 	HealthLeft:SetPoint("LEFT", Health, 3, 0)
 	HealthLeft:SetJustifyH("LEFT")
 
 	local HealthRight = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthRight, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+	YxUI:SetFontInfo(HealthRight, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 	HealthRight:SetPoint("RIGHT", Health, -3, 0)
 	HealthRight:SetJustifyH("RIGHT")
 
@@ -156,13 +156,13 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
     Leader:SetSize(16, 16)
     Leader:SetPoint("LEFT", Health, "TOPLEFT", 3, 0)
     Leader:SetTexture(Assets:GetTexture("Leader"))
-    Leader:SetVertexColor(HydraUI:HexToRGB("FFEB3B"))
+    Leader:SetVertexColor(YxUI:HexToRGB("FFEB3B"))
     Leader:Hide()
 
     -- PVP indicator
 	local PvPIndicator = Health:CreateTexture(nil, "ARTWORK", nil, 1)
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		PvPIndicator:SetSize(30, 30)
 		PvPIndicator:SetPoint("RIGHT", Health, "LEFT", -4, -2)
 
@@ -178,7 +178,7 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 	RaidTarget:SetSize(16, 16)
 	RaidTarget:SetPoint("CENTER", Health, "TOP")
 
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-header-texture-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-header-texture-color"])
 
 	-- Attributes
 	Health.Smooth = true
@@ -187,10 +187,10 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 
 	if Settings["unitframes-player-enable-power"] then
 		local Power = CreateFrame("StatusBar", nil, self)
-		local PowerAnchor = CreateFrame("Frame", "HydraUI Player Power", HydraUI.UIParent)
+		local PowerAnchor = CreateFrame("Frame", "YxUI Player Power", YxUI.UIParent)
 		PowerAnchor:SetSize(Settings["unitframes-player-width"], Settings["unitframes-player-power-height"])
-		PowerAnchor:SetPoint("CENTER", HydraUI.UIParent, 0, -133)
-		HydraUI:CreateMover(PowerAnchor)
+		PowerAnchor:SetPoint("CENTER", YxUI.UIParent, 0, -133)
+		YxUI:CreateMover(PowerAnchor)
 
 		if Settings["player-move-power"] then
 			Power:SetPoint("BOTTOMLEFT", PowerAnchor, 1, 1)
@@ -217,12 +217,12 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 		Backdrop:SetVertexColor(0, 0, 0)
 
 		local PowerRight = Power:CreateFontString(nil, "OVERLAY")
-		HydraUI:SetFontInfo(PowerRight, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+		YxUI:SetFontInfo(PowerRight, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 		PowerRight:SetPoint("RIGHT", Power, -3, 0)
 		PowerRight:SetJustifyH("RIGHT")
 
 		local PowerLeft = Power:CreateFontString(nil, "OVERLAY")
-		HydraUI:SetFontInfo(PowerLeft, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+		YxUI:SetFontInfo(PowerLeft, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 		PowerLeft:SetPoint("LEFT", Power, 3, 0)
 		PowerLeft:SetJustifyH("LEFT")
 
@@ -233,7 +233,7 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 		AdditionalPower:SetReverseFill(Settings["unitframes-player-power-reverse"])]]
 
 		-- Mana regen
-		if (Settings["unitframes-show-mana-timer"] and not HydraUI.IsMainline) then
+		if (Settings["unitframes-show-mana-timer"] and not YxUI.IsMainline) then
 			local ManaTimer = CreateFrame("StatusBar", nil, Power)
 			ManaTimer:SetAllPoints(Power)
 			ManaTimer:SetStatusBarTexture(Assets:GetTexture(Settings.PlayerPowerTexture))
@@ -256,7 +256,7 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 		end
 
 		-- Energy ticks
-		if (Settings["unitframes-show-energy-timer"] and (HydraUI.IsClassic or HydraUI.IsTBC)) then
+		if (Settings["unitframes-show-energy-timer"] and (YxUI.IsClassic or YxUI.IsTBC)) then
 			local EnergyTick = CreateFrame("StatusBar", nil, Power)
 			EnergyTick:SetAllPoints(Power)
 			EnergyTick:SetStatusBarTexture(Assets:GetTexture(Settings.PlayerPowerTexture))
@@ -279,7 +279,7 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 		end
 
 		-- Power prediction
-		if HydraUI.IsMainline then
+		if YxUI.IsMainline then
 			local MainBar = CreateFrame("StatusBar", nil, Power)
 			MainBar:SetReverseFill(true)
 			MainBar:SetPoint("TOPLEFT")
@@ -312,7 +312,7 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 
     -- Castbar
 	if Settings["unitframes-player-enable-castbar"] then
-		local Anchor = CreateFrame("Frame", "HydraUI Casting Bar", self)
+		local Anchor = CreateFrame("Frame", "YxUI Casting Bar", self)
 		Anchor:SetSize(Settings["unitframes-player-cast-width"], Settings["unitframes-player-cast-height"])
 
 		local Castbar = CreateFrame("StatusBar", nil, self)
@@ -333,12 +333,12 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 		Background:SetVertexColor(0, 0, 0)
 
 		local Time = Castbar:CreateFontString(nil, "OVERLAY")
-		HydraUI:SetFontInfo(Time, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+		YxUI:SetFontInfo(Time, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 		Time:SetPoint("RIGHT", Castbar, -5, 0)
 		Time:SetJustifyH("RIGHT")
 
 		local Text = Castbar:CreateFontString(nil, "OVERLAY")
-		HydraUI:SetFontInfo(Text, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+		YxUI:SetFontInfo(Text, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 		Text:SetPoint("LEFT", Castbar, 5, 0)
 		Text:SetSize(Settings["unitframes-player-cast-width"] * 0.7, Settings["unitframes-font-size"])
 		Text:SetJustifyH("LEFT")
@@ -370,15 +370,15 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 	end
 
 	if Settings["unitframes-player-enable-resource"] then
-		local ResourceAnchor = CreateFrame("Frame", "HydraUI Class Resource", HydraUI.UIParent)
+		local ResourceAnchor = CreateFrame("Frame", "YxUI Class Resource", YxUI.UIParent)
 		ResourceAnchor:SetSize(Settings["unitframes-player-width"], Settings["player-resource-height"] + 2)
-		ResourceAnchor:SetPoint("CENTER", HydraUI.UIParent, 0, -120)
-		HydraUI:CreateMover(ResourceAnchor)
+		ResourceAnchor:SetPoint("CENTER", YxUI.UIParent, 0, -120)
+		YxUI:CreateMover(ResourceAnchor)
 
-		if (HydraUI.UserClass == "ROGUE" or HydraUI.UserClass == "DRUID") then
+		if (YxUI.UserClass == "ROGUE" or YxUI.UserClass == "DRUID") then
 			local ComboPoints = CreateFrame("Frame", self:GetName() .. "ComboPoints", self, "BackdropTemplate")
 			ComboPoints:SetSize(Settings["unitframes-player-width"], Settings["player-resource-height"] + 2)
-			ComboPoints:SetBackdrop(HydraUI.Backdrop)
+			ComboPoints:SetBackdrop(YxUI.Backdrop)
 			ComboPoints:SetBackdropColor(0, 0, 0)
 			ComboPoints:SetBackdropBorderColor(0, 0, 0)
 
@@ -388,27 +388,27 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 				ComboPoints:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, -1)
 			end
 
-			local Max = HydraUI.UserClass == "DRUID" and 5 or (not HydraUI.IsMainline and 5 or 7)
+			local Max = YxUI.UserClass == "DRUID" and 5 or (not YxUI.IsMainline and 5 or 7)
 			local Width = (Settings["unitframes-player-width"] / Max) - 1
 
 			for i = 1, Max do
 				ComboPoints[i] = CreateFrame("StatusBar", self:GetName() .. "ComboPoint" .. i, ComboPoints)
 				ComboPoints[i]:SetSize(Width, Settings["player-resource-height"])
 				ComboPoints[i]:SetStatusBarTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				ComboPoints[i]:SetStatusBarColor(HydraUI.ComboPoints[i][1], HydraUI.ComboPoints[i][2], HydraUI.ComboPoints[i][3])
+				ComboPoints[i]:SetStatusBarColor(YxUI.ComboPoints[i][1], YxUI.ComboPoints[i][2], YxUI.ComboPoints[i][3])
 				ComboPoints[i]:SetWidth(i == 1 and Width - 1 or Width)
 
 				ComboPoints[i].BG = ComboPoints:CreateTexture(nil, "BORDER")
 				ComboPoints[i].BG:SetAllPoints(ComboPoints[i])
 				ComboPoints[i].BG:SetTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				ComboPoints[i].BG:SetVertexColor(HydraUI.ComboPoints[i][1], HydraUI.ComboPoints[i][2], HydraUI.ComboPoints[i][3])
+				ComboPoints[i].BG:SetVertexColor(YxUI.ComboPoints[i][1], YxUI.ComboPoints[i][2], YxUI.ComboPoints[i][3])
 				ComboPoints[i].BG:SetAlpha(0.3)
 
-				if HydraUI.IsMainline then
+				if YxUI.IsMainline then
 					ComboPoints[i].Charged = ComboPoints[i]:CreateTexture(nil, "ARTWORK")
 					ComboPoints[i].Charged:SetAllPoints()
 					ComboPoints[i].Charged:SetTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-					ComboPoints[i].Charged:SetVertexColor(HydraUI:HexToRGB(Settings["color-combo-charged"]))
+					ComboPoints[i].Charged:SetVertexColor(YxUI:HexToRGB(Settings["color-combo-charged"]))
 					ComboPoints[i].Charged:Hide()
 				end
 
@@ -421,12 +421,12 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 
 			self.ComboPoints = ComboPoints
 			self.AuraParent = ComboPoints
-		elseif (HydraUI.UserClass == "WARLOCK" and (HydraUI.IsMainline or HydraUI.IsCata)) then
-			local Count = HydraUI.IsMainline and 5 or 3
+		elseif (YxUI.UserClass == "WARLOCK" and (YxUI.IsMainline or YxUI.IsCata)) then
+			local Count = YxUI.IsMainline and 5 or 3
 		
 			local SoulShards = CreateFrame("Frame", self:GetName() .. "SoulShards", self, "BackdropTemplate")
 			SoulShards:SetSize(Settings["unitframes-player-width"], Settings["player-resource-height"] + 2)
-			SoulShards:SetBackdrop(HydraUI.Backdrop)
+			SoulShards:SetBackdrop(YxUI.Backdrop)
 			SoulShards:SetBackdropColor(0, 0, 0)
 			SoulShards:SetBackdropBorderColor(0, 0, 0)
 
@@ -442,13 +442,13 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 				SoulShards[i] = CreateFrame("StatusBar", self:GetName() .. "SoulShard" .. i, SoulShards)
 				SoulShards[i]:SetSize(Width, Settings["player-resource-height"])
 				SoulShards[i]:SetStatusBarTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				SoulShards[i]:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-soul-shards"]))
+				SoulShards[i]:SetStatusBarColor(YxUI:HexToRGB(Settings["color-soul-shards"]))
 				SoulShards[i]:SetWidth(i == 1 and Width - 1 or Width)
 
 				SoulShards[i].bg = SoulShards:CreateTexture(nil, "BORDER")
 				SoulShards[i].bg:SetAllPoints(SoulShards[i])
 				SoulShards[i].bg:SetTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				SoulShards[i].bg:SetVertexColor(HydraUI:HexToRGB(Settings["color-soul-shards"]))
+				SoulShards[i].bg:SetVertexColor(YxUI:HexToRGB(Settings["color-soul-shards"]))
 				SoulShards[i].bg:SetAlpha(0.3)
 
 				if (i == 1) then
@@ -461,10 +461,10 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 			self.ClassPower = SoulShards
 			self.SoulShards = SoulShards
 			self.AuraParent = SoulShards
-		elseif (HydraUI.UserClass == "MAGE" and HydraUI.IsMainline) then
+		elseif (YxUI.UserClass == "MAGE" and YxUI.IsMainline) then
 			local ArcaneCharges = CreateFrame("Frame", self:GetName() .. "ArcaneCharges", self, "BackdropTemplate")
 			ArcaneCharges:SetSize(Settings["unitframes-player-width"], Settings["player-resource-height"] + 2)
-			ArcaneCharges:SetBackdrop(HydraUI.Backdrop)
+			ArcaneCharges:SetBackdrop(YxUI.Backdrop)
 			ArcaneCharges:SetBackdropColor(0, 0, 0)
 			ArcaneCharges:SetBackdropBorderColor(0, 0, 0)
 
@@ -480,13 +480,13 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 				ArcaneCharges[i] = CreateFrame("StatusBar", self:GetName() .. "ArcaneCharge" .. i, ArcaneCharges)
 				ArcaneCharges[i]:SetSize(Width, Settings["player-resource-height"])
 				ArcaneCharges[i]:SetStatusBarTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				ArcaneCharges[i]:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-arcane-charges"]))
+				ArcaneCharges[i]:SetStatusBarColor(YxUI:HexToRGB(Settings["color-arcane-charges"]))
 				ArcaneCharges[i]:SetWidth(i == 1 and Width - 1 or Width)
 
 				ArcaneCharges[i].bg = ArcaneCharges:CreateTexture(nil, "BORDER")
 				ArcaneCharges[i].bg:SetAllPoints(ArcaneCharges[i])
 				ArcaneCharges[i].bg:SetTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				ArcaneCharges[i].bg:SetVertexColor(HydraUI:HexToRGB(Settings["color-arcane-charges"]))
+				ArcaneCharges[i].bg:SetVertexColor(YxUI:HexToRGB(Settings["color-arcane-charges"]))
 				ArcaneCharges[i].bg:SetAlpha(0.3)
 
 				if (i == 1) then
@@ -499,10 +499,10 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 			self.ClassPower = ArcaneCharges
 			self.ArcaneCharges = ArcaneCharges
 			self.AuraParent = ArcaneCharges
-		elseif (HydraUI.UserClass == "MONK") then
+		elseif (YxUI.UserClass == "MONK") then
 			local Chi = CreateFrame("Frame", self:GetName() .. "Chi", self, "BackdropTemplate")
 			Chi:SetSize(Settings["unitframes-player-width"], Settings["player-resource-height"] + 2)
-			Chi:SetBackdrop(HydraUI.Backdrop)
+			Chi:SetBackdrop(YxUI.Backdrop)
 			Chi:SetBackdropColor(0, 0, 0)
 			Chi:SetBackdropBorderColor(0, 0, 0)
 
@@ -518,13 +518,13 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 				Chi[i] = CreateFrame("StatusBar", self:GetName() .. "Chi" .. i, Chi)
 				Chi[i]:SetSize(Width, Settings["player-resource-height"])
 				Chi[i]:SetStatusBarTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				Chi[i]:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-chi"]))
+				Chi[i]:SetStatusBarColor(YxUI:HexToRGB(Settings["color-chi"]))
 				Chi[i]:SetWidth(i == 1 and Width - 1 or Width)
 
 				Chi[i].bg = Chi:CreateTexture(nil, "BORDER")
 				Chi[i].bg:SetAllPoints(Chi[i])
 				Chi[i].bg:SetTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				Chi[i].bg:SetVertexColor(HydraUI:HexToRGB(Settings["color-chi"]))
+				Chi[i].bg:SetVertexColor(YxUI:HexToRGB(Settings["color-chi"]))
 				Chi[i].bg:SetAlpha(0.3)
 
 				if (i == 1) then
@@ -559,10 +559,10 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 			self.ClassPower = Chi
 			self.Chi = Chi
 			self.AuraParent = Chi
-		elseif (HydraUI.UserClass == "DEATHKNIGHT") then
+		elseif (YxUI.UserClass == "DEATHKNIGHT") then
 			local Runes = CreateFrame("Frame", self:GetName() .. "Runes", self, "BackdropTemplate")
 			Runes:SetSize(Settings["unitframes-player-width"], Settings["player-resource-height"] + 2)
-			Runes:SetBackdrop(HydraUI.Backdrop)
+			Runes:SetBackdrop(YxUI.Backdrop)
 			Runes:SetBackdropColor(0, 0, 0)
 			Runes:SetBackdropBorderColor(0, 0, 0)
 			Runes.sortOrder = "asc" -- desc
@@ -579,14 +579,14 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 				Runes[i] = CreateFrame("StatusBar", self:GetName() .. "Rune" .. i, Runes)
 				Runes[i]:SetSize(Width, Settings["player-resource-height"])
 				Runes[i]:SetStatusBarTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				Runes[i]:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-runes"]))
+				Runes[i]:SetStatusBarColor(YxUI:HexToRGB(Settings["color-runes"]))
 				Runes[i]:SetWidth(i == 1 and Width - 1 or Width)
 				Runes[i].Duration = 0
 
 				Runes[i].bg = Runes[i]:CreateTexture(nil, "BORDER")
 				Runes[i].bg:SetAllPoints(Runes[i])
 				Runes[i].bg:SetTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				Runes[i].bg:SetVertexColor(HydraUI:HexToRGB(Settings["color-runes"]))
+				Runes[i].bg:SetVertexColor(YxUI:HexToRGB(Settings["color-runes"]))
 				Runes[i].bg:SetAlpha(0.2)
 
 				Runes[i].Shine = Runes[i]:CreateTexture(nil, "ARTWORK")
@@ -621,12 +621,12 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 
 			self.Runes = Runes
 			self.AuraParent = Runes
-		elseif (HydraUI.UserClass == "PALADIN" and (HydraUI.IsMainline or HydraUI.IsCata)) then
-			local Count = HydraUI.IsMainline and 5 or 3
+		elseif (YxUI.UserClass == "PALADIN" and (YxUI.IsMainline or YxUI.IsCata)) then
+			local Count = YxUI.IsMainline and 5 or 3
 		
 			local HolyPower = CreateFrame("Frame", self:GetName() .. "HolyPower", self, "BackdropTemplate")
 			HolyPower:SetSize(Settings["unitframes-player-width"], Settings["player-resource-height"] + 2)
-			HolyPower:SetBackdrop(HydraUI.Backdrop)
+			HolyPower:SetBackdrop(YxUI.Backdrop)
 			HolyPower:SetBackdropColor(0, 0, 0)
 			HolyPower:SetBackdropBorderColor(0, 0, 0)
 
@@ -642,13 +642,13 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 				HolyPower[i] = CreateFrame("StatusBar", self:GetName() .. "HolyPower" .. i, HolyPower)
 				HolyPower[i]:SetSize(Width, Settings["player-resource-height"])
 				HolyPower[i]:SetStatusBarTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				HolyPower[i]:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-holy-power"]))
+				HolyPower[i]:SetStatusBarColor(YxUI:HexToRGB(Settings["color-holy-power"]))
 				HolyPower[i]:SetWidth(i == 1 and Width - 1 or Width)
 
 				HolyPower[i].bg = HolyPower:CreateTexture(nil, "BORDER")
 				HolyPower[i].bg:SetAllPoints(HolyPower[i])
 				HolyPower[i].bg:SetTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				HolyPower[i].bg:SetVertexColor(HydraUI:HexToRGB(Settings["color-holy-power"]))
+				HolyPower[i].bg:SetVertexColor(YxUI:HexToRGB(Settings["color-holy-power"]))
 				HolyPower[i].bg:SetAlpha(0.3)
 
 				if (i == 1) then
@@ -661,10 +661,10 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 			self.ClassPower = HolyPower
 			self.HolyPower = HolyPower
 			self.AuraParent = HolyPower
-		elseif (HydraUI.UserClass == "SHAMAN") and (not HydraUI.IsMainline) then
+		elseif (YxUI.UserClass == "SHAMAN") and (not YxUI.IsMainline) then
 			local Totems = CreateFrame("Frame", self:GetName() .. "Totems", self, "BackdropTemplate")
 			Totems:SetSize(Settings["unitframes-player-width"], Settings["player-resource-height"] + 2)
-			Totems:SetBackdrop(HydraUI.Backdrop)
+			Totems:SetBackdrop(YxUI.Backdrop)
 			Totems:SetBackdropColor(0, 0, 0)
 			Totems:SetBackdropBorderColor(0, 0, 0)
 			Totems.PostUpdate = UF.PostUpdateTotems
@@ -675,11 +675,11 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 				Totems:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, -1)
 			end
 
-			--[[local TotemBar = CreateFrame("Frame", "HydraUI Totem Bar", HydraUI.UIParent)
+			--[[local TotemBar = CreateFrame("Frame", "YxUI Totem Bar", YxUI.UIParent)
 			TotemBar:SetSize(40 * 4 + 5, 40 + 2)
-			TotemBar:SetPoint("CENTER", HydraUI.UIParent, 0, -120)
-			TotemBar:SetMovable("CENTER", HydraUI.UIParent, 0, -120)
-			--HydraUI:CreateMover(TotemBar)
+			TotemBar:SetPoint("CENTER", YxUI.UIParent, 0, -120)
+			TotemBar:SetMovable("CENTER", YxUI.UIParent, 0, -120)
+			--YxUI:CreateMover(TotemBar)
 			TotemBar:EnableMouse(true)
 			TotemBar:RegisterForDrag("LeftButton")
 			TotemBar:SetUserPlaced(true)
@@ -700,7 +700,7 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 				--[[Totems[i].bg = Totems:CreateTexture(nil, "BACKGROUND")
 				Totems[i].bg:SetAllPoints(Totems[i])
 				Totems[i].bg:SetTexture(Assets:GetTexture("Blank"))
-				Totems[i].bg:SetVertexColor(HydraUI.TotemColors[i][1], HydraUI.TotemColors[i][2], HydraUI.TotemColors[i][3], 0.3)
+				Totems[i].bg:SetVertexColor(YxUI.TotemColors[i][1], YxUI.TotemColors[i][2], YxUI.TotemColors[i][3], 0.3)
 
 				Totems[i].Icon = Totems[i]:CreateTexture(nil, "OVERLAY")
 				Totems[i].Icon:SetPoint("TOPLEFT", 0, 0)
@@ -713,13 +713,13 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 				local Cooldown = Totems[i].Cooldown:GetRegions()
 
 				if Cooldown then
-					HydraUI:SetFontInfo(Cooldown, Settings["unitframes-font"], 18, Settings["unitframes-font-flags"])
+					YxUI:SetFontInfo(Cooldown, Settings["unitframes-font"], 18, Settings["unitframes-font-flags"])
 				end]]
 
 				Totems[i].Bar = CreateFrame("StatusBar", self:GetName() .. "Totems" .. i, Totems)
 				Totems[i].Bar:SetSize(Width, Settings["player-resource-height"])
 				Totems[i].Bar:SetStatusBarTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				Totems[i].Bar:SetStatusBarColor(HydraUI.TotemColors[i][1], HydraUI.TotemColors[i][2], HydraUI.TotemColors[i][3])
+				Totems[i].Bar:SetStatusBarColor(YxUI.TotemColors[i][1], YxUI.TotemColors[i][2], YxUI.TotemColors[i][3])
 				Totems[i].Bar:SetWidth(i == 1 and Width - 1 or Width)
 				Totems[i].Bar:EnableMouse(true)
 				Totems[i].Bar:SetID(i)
@@ -728,7 +728,7 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 				Totems[i].bg = Totems:CreateTexture(nil, "BORDER")
 				Totems[i].bg:SetAllPoints(Totems[i].Bar)
 				Totems[i].bg:SetTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				Totems[i].bg:SetVertexColor(HydraUI.TotemColors[i][1], HydraUI.TotemColors[i][2], HydraUI.TotemColors[i][3])
+				Totems[i].bg:SetVertexColor(YxUI.TotemColors[i][1], YxUI.TotemColors[i][2], YxUI.TotemColors[i][3])
 				Totems[i].bg:SetAlpha(0.3)
 
 				if (i == 1) then
@@ -743,10 +743,10 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 			self.ClassPower = Totems
 			self.Totems = Totems
 			self.AuraParent = Totems
-		elseif (HydraUI.UserClass == "EVOKER") then
+		elseif (YxUI.UserClass == "EVOKER") then
 			local Essence = CreateFrame("Frame", self:GetName() .. "Essence", self, "BackdropTemplate")
 			Essence:SetSize(Settings["unitframes-player-width"], Settings["player-resource-height"] + 2)
-			Essence:SetBackdrop(HydraUI.Backdrop)
+			Essence:SetBackdrop(YxUI.Backdrop)
 			Essence:SetBackdropColor(0, 0, 0)
 			Essence:SetBackdropBorderColor(0, 0, 0)
 
@@ -762,13 +762,13 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 				Essence[i] = CreateFrame("StatusBar", self:GetName() .. "Essence" .. i, Essence)
 				Essence[i]:SetSize(Width, Settings["player-resource-height"])
 				Essence[i]:SetStatusBarTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				Essence[i]:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-essence"]))
+				Essence[i]:SetStatusBarColor(YxUI:HexToRGB(Settings["color-essence"]))
 				Essence[i]:SetWidth(i == 1 and Width - 1 or Width)
 
 				Essence[i].bg = Essence:CreateTexture(nil, "BORDER")
 				Essence[i].bg:SetAllPoints(Essence[i])
 				Essence[i].bg:SetTexture(Assets:GetTexture(Settings.PlayerResourceTexture))
-				Essence[i].bg:SetVertexColor(HydraUI:HexToRGB(Settings["color-essence"]))
+				Essence[i].bg:SetVertexColor(YxUI:HexToRGB(Settings["color-essence"]))
 				Essence[i].bg:SetAlpha(0.3)
 
 				if (i == 1) then
@@ -797,7 +797,7 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 		Threat:SetPoint("BOTTOMRIGHT", 1, -1)
 	end
 
-	Threat:SetBackdrop(HydraUI.Outline)
+	Threat:SetBackdrop(YxUI.Outline)
 	Threat.PostUpdate = UF.ThreatPostUpdate
 
 	self.ThreatIndicator = Threat
@@ -869,14 +869,14 @@ HydraUI.StyleFuncs["player"] = function(self, unit)
 end
 
 local UpdateOnlyPlayerDebuffs = function(value)
-	if HydraUI.UnitFrames["target"] then
-		HydraUI.UnitFrames["target"].Debuffs.onlyShowPlayer = value
+	if YxUI.UnitFrames["target"] then
+		YxUI.UnitFrames["target"].Debuffs.onlyShowPlayer = value
 	end
 end
 
 local UpdatePlayerWidth = function(value)
-	if HydraUI.UnitFrames["player"] then
-		local Frame = HydraUI.UnitFrames["player"]
+	if YxUI.UnitFrames["player"] then
+		local Frame = YxUI.UnitFrames["player"]
 
 		Frame:SetWidth(value)
 
@@ -951,8 +951,8 @@ local UpdatePlayerWidth = function(value)
 end
 
 local UpdatePlayerHealthHeight = function(value)
-	if HydraUI.UnitFrames["player"] then
-		local Frame = HydraUI.UnitFrames["player"]
+	if YxUI.UnitFrames["player"] then
+		local Frame = YxUI.UnitFrames["player"]
 
 		Frame.Health:SetHeight(value)
 		Frame:SetHeight(value + Settings["unitframes-player-power-height"] + 3)
@@ -960,8 +960,8 @@ local UpdatePlayerHealthHeight = function(value)
 end
 
 local UpdatePlayerHealthFill = function(value)
-	if HydraUI.UnitFrames["player"] then
-		local Unit = HydraUI.UnitFrames["player"]
+	if YxUI.UnitFrames["player"] then
+		local Unit = YxUI.UnitFrames["player"]
 
 		Unit.Health:SetReverseFill(value)
 		Unit.HealBar:SetReverseFill(value)
@@ -988,8 +988,8 @@ local UpdatePlayerHealthFill = function(value)
 end
 
 local UpdatePlayerPowerHeight = function(value)
-	if HydraUI.UnitFrames["player"] then
-		local Frame = HydraUI.UnitFrames["player"]
+	if YxUI.UnitFrames["player"] then
+		local Frame = YxUI.UnitFrames["player"]
 
 		Frame.Power:SetHeight(value)
 
@@ -1000,28 +1000,28 @@ local UpdatePlayerPowerHeight = function(value)
 end
 
 local UpdatePlayerPowerFill = function(value)
-	if HydraUI.UnitFrames["player"] then
-		HydraUI.UnitFrames["player"].Power:SetReverseFill(value)
+	if YxUI.UnitFrames["player"] then
+		YxUI.UnitFrames["player"].Power:SetReverseFill(value)
 	end
 end
 
 local UpdatePlayerCastBarSize = function()
-	if HydraUI.UnitFrames["player"].Castbar then
-		HydraUI.UnitFrames["player"].Castbar:SetSize(Settings["unitframes-player-cast-width"], Settings["unitframes-player-cast-height"])
-		HydraUI.UnitFrames["player"].Castbar.Icon:SetSize(Settings["unitframes-player-cast-height"], Settings["unitframes-player-cast-height"])
+	if YxUI.UnitFrames["player"].Castbar then
+		YxUI.UnitFrames["player"].Castbar:SetSize(Settings["unitframes-player-cast-width"], Settings["unitframes-player-cast-height"])
+		YxUI.UnitFrames["player"].Castbar.Icon:SetSize(Settings["unitframes-player-cast-height"], Settings["unitframes-player-cast-height"])
 	end
 end
 
 local UpdateCastClassColor = function(value)
-	if HydraUI.UnitFrames["player"].Castbar then
-		HydraUI.UnitFrames["player"].Castbar.ClassColor = value
-		HydraUI.UnitFrames["player"].Castbar:ForceUpdate()
+	if YxUI.UnitFrames["player"].Castbar then
+		YxUI.UnitFrames["player"].Castbar.ClassColor = value
+		YxUI.UnitFrames["player"].Castbar:ForceUpdate()
 	end
 end
 
 local UpdatePlayerHealthColor = function(value)
-	if HydraUI.UnitFrames["player"] then
-		local Health = HydraUI.UnitFrames["player"].Health
+	if YxUI.UnitFrames["player"] then
+		local Health = YxUI.UnitFrames["player"].Health
 
 		UF:SetHealthAttributes(Health, value)
 
@@ -1030,8 +1030,8 @@ local UpdatePlayerHealthColor = function(value)
 end
 
 local UpdatePlayerPowerColor = function(value)
-	if HydraUI.UnitFrames["player"] then
-		local Power = HydraUI.UnitFrames["player"].Power
+	if YxUI.UnitFrames["player"] then
+		local Power = YxUI.UnitFrames["player"].Power
 
 		UF:SetPowerAttributes(Power, value)
 
@@ -1040,46 +1040,46 @@ local UpdatePlayerPowerColor = function(value)
 end
 
 local UpdatePlayerEnablePortrait = function(value)
-	if HydraUI.UnitFrames["player"] then
+	if YxUI.UnitFrames["player"] then
 		if value then
-			HydraUI.UnitFrames["player"]:EnableElement("Portrait")
+			YxUI.UnitFrames["player"]:EnableElement("Portrait")
 
-			if HydraUI.UnitFrames["player"].Portrait.BG then
-				HydraUI.UnitFrames["player"].Portrait.BG:Show()
+			if YxUI.UnitFrames["player"].Portrait.BG then
+				YxUI.UnitFrames["player"].Portrait.BG:Show()
 			end
 		else
-			HydraUI.UnitFrames["player"]:DisableElement("Portrait")
+			YxUI.UnitFrames["player"]:DisableElement("Portrait")
 
-			if HydraUI.UnitFrames["player"].Portrait.BG then
-				HydraUI.UnitFrames["player"].Portrait.BG:Hide()
+			if YxUI.UnitFrames["player"].Portrait.BG then
+				YxUI.UnitFrames["player"].Portrait.BG:Hide()
 			end
 		end
 
-		HydraUI.UnitFrames["player"].Portrait:ForceUpdate()
+		YxUI.UnitFrames["player"].Portrait:ForceUpdate()
 	end
 end
 
 local UpdateOverlayAlpha = function(value)
-	if HydraUI.UnitFrames["player"] and Settings["player-portrait-style"] == "OVERLAY" then
-		HydraUI.UnitFrames["player"].Portrait:SetAlpha(value / 100)
+	if YxUI.UnitFrames["player"] and Settings["player-portrait-style"] == "OVERLAY" then
+		YxUI.UnitFrames["player"].Portrait:SetAlpha(value / 100)
 	end
 end
 
 local UpdatePlayerEnablePVPIndicator = function(value)
-	if HydraUI.UnitFrames["player"] then
+	if YxUI.UnitFrames["player"] then
 		if value then
-			HydraUI.UnitFrames["player"]:EnableElement("PvPIndicator")
-			HydraUI.UnitFrames["player"].PvPIndicator:ForceUpdate()
+			YxUI.UnitFrames["player"]:EnableElement("PvPIndicator")
+			YxUI.UnitFrames["player"].PvPIndicator:ForceUpdate()
 		else
-			HydraUI.UnitFrames["player"]:DisableElement("PvPIndicator")
-			HydraUI.UnitFrames["player"].PvPIndicator:Hide()
+			YxUI.UnitFrames["player"]:DisableElement("PvPIndicator")
+			YxUI.UnitFrames["player"].PvPIndicator:Hide()
 		end
 	end
 end
 
 local UpdateResourceBarHeight = function(value)
-	if HydraUI.UnitFrames["player"] then
-		local Frame = HydraUI.UnitFrames["player"]
+	if YxUI.UnitFrames["player"] then
+		local Frame = YxUI.UnitFrames["player"]
 
 		if Frame.ComboPoints then
 			Frame.ComboPoints:SetHeight(value + 2)
@@ -1131,8 +1131,8 @@ local UpdateResourceBarHeight = function(value)
 end
 
 local UpdateResourceTexture = function(value)
-	if HydraUI.UnitFrames["player"] then
-		local Frame = HydraUI.UnitFrames["player"]
+	if YxUI.UnitFrames["player"] then
+		local Frame = YxUI.UnitFrames["player"]
 
 		if Frame.ComboPoints then
 			for i = 1, #Frame.ComboPoints do
@@ -1177,41 +1177,41 @@ local UpdateResourceTexture = function(value)
 end
 
 local UpdateBuffSize = function(value)
-	if HydraUI.UnitFrames["player"] then
-		HydraUI.UnitFrames["player"].Buffs.size = value
-		HydraUI.UnitFrames["player"].Buffs:SetSize(Settings["unitframes-player-width"], value)
-		HydraUI.UnitFrames["player"].Buffs:ForceUpdate()
+	if YxUI.UnitFrames["player"] then
+		YxUI.UnitFrames["player"].Buffs.size = value
+		YxUI.UnitFrames["player"].Buffs:SetSize(Settings["unitframes-player-width"], value)
+		YxUI.UnitFrames["player"].Buffs:ForceUpdate()
 	end
 end
 
 local UpdateBuffSpacing = function(value)
-	if HydraUI.UnitFrames["player"] then
-		HydraUI.UnitFrames["player"].Buffs.spacing = value
-		HydraUI.UnitFrames["player"].Buffs:ForceUpdate()
+	if YxUI.UnitFrames["player"] then
+		YxUI.UnitFrames["player"].Buffs.spacing = value
+		YxUI.UnitFrames["player"].Buffs:ForceUpdate()
 	end
 end
 
 local UpdateDebuffSize = function(value)
-	if HydraUI.UnitFrames["player"] then
-		HydraUI.UnitFrames["player"].Debuffs.size = value
-		HydraUI.UnitFrames["player"].Debuffs:SetSize(Settings["unitframes-player-width"], value)
-		HydraUI.UnitFrames["player"].Debuffs:ForceUpdate()
+	if YxUI.UnitFrames["player"] then
+		YxUI.UnitFrames["player"].Debuffs.size = value
+		YxUI.UnitFrames["player"].Debuffs:SetSize(Settings["unitframes-player-width"], value)
+		YxUI.UnitFrames["player"].Debuffs:ForceUpdate()
 	end
 end
 
 local UpdateDebuffSpacing = function(value)
-	if HydraUI.UnitFrames["player"] then
-		HydraUI.UnitFrames["player"].Debuffs.spacing = value
-		HydraUI.UnitFrames["player"].Debuffs:ForceUpdate()
+	if YxUI.UnitFrames["player"] then
+		YxUI.UnitFrames["player"].Debuffs.spacing = value
+		YxUI.UnitFrames["player"].Debuffs:ForceUpdate()
 	end
 end
 
 local UpdateDisplayedAuras = function()
-	if (not HydraUI.UnitFrames["player"]) then
+	if (not YxUI.UnitFrames["player"]) then
 		return
 	end
 
-	local Player = HydraUI.UnitFrames["player"]
+	local Player = YxUI.UnitFrames["player"]
 
 	Player.Buffs:ClearAllPoints()
 	Player.Debuffs:ClearAllPoints()
@@ -1247,8 +1247,8 @@ local UpdateDisplayedAuras = function()
 end
 
 local UpdateResourcePosition = function(value)
-	if HydraUI.UnitFrames["player"] then
-		local Frame = HydraUI.UnitFrames["player"]
+	if YxUI.UnitFrames["player"] then
+		local Frame = YxUI.UnitFrames["player"]
 
 		Frame.Debuffs:ClearAllPoints()
 		Frame.ThreatIndicator:ClearAllPoints()
@@ -1341,8 +1341,8 @@ local UpdateResourcePosition = function(value)
 end
 
 local UpdatePowerBarPosition = function(value)
-	if HydraUI.UnitFrames["player"] then
-		local Frame = HydraUI.UnitFrames["player"]
+	if YxUI.UnitFrames["player"] then
+		local Frame = YxUI.UnitFrames["player"]
 
 		Frame.Power:ClearAllPoints()
 
@@ -1361,8 +1361,8 @@ local UpdatePowerBarPosition = function(value)
 end
 
 local UpdateHealthTexture = function(value)
-	if HydraUI.UnitFrames["player"] then
-		local Frame = HydraUI.UnitFrames["player"]
+	if YxUI.UnitFrames["player"] then
+		local Frame = YxUI.UnitFrames["player"]
 
 		Frame.Health:SetStatusBarTexture(Assets:GetTexture(value))
 		Frame.Health.bg:SetTexture(Assets:GetTexture(value))
@@ -1375,8 +1375,8 @@ local UpdateHealthTexture = function(value)
 end
 
 local UpdatePowerTexture = function(value)
-	if HydraUI.UnitFrames["player"] then
-		local Frame = HydraUI.UnitFrames["player"]
+	if YxUI.UnitFrames["player"] then
+		local Frame = YxUI.UnitFrames["player"]
 
 		Frame.Power:SetStatusBarTexture(Assets:GetTexture(value))
 		Frame.Power.bg:SetTexture(Assets:GetTexture(value))
@@ -1395,13 +1395,13 @@ local UpdatePowerTexture = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Player"], Language["Unit Frames"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Player"], Language["Unit Frames"], function(left, right)
 	left:CreateHeader(Language["Styling"])
 	left:CreateSwitch("player-enable", Settings["player-enable"], Language["Enable Player"], Language["Enable the player unit frame"], ReloadUI):RequiresReload(true)
 	left:CreateSlider("unitframes-player-width", Settings["unitframes-player-width"], 120, 320, 1, Language["Width"], Language["Set the width of the player unit frame"], UpdatePlayerWidth)
 	left:CreateSwitch("player-enable-pvp", Settings["player-enable-pvp"], Language["Enable PVP Indicator"], Language["Display the pvp indicator"], UpdatePlayerEnablePVPIndicator)
 
-	if (HydraUI.IsClassic or HydraUI.IsTBC) then
+	if (YxUI.IsClassic or YxUI.IsTBC) then
 		left:CreateSwitch("unitframes-show-mana-timer", Settings["unitframes-show-mana-timer"], Language["Enable Mana Regen Timer"], Language["Display the time until your full mana regeneration is active"], ReloadUI):RequiresReload(true)
 		left:CreateSwitch("unitframes-show-energy-timer", Settings["unitframes-show-energy-timer"], Language["Enable Energy Timer"], Language["Display the time until your next energy tick on the power bar"], ReloadUI):RequiresReload(true)
 	end

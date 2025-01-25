@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 Defaults["unitframes-targettarget-width"] = 110
 Defaults["unitframes-targettarget-health-height"] = 26
@@ -16,12 +16,12 @@ Defaults["unitframes-targettarget-debuffs"] = true
 Defaults["unitframes-targettarget-debuff-size"] = 20
 Defaults["unitframes-targettarget-debuff-pos"] = "BOTTOM"
 Defaults["tot-enable"] = true
-Defaults.ToTHealthTexture = "HydraUI 4"
-Defaults.ToTPowerTexture = "HydraUI 4"
+Defaults.ToTHealthTexture = "YxUI 4"
+Defaults.ToTPowerTexture = "YxUI 4"
 
-local UF = HydraUI:GetModule("Unit Frames")
+local UF = YxUI:GetModule("Unit Frames")
 
-HydraUI.StyleFuncs["targettarget"] = function(self, unit)
+YxUI.StyleFuncs["targettarget"] = function(self, unit)
 	-- General
 	self:RegisterForClicks("AnyUp")
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
@@ -36,7 +36,7 @@ HydraUI.StyleFuncs["targettarget"] = function(self, unit)
 	local Threat = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	Threat:SetPoint("TOPLEFT", -1, 1)
 	Threat:SetPoint("BOTTOMRIGHT", 1, -1)
-	Threat:SetBackdrop(HydraUI.Outline)
+	Threat:SetBackdrop(YxUI.Outline)
 	Threat.PostUpdate = UF.ThreatPostUpdate
 
 	self.ThreatIndicator = Threat
@@ -64,7 +64,7 @@ HydraUI.StyleFuncs["targettarget"] = function(self, unit)
 
 	self.HealBar = HealBar
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		local AbsorbsBar = CreateFrame("StatusBar", nil, Health)
 		AbsorbsBar:SetWidth(Settings["unitframes-targettarget-width"])
 		AbsorbsBar:SetHeight(Settings["unitframes-targettarget-health-height"])
@@ -87,12 +87,12 @@ HydraUI.StyleFuncs["targettarget"] = function(self, unit)
 	HealthBG.multiplier = 0.2
 
 	local HealthLeft = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthLeft, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+	YxUI:SetFontInfo(HealthLeft, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 	HealthLeft:SetPoint("LEFT", Health, 3, 0)
 	HealthLeft:SetJustifyH("LEFT")
 
 	local HealthRight = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthRight, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+	YxUI:SetFontInfo(HealthRight, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 	HealthRight:SetPoint("RIGHT", Health, -3, 0)
 	HealthRight:SetJustifyH("RIGHT")
 
@@ -101,7 +101,7 @@ HydraUI.StyleFuncs["targettarget"] = function(self, unit)
 	RaidTargetIndicator:SetSize(16, 16)
 	RaidTargetIndicator:SetPoint("CENTER", Health, "TOP")
 
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-header-texture-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-header-texture-color"])
 
 	-- Attributes
 	Health.colorTapping = true
@@ -175,21 +175,21 @@ HydraUI.StyleFuncs["targettarget"] = function(self, unit)
 end
 
 local UpdateTargetTargetWidth = function(value)
-	if HydraUI.UnitFrames["target"] then
-		HydraUI.UnitFrames["targettarget"]:SetWidth(value)
+	if YxUI.UnitFrames["target"] then
+		YxUI.UnitFrames["targettarget"]:SetWidth(value)
 	end
 end
 
 local UpdateTargetTargetHealthHeight = function(value)
-	if HydraUI.UnitFrames["targettarget"] then
-		HydraUI.UnitFrames["targettarget"].Health:SetHeight(value)
-		HydraUI.UnitFrames["targettarget"]:SetHeight(value + Settings["unitframes-targettarget-power-height"] + 3)
+	if YxUI.UnitFrames["targettarget"] then
+		YxUI.UnitFrames["targettarget"].Health:SetHeight(value)
+		YxUI.UnitFrames["targettarget"]:SetHeight(value + Settings["unitframes-targettarget-power-height"] + 3)
 	end
 end
 
 local UpdateTargetTargetPowerHeight = function(value)
-	if HydraUI.UnitFrames["targettarget"] then
-		local Frame = HydraUI.UnitFrames["targettarget"]
+	if YxUI.UnitFrames["targettarget"] then
+		local Frame = YxUI.UnitFrames["targettarget"]
 
 		Frame.Power:SetHeight(value)
 		Frame:SetHeight(Settings["unitframes-targettarget-health-height"] + value + 3)
@@ -197,8 +197,8 @@ local UpdateTargetTargetPowerHeight = function(value)
 end
 
 local UpdateTargetTargetHealthColor = function(value)
-	if HydraUI.UnitFrames["targettarget"] then
-		local Health = HydraUI.UnitFrames["targettarget"].Health
+	if YxUI.UnitFrames["targettarget"] then
+		local Health = YxUI.UnitFrames["targettarget"].Health
 
 		UF:SetHealthAttributes(Health, value)
 
@@ -207,8 +207,8 @@ local UpdateTargetTargetHealthColor = function(value)
 end
 
 local UpdateTargetTargetHealthFill = function(value)
-	if HydraUI.UnitFrames["targettarget"] then
-		local Unit = HydraUI.UnitFrames["targettarget"]
+	if YxUI.UnitFrames["targettarget"] then
+		local Unit = YxUI.UnitFrames["targettarget"]
 
 		Unit.Health:SetReverseFill(value)
 		Unit.HealBar:SetReverseFill(value)
@@ -235,8 +235,8 @@ local UpdateTargetTargetHealthFill = function(value)
 end
 
 local UpdateTargetTargetPowerColor = function(value)
-	if HydraUI.UnitFrames["targettarget"] then
-		local Power = HydraUI.UnitFrames["targettarget"].Power
+	if YxUI.UnitFrames["targettarget"] then
+		local Power = YxUI.UnitFrames["targettarget"].Power
 
 		UF:SetPowerAttributes(Power, value)
 
@@ -245,32 +245,32 @@ local UpdateTargetTargetPowerColor = function(value)
 end
 
 local UpdateTargetTargetPowerFill = function(value)
-	if HydraUI.UnitFrames["targettarget"] then
-		HydraUI.UnitFrames["targettarget"].Power:SetReverseFill(value)
+	if YxUI.UnitFrames["targettarget"] then
+		YxUI.UnitFrames["targettarget"].Power:SetReverseFill(value)
 	end
 end
 
 local UpdateEnableDebuffs = function(value)
-	if HydraUI.UnitFrames["targettarget"] then
+	if YxUI.UnitFrames["targettarget"] then
 		if value then
-			HydraUI.UnitFrames["targettarget"]:EnableElement("Debuffs")
+			YxUI.UnitFrames["targettarget"]:EnableElement("Debuffs")
 		else
-			HydraUI.UnitFrames["targettarget"]:DisableElement("Debuffs")
+			YxUI.UnitFrames["targettarget"]:DisableElement("Debuffs")
 		end
 	end
 end
 
 local UpdateDebuffSize = function(value)
-	if HydraUI.UnitFrames["targettarget"] then
-		HydraUI.UnitFrames["targettarget"].Debuffs.size = value
-		HydraUI.UnitFrames["targettarget"].Debuffs:SetSize(Settings["unitframes-targettarget-width"], value)
-		HydraUI.UnitFrames["targettarget"].Debuffs:ForceUpdate()
+	if YxUI.UnitFrames["targettarget"] then
+		YxUI.UnitFrames["targettarget"].Debuffs.size = value
+		YxUI.UnitFrames["targettarget"].Debuffs:SetSize(Settings["unitframes-targettarget-width"], value)
+		YxUI.UnitFrames["targettarget"].Debuffs:ForceUpdate()
 	end
 end
 
 local UpdateDebuffPosition = function(value)
-	if HydraUI.UnitFrames["targettarget"] then
-		local Unit = HydraUI.UnitFrames["targettarget"]
+	if YxUI.UnitFrames["targettarget"] then
+		local Unit = YxUI.UnitFrames["targettarget"]
 
 		Unit.Debuffs:ClearAllPoints()
 
@@ -287,8 +287,8 @@ local UpdateDebuffPosition = function(value)
 end
 
 local UpdateHealthTexture = function(value)
-	if HydraUI.UnitFrames["targettarget"] then
-		local Frame = HydraUI.UnitFrames["targettarget"]
+	if YxUI.UnitFrames["targettarget"] then
+		local Frame = YxUI.UnitFrames["targettarget"]
 
 		Frame.Health:SetStatusBarTexture(Assets:GetTexture(value))
 		Frame.Health.bg:SetTexture(Assets:GetTexture(value))
@@ -301,15 +301,15 @@ local UpdateHealthTexture = function(value)
 end
 
 local UpdatePowerTexture = function(value)
-	if HydraUI.UnitFrames["targettarget"] then
-		local Frame = HydraUI.UnitFrames["targettarget"]
+	if YxUI.UnitFrames["targettarget"] then
+		local Frame = YxUI.UnitFrames["targettarget"]
 
 		Frame.Power:SetStatusBarTexture(Assets:GetTexture(value))
 		Frame.Power.bg:SetTexture(Assets:GetTexture(value))
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Target of Target"], Language["Unit Frames"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Target of Target"], Language["Unit Frames"], function(left, right)
 	left:CreateHeader(Language["Styling"])
 	left:CreateSwitch("tot-enable", Settings["tot-enable"], Language["Enable Target Target"], Language["Enable the target of target unit frame"], ReloadUI):RequiresReload(true)
 	left:CreateSlider("unitframes-targettarget-width", Settings["unitframes-targettarget-width"], 60, 320, 1, "Width", "Set the width of the target's target unit frame", UpdateTargetTargetWidth)

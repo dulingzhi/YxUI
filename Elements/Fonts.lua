@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-local Fonts = HydraUI:NewModule("Fonts")
+local Fonts = YxUI:NewModule("Fonts")
 
 local Locale = GetLocale()
 local Font
@@ -44,12 +44,12 @@ function Fonts:UpdateFont(object)
 end
 
 function Fonts:Load()
-	HydraUI:SetFontInfo(UIErrorsFrame, Settings["error-font"], Settings["error-font-size"], Settings["error-font-flags"])
+	YxUI:SetFontInfo(UIErrorsFrame, Settings["error-font"], Settings["error-font-size"], Settings["error-font-flags"])
 
-	HydraUI:SetFontInfo(RaidWarningFrameSlot1, Settings["warning-font"], Settings["warning-font-size"], Settings["warning-font-flags"])
-	HydraUI:SetFontInfo(RaidWarningFrameSlot2, Settings["warning-font"], Settings["warning-font-size"], Settings["warning-font-flags"])
+	YxUI:SetFontInfo(RaidWarningFrameSlot1, Settings["warning-font"], Settings["warning-font-size"], Settings["warning-font-flags"])
+	YxUI:SetFontInfo(RaidWarningFrameSlot2, Settings["warning-font"], Settings["warning-font-size"], Settings["warning-font-flags"])
 
-	HydraUI:SetFontInfo(AutoFollowStatusText, Settings["status-font"], Settings["status-font-size"], Settings["status-font-flags"])
+	YxUI:SetFontInfo(AutoFollowStatusText, Settings["status-font"], Settings["status-font-size"], Settings["status-font-flags"])
 
 	if (not Settings["replace-ui-fonts"]) then
 		return
@@ -177,19 +177,19 @@ function Fonts:Load()
 end
 
 local UpdateRaidFont = function()
-	HydraUI:SetFontInfo(RaidWarningFrameSlot1, Settings["warning-font"], Settings["warning-font-size"], Settings["warning-font-flags"])
-	HydraUI:SetFontInfo(RaidWarningFrameSlot2, Settings["warning-font"], Settings["warning-font-size"], Settings["warning-font-flags"])
+	YxUI:SetFontInfo(RaidWarningFrameSlot1, Settings["warning-font"], Settings["warning-font-size"], Settings["warning-font-flags"])
+	YxUI:SetFontInfo(RaidWarningFrameSlot2, Settings["warning-font"], Settings["warning-font-size"], Settings["warning-font-flags"])
 end
 
 local UpdateStatusFont = function()
-	HydraUI:SetFontInfo(AutoFollowStatusText, Settings["status-font"], Settings["status-font-size"], Settings["status-font-flags"])
+	YxUI:SetFontInfo(AutoFollowStatusText, Settings["status-font"], Settings["status-font-size"], Settings["status-font-flags"])
 end
 
 local UpdateErrorFont = function()
-	HydraUI:SetFontInfo(UIErrorsFrame, Settings["error-font"], Settings["error-font-size"], Settings["error-font-flags"])
+	YxUI:SetFontInfo(UIErrorsFrame, Settings["error-font"], Settings["error-font-size"], Settings["error-font-flags"])
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
 	left:CreateHeader(Language["Raid Warnings"])
 	left:CreateDropdown("warning-font", Settings["warning-font"], Assets:GetFontList(), Language["Font"], Language["Set the font of raid warnings"], UpdateRaidFont, "Font")
 	left:CreateSlider("warning-font-size", Settings["warning-font-size"], 8, 32, 1, Language["Font Size"], Language["Set the font size of raid warnings"], UpdateRaidFont)

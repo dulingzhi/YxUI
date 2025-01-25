@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local OnMouseUp = function()
 	ToggleCharacter("ReputationFrame")
@@ -23,11 +23,11 @@ local OnEnter = function(self)
 	local RemainingPercent = floor((Remaining / Max * 100 + 0.05) * 10) / 10
 
 	GameTooltip:AddLine(Language["Current reputation"])
-	GameTooltip:AddDoubleLine(format("%s / %s", HydraUI:Comma(Value), HydraUI:Comma(Max)), format("%s%%", floor((Value / Max * 100 + 0.05) * 10) / 10), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(format("%s / %s", YxUI:Comma(Value), YxUI:Comma(Max)), format("%s%%", floor((Value / Max * 100 + 0.05) * 10) / 10), 1, 1, 1, 1, 1, 1)
 
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddLine(Language["Remaining reputation"])
-	GameTooltip:AddDoubleLine(format("%s", HydraUI:Comma(Remaining)), format("%s%%", RemainingPercent), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(format("%s", YxUI:Comma(Remaining)), format("%s%%", RemainingPercent), 1, 1, 1, 1, 1, 1)
 
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddLine(Language["Faction standing"])
@@ -47,7 +47,7 @@ local Update = function(self)
 		Max = Max - Min
 		Value = Value - Min
 
-		self.Text:SetText(format("|cff%s%s%%|r", HydraUI.ValueColor, floor((Value / Max * 100 + 0.05) * 10) / 10 ))
+		self.Text:SetText(format("|cff%s%s%%|r", YxUI.ValueColor, floor((Value / Max * 100 + 0.05) * 10) / 10 ))
 	else
 		self.Text:SetText("")
 	end
@@ -73,4 +73,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText(REPUTATION, OnEnable, OnDisable, Update)
+YxUI:AddDataText(REPUTATION, OnEnable, OnDisable, Update)

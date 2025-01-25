@@ -1,30 +1,30 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 local AceSerializer = LibStub:GetLibrary("AceSerializer-3.0")
 local LibDeflate = LibStub:GetLibrary("LibDeflate")
-local GUI = HydraUI:GetModule("GUI")
+local GUI = YxUI:GetModule("GUI")
 local DefaultKey = "%s-%s"
 
 local next = next
 local format = format
 local match = string.match
 
-HydraUI.ProfileList = {}
+YxUI.ProfileList = {}
 
-HydraUI.ProfileMetadata = {
+YxUI.ProfileMetadata = {
 	["profile-name"] = true,
 	["profile-created"] = true,
 	["profile-created-by"] = true,
 	["profile-last-modified"] = true,
 }
 
-HydraUI.PreserveSettings = {
+YxUI.PreserveSettings = {
 	"ui-scale",
 	"ui-display-welcome",
 	"ui-picker-palette",
 }
 
-function HydraUI:UpdateProfileList()
+function YxUI:UpdateProfileList()
 	if self.Profiles then
 		for Name in next, self.Profiles do
 			self.ProfileList[Name] = Name
@@ -32,7 +32,7 @@ function HydraUI:UpdateProfileList()
 	end
 end
 
-function HydraUI:GetProfileCount()
+function YxUI:GetProfileCount()
 	local Count = 0
 
 	for Name in next, self.Profiles do
@@ -42,29 +42,29 @@ function HydraUI:GetProfileCount()
 	return Count
 end
 
-function HydraUI:GetDefaultProfileKey()
+function YxUI:GetDefaultProfileKey()
 	return format(DefaultKey, self.UserName, self.UserRealm)
 end
 
-function HydraUI:GetActiveProfileName()
+function YxUI:GetActiveProfileName()
 	if (self.ProfileData and self.ProfileData[self.UserProfileKey]) then
 		return self.ProfileData[self.UserProfileKey]
 	end
 end
 
-function HydraUI:GetActiveProfile()
+function YxUI:GetActiveProfile()
 	if (self.ProfileData and self.ProfileData[self.UserProfileKey]) then
 		return self:GetProfile(self.ProfileData[self.UserProfileKey])
 	end
 end
 
-function HydraUI:SetActiveProfile(name)
+function YxUI:SetActiveProfile(name)
 	if (self.ProfileData and self.ProfileData[self.UserProfileKey]) then
 		self.ProfileData[self.UserProfileKey] = name
 	end
 end
 
-function HydraUI:CountChangedValues(name)
+function YxUI:CountChangedValues(name)
 	local Profile = self:GetProfile(name)
 	local Count = 0
 
@@ -77,7 +77,7 @@ function HydraUI:CountChangedValues(name)
 	return Count
 end
 
-function HydraUI:CreateProfileData()
+function YxUI:CreateProfileData()
 	if (not self.ProfileData) then -- No profile data exists, create a default
 		self:CreateProfile(Language["Default"])
 	end
@@ -87,7 +87,7 @@ function HydraUI:CreateProfileData()
 	end
 end
 
-function HydraUI:CreateProfileNameID(name)
+function YxUI:CreateProfileNameID(name)
 	local ID = 0
 	local Found
 
@@ -102,7 +102,7 @@ function HydraUI:CreateProfileNameID(name)
 	return format("%s (%d)", name, ID)
 end
 
-function HydraUI:AddProfile(profile)
+function YxUI:AddProfile(profile)
 	if (type(profile) ~= "table") then
 		return
 	end
@@ -137,9 +137,9 @@ function HydraUI:AddProfile(profile)
 	self:UpdateProfileInfo()
 end
 
-function HydraUI:CreateProfile(name)
-	self:BindSavedVariable("HydraUIProfileData", "ProfileData")
-	self:BindSavedVariable("HydraUIProfiles", "Profiles")
+function YxUI:CreateProfile(name)
+	self:BindSavedVariable("YxUIProfileData", "ProfileData")
+	self:BindSavedVariable("YxUIProfiles", "Profiles")
 
 	if (not name) then
 		name = self:GetDefaultProfileKey()
@@ -168,7 +168,7 @@ function HydraUI:CreateProfile(name)
 	return self.Profiles[name]
 end
 
-function HydraUI:RestoreToDefault(name)
+function YxUI:RestoreToDefault(name)
 	if (not self.Profiles[name]) then
 		return
 	end
@@ -182,7 +182,7 @@ function HydraUI:RestoreToDefault(name)
 	self:print(format('Restored profile "%s" to default.', name))
 end
 
-function HydraUI:GetProfile(name)
+function YxUI:GetProfile(name)
 	if self.Profiles[name] then
 		return self.Profiles[name]
 	else
@@ -196,7 +196,7 @@ function HydraUI:GetProfile(name)
 	end
 end
 
-function HydraUI:SetProfileValue(name, id, value)
+function YxUI:SetProfileValue(name, id, value)
 	if self.Profiles[name] then
 		if (value ~= Defaults[id]) then -- Only saving a value if it's different than default
 			self.Profiles[name][id] = value
@@ -208,11 +208,11 @@ function HydraUI:SetProfileValue(name, id, value)
 	end
 end
 
-function HydraUI:GetProfileList()
+function YxUI:GetProfileList()
 	return self.ProfileList
 end
 
-function HydraUI:ProfileIsUsedBy(name)
+function YxUI:ProfileIsUsedBy(name)
 	local First = true
 	local String
 
@@ -230,7 +230,7 @@ function HydraUI:ProfileIsUsedBy(name)
 	return String
 end
 
-function HydraUI:GetMostUsedProfile() -- Return most used profile as a fallback instead of "Default" which may not even exist if the user deletes it
+function YxUI:GetMostUsedProfile() -- Return most used profile as a fallback instead of "Default" which may not even exist if the user deletes it
 	local Temp = {}
 	local HighestValue = 0
 	local HighestName
@@ -253,7 +253,7 @@ function HydraUI:GetMostUsedProfile() -- Return most used profile as a fallback 
 	return HighestName, self.ProfileData[HighestName]
 end
 
-function HydraUI:GetNumServedByProfile(name)
+function YxUI:GetNumServedByProfile(name)
 	local Count = 0
 	local Total = 0
 
@@ -268,7 +268,7 @@ function HydraUI:GetNumServedByProfile(name)
 	return Count, (Count == Total)
 end
 
-function HydraUI:DeleteProfile(name)
+function YxUI:DeleteProfile(name)
 	if self.Profiles[name] then
 		self.Profiles[name] = nil
 		self.ProfileList[name] = nil
@@ -300,7 +300,7 @@ function HydraUI:DeleteProfile(name)
 	end
 end
 
-function HydraUI:MergeWithDefaults(name)
+function YxUI:MergeWithDefaults(name)
 	local Profile = self:GetProfile(name)
 	local Values = {}
 
@@ -319,7 +319,7 @@ function HydraUI:MergeWithDefaults(name)
 	return Values
 end
 
-function HydraUI:ApplyProfile(name)
+function YxUI:ApplyProfile(name)
 	local Values = self:MergeWithDefaults(name)
 
 	for ID, Value in next, Values do
@@ -337,7 +337,7 @@ function HydraUI:ApplyProfile(name)
 	self.ProfileData[self.UserProfileKey] = name]]
 end
 
-function HydraUI:DeleteUnusedProfiles()
+function YxUI:DeleteUnusedProfiles()
 	local Deleted = 0
 	local Counts = {}
 	local Count = 0
@@ -385,7 +385,7 @@ function HydraUI:DeleteUnusedProfiles()
 	self:print(format("Deleted %s unused profiles.", Deleted))
 end
 
-function HydraUI:CountUnusedProfiles()
+function YxUI:CountUnusedProfiles()
 	local Unused = 0
 	local Counts = {}
 	local Count = 0
@@ -429,7 +429,7 @@ function HydraUI:CountUnusedProfiles()
 	return Unused
 end
 
-function HydraUI:RenameProfile(from, to)
+function YxUI:RenameProfile(from, to)
 	if (not self.Profiles[from]) then
 		return
 	elseif self.Profiles[to] then
@@ -457,7 +457,7 @@ function HydraUI:RenameProfile(from, to)
 	self:print(format(Language['Profile "%s" has been renamed to "%s".'], from, to))
 end
 
-function HydraUI:CopyProfile(from, to)
+function YxUI:CopyProfile(from, to)
 	if (not self.Profiles[from]) or (not self.Profiles[to]) then
 		return
 	end
@@ -470,13 +470,13 @@ function HydraUI:CopyProfile(from, to)
 	C_UI.Reload()
 end
 
-function HydraUI:UpdateProfileLastModified(name)
+function YxUI:UpdateProfileLastModified(name)
 	local Profile = self:GetProfile(name)
 
 	Profile["profile-last-modified"] = self:GetCurrentDate()
 end
 
-function HydraUI:SetProfileMetadata(name, meta, value) -- /run HydraUIGlobal:get():SetProfileMetadata("ProfileName", "profile-created-by", "Hydra")
+function YxUI:SetProfileMetadata(name, meta, value) -- /run YxUIGlobal:get():SetProfileMetadata("ProfileName", "profile-created-by", "Jai")
 	if (self.Profiles[name] and self.ProfileMetadata[meta]) then
 		self.Profiles[name][meta] = value
 
@@ -493,23 +493,23 @@ end
 	Remove MigrateValue declarations after a reasonable while.
 --]]
 
-HydraUI.MigrateKeys = {}
-HydraUI.MigrateValues = {}
-HydraUI.MigrateGlobals = {}
+YxUI.MigrateKeys = {}
+YxUI.MigrateValues = {}
+YxUI.MigrateGlobals = {}
 
-function HydraUI:MigrateKey(from, to) -- HydraUI:MigrateKey("ui-display-welcome", "ui-welcome")
+function YxUI:MigrateKey(from, to) -- YxUI:MigrateKey("ui-display-welcome", "ui-welcome")
 	tinsert(self.MigrateKeys, {From = from, To = to})
 end
 
-function HydraUI:MigrateValue(key, from, to) -- HydraUI:MigrateValue("unitframes-player-health-color", "CUSTOM", "CLASS") HydraUI:MigrateValue("tooltips-hide-on-unit", "NO_COMBAT", "IN_COMBAT")
+function YxUI:MigrateValue(key, from, to) -- YxUI:MigrateValue("unitframes-player-health-color", "CUSTOM", "CLASS") YxUI:MigrateValue("tooltips-hide-on-unit", "NO_COMBAT", "IN_COMBAT")
 	tinsert(self.MigrateValues, {Key = key, From = from, To = to})
 end
 
-function HydraUI:MigrateGlobal(from, to) -- HydraUI:MigrateGlobal("HydraUIData", "HydraUIMisc")
+function YxUI:MigrateGlobal(from, to) -- YxUI:MigrateGlobal("YxUIData", "YxUIMisc")
 	tinsert(self.MigrateGlobals, {From = from, To = to})
 end
 
-function HydraUI:Migrate(profile)
+function YxUI:Migrate(profile)
 	for i = #self.MigrateKeys, 1, -1 do
 		if profile[self.MigrateKeys[i].From] then
 			profile[self.MigrateKeys[i].To] = profile[self.MigrateKeys[i].From]
@@ -528,7 +528,7 @@ function HydraUI:Migrate(profile)
 	end
 end
 
-function HydraUI:MigrateData()
+function YxUI:MigrateData()
 	for i = #self.MigrateGlobals, 1, -1 do
 		if (not _G[self.MigrateGlobals[i].To]) then
 			_G[self.MigrateGlobals[i].To] = {}
@@ -548,43 +548,43 @@ function HydraUI:MigrateData()
 	end
 
 	for ProfileName, Profile in next, self.Profiles do
-		HydraUI:Migrate(Profile)
+		YxUI:Migrate(Profile)
 	end
 end
 
-function HydraUI:MigrateMoverData()
-	self:BindSavedVariable("HydraUIData", "Data")
+function YxUI:MigrateMoverData()
+	self:BindSavedVariable("YxUIData", "Data")
 
 	if self.Data.MoversMigrated then
 		return
 	end
 
-	if (HydraUIMove and self.Profiles) then
+	if (YxUIMove and self.Profiles) then
 		for Key, Profile in next, self.Profiles do
 			if (not Profile.Move) then
 				Profile.Move = {}
 			end
 
-			for Frame, Position in next, HydraUIMove do
+			for Frame, Position in next, YxUIMove do
 				Profile.Move[Frame] = format("%s:%s:%s:%s:%s", unpack(Position))
 			end
 		end
 
-		HydraUIMove = nil
+		YxUIMove = nil
 
 		self.Data.MoversMigrated = true
 	end
 end
 
-function HydraUI:RemoveData(key)
-	self:BindSavedVariable("HydraUIData", "Data")
+function YxUI:RemoveData(key)
+	self:BindSavedVariable("YxUIData", "Data")
 
 	if self.Data then
 		self.Data[key] = nil
 	end
 end
 
-function HydraUI:CloneProfile(profile)
+function YxUI:CloneProfile(profile)
 	local Clone = {}
 
 	for Key, Value in next, profile do
@@ -596,7 +596,7 @@ function HydraUI:CloneProfile(profile)
 	return Clone
 end
 
-function HydraUI:GetEncodedProfile()
+function YxUI:GetEncodedProfile()
 	local Profile = self:CloneProfile(self:GetActiveProfile())
 	local Serialized = AceSerializer:Serialize(Profile)
 	local Compressed = LibDeflate:CompressDeflate(Serialized, {level = 9})
@@ -605,7 +605,7 @@ function HydraUI:GetEncodedProfile()
 	return Encoded
 end
 
-function HydraUI:DecodeProfile(encoded)
+function YxUI:DecodeProfile(encoded)
 	local Decoded = LibDeflate:DecodeForPrint(encoded)
 
 	if (not Decoded) then
@@ -632,7 +632,7 @@ function HydraUI:DecodeProfile(encoded)
 	return Deserialized
 end
 
-function HydraUI:UpdateProfileInfo()
+function YxUI:UpdateProfileInfo()
 	local Name = self:GetActiveProfileName()
 	local Profile = self:GetProfile(Name)
 	local MostUsed = self:GetMostUsedProfile()
@@ -649,8 +649,8 @@ function HydraUI:UpdateProfileInfo()
 
 	GUI:GetWidget("current-profile").Right:SetText(Name)
 	GUI:GetWidget("created-by").Right:SetText(Profile["profile-created-by"])
-	GUI:GetWidget("created-on").Right:SetText(HydraUI:IsToday(Profile["profile-created"]))
-	GUI:GetWidget("last-modified").Right:SetText(HydraUI:IsToday(Profile["profile-last-modified"]))
+	GUI:GetWidget("created-on").Right:SetText(YxUI:IsToday(Profile["profile-created"]))
+	GUI:GetWidget("last-modified").Right:SetText(YxUI:IsToday(Profile["profile-last-modified"]))
 	GUI:GetWidget("modifications").Right:SetText(self:CountChangedValues(Name))
 	GUI:GetWidget("serving-characters").Right:SetText(NumServed)
 
@@ -660,24 +660,24 @@ function HydraUI:UpdateProfileInfo()
 end
 
 local AcceptNewProfile = function(value)
-	HydraUI:SetActiveProfile(value)
+	YxUI:SetActiveProfile(value)
 
 	C_UI.Reload()
 end
 
 local UpdateActiveProfile = function(value)
-	if (value ~= HydraUI:GetActiveProfileName()) then
-		HydraUI:DisplayPopup(Language["Attention"], format(Language['Are you sure you would like to change to the current profile to "%s"?'], value), ACCEPT, AcceptNewProfile, CANCEL, nil, value)
+	if (value ~= YxUI:GetActiveProfileName()) then
+		YxUI:DisplayPopup(Language["Attention"], format(Language['Are you sure you would like to change to the current profile to "%s"?'], value), ACCEPT, AcceptNewProfile, CANCEL, nil, value)
 	end
 end
 
 local CreateProfile = function(value)
-	if HydraUI.Profiles[value] then
-		return HydraUI:print(format(Language['A profile already exists with the name "%s".'], value))
+	if YxUI.Profiles[value] then
+		return YxUI:print(format(Language['A profile already exists with the name "%s".'], value))
 	end
 
-	HydraUI:CreateProfile(value)
-	HydraUI:UpdateProfileInfo()
+	YxUI:CreateProfile(value)
+	YxUI:UpdateProfileInfo()
 
 	local Widget = GUI:GetWidget("ui-profile")
 	Widget.Dropdown:CreateSelection(value, value)
@@ -693,12 +693,12 @@ local CreateProfile = function(value)
 end
 
 local DeleteProfile = function(value)
-	HydraUI:DeleteProfile(value)
-	HydraUI:UpdateProfileInfo()
+	YxUI:DeleteProfile(value)
+	YxUI:UpdateProfileInfo()
 
 	local Widget = GUI:GetWidget("ui-profile")
 	Widget.Dropdown:RemoveSelection(value)
-	Widget.Dropdown.Current:SetText(HydraUI:GetActiveProfileName())
+	Widget.Dropdown.Current:SetText(YxUI:GetActiveProfileName())
 
 	Widget = GUI:GetWidget("profile-copy")
 	Widget.Dropdown:RemoveSelection(value)
@@ -709,7 +709,7 @@ local DeleteProfile = function(value)
 end
 
 local ShowExportWindow = function()
-	local Encoded = HydraUI:GetEncodedProfile()
+	local Encoded = YxUI:GetEncodedProfile()
 
 	GUI:CreateExportWindow()
 	GUI:SetExportWindowText(Encoded)
@@ -721,46 +721,46 @@ local ShowImportWindow = function()
 end
 
 local DeleteUnused = function()
-	HydraUI:DeleteUnusedProfiles()
-	HydraUI:UpdateProfileInfo()
+	YxUI:DeleteUnusedProfiles()
+	YxUI:UpdateProfileInfo()
 end
 
 local RenameProfile = function(value)
 	if (value and match(value, "%S+")) then
-		HydraUI:RenameProfile(HydraUI:GetActiveProfileName(), value)
-		HydraUI:UpdateProfileInfo()
+		YxUI:RenameProfile(YxUI:GetActiveProfileName(), value)
+		YxUI:UpdateProfileInfo()
 	end
 end
 
 local RestoreToDefault = function()
-	HydraUI:RestoreToDefault(HydraUI:GetActiveProfileName())
+	YxUI:RestoreToDefault(YxUI:GetActiveProfileName())
 
 	C_UI.Reload() -- Temp
 end
 
 local CopyProfileOnAccept = function(from)
-	HydraUI:CopyProfile(from, HydraUI:GetActiveProfileName())
+	YxUI:CopyProfile(from, YxUI:GetActiveProfileName())
 end
 
 local PromptDelete = function(value)
-	HydraUI:DisplayPopup(Language["Attention"], format(Language["Are you sure you would like to delete %s"], value), ACCEPT, DeleteProfile, CANCEL, nil, value)
+	YxUI:DisplayPopup(Language["Attention"], format(Language["Are you sure you would like to delete %s"], value), ACCEPT, DeleteProfile, CANCEL, nil, value)
 end
 
 local CopyProfile = function(value)
-	HydraUI:DisplayPopup(Language["Attention"], format(Language["Are you sure you would like to copy %s to %s?"], value, HydraUI:GetActiveProfileName()), ACCEPT, CopyProfileOnAccept, CANCEL, nil, value)
+	YxUI:DisplayPopup(Language["Attention"], format(Language["Are you sure you would like to copy %s to %s?"], value, YxUI:GetActiveProfileName()), ACCEPT, CopyProfileOnAccept, CANCEL, nil, value)
 end
 
 GUI:AddWidgets(Language["General"], Language["Profiles"], function(left, right)
 	left:CreateHeader(Language["Profiles"])
-	left:CreateDropdown("ui-profile", HydraUI:GetActiveProfileName(), HydraUI:GetProfileList(), Language["Select Profile"], Language["Select a profile to load"], UpdateActiveProfile)
+	left:CreateDropdown("ui-profile", YxUI:GetActiveProfileName(), YxUI:GetProfileList(), Language["Select Profile"], Language["Select a profile to load"], UpdateActiveProfile)
 	--left:CreateButton("Apply", "Apply Current Profile", "", UpdateActiveProfile)
 
 	left:CreateHeader(Language["Modify"])
-	left:CreateInput("profile-key", HydraUI:GetDefaultProfileKey(), Language["Create New Profile"], Language["Create a new profile to store a different collection of settings"], CreateProfile):DisableSaving()
-	--left:CreateInput("profile-delete", HydraUI:GetDefaultProfileKey(), Language["Delete Profile"], Language["Delete a profile"], DeleteProfile):DisableSaving()
+	left:CreateInput("profile-key", YxUI:GetDefaultProfileKey(), Language["Create New Profile"], Language["Create a new profile to store a different collection of settings"], CreateProfile):DisableSaving()
+	--left:CreateInput("profile-delete", YxUI:GetDefaultProfileKey(), Language["Delete Profile"], Language["Delete a profile"], DeleteProfile):DisableSaving()
 	left:CreateInput("profile-rename", "", Language["Rename Profile"], Language["Rename the currently selected profile"], RenameProfile):DisableSaving()
-	left:CreateDropdown("profile-delete", HydraUI:GetActiveProfileName(), HydraUI:GetProfileList(), Language["Delete Profile"],  Language["Delete a profile"], DeleteProfile):DisableSaving()
-	left:CreateDropdown("profile-copy", HydraUI:GetActiveProfileName(), HydraUI:GetProfileList(), Language["Copy From"], Language["Copy the settings from another profile"], CopyProfile)
+	left:CreateDropdown("profile-delete", YxUI:GetActiveProfileName(), YxUI:GetProfileList(), Language["Delete Profile"],  Language["Delete a profile"], DeleteProfile):DisableSaving()
+	left:CreateDropdown("profile-copy", YxUI:GetActiveProfileName(), YxUI:GetProfileList(), Language["Copy From"], Language["Copy the settings from another profile"], CopyProfile)
 
 	left:CreateHeader(Language["Manage"])
 	left:CreateButton("", Language["Restore"], Language["Restore To Default"], Language["Restore the currently selected profile to default settings"], RestoreToDefault):RequiresReload(true)
@@ -773,10 +773,10 @@ GUI:AddWidgets(Language["General"], Language["Profiles"], function(left, right)
 	right:CreateHeader(Language["What is a profile?"])
 	right:CreateMessage("", Language["Profiles store your settings so that you can quickly and easily change between configurations."])
 
-	local Name = HydraUI:GetActiveProfileName()
-	local Profile = HydraUI:GetProfile(Name)
-	local MostUsed = HydraUI:GetMostUsedProfile()
-	local NumServed, IsAll = HydraUI:GetNumServedByProfile(Name)
+	local Name = YxUI:GetActiveProfileName()
+	local Profile = YxUI:GetProfile(Name)
+	local MostUsed = YxUI:GetMostUsedProfile()
+	local NumServed, IsAll = YxUI:GetNumServedByProfile(Name)
 	local MostUsedServed = NumServed
 
 	if IsAll then
@@ -784,19 +784,19 @@ GUI:AddWidgets(Language["General"], Language["Profiles"], function(left, right)
 	end
 
 	if (Profile ~= MostUsed) then
-		MostUsedServed = HydraUI:GetNumServedByProfile(MostUsed)
+		MostUsedServed = YxUI:GetNumServedByProfile(MostUsed)
 	end
 
 	right:CreateHeader(Language["Info"])
 	right:CreateDoubleLine("current-profile", Language["Current Profile:"], Name)
 	right:CreateDoubleLine("created-by", Language["Created By:"], Profile["profile-created-by"])
-	right:CreateDoubleLine("created-on", Language["Created On:"], HydraUI:IsToday(Profile["profile-created"]))
-	right:CreateDoubleLine("last-modified", Language["Last Modified:"], HydraUI:IsToday(Profile["profile-last-modified"]))
-	right:CreateDoubleLine("modifications", Language["Modifications:"], HydraUI:CountChangedValues(Name))
+	right:CreateDoubleLine("created-on", Language["Created On:"], YxUI:IsToday(Profile["profile-created"]))
+	right:CreateDoubleLine("last-modified", Language["Last Modified:"], YxUI:IsToday(Profile["profile-last-modified"]))
+	right:CreateDoubleLine("modifications", Language["Modifications:"], YxUI:CountChangedValues(Name))
 	right:CreateDoubleLine("serving-characters", Language["Serving Characters:"], NumServed)
 
 	right:CreateHeader(Language["General"])
 	right:CreateDoubleLine("popular-profile", Language["Popular Profile:"], format("%s (%d)", MostUsed, MostUsedServed))
-	right:CreateDoubleLine("stored-profiles", Language["Stored Profiles:"], HydraUI:GetProfileCount())
-	right:CreateDoubleLine("unused-profiles", Language["Unused Profiles:"], HydraUI:CountUnusedProfiles())
+	right:CreateDoubleLine("stored-profiles", Language["Stored Profiles:"], YxUI:GetProfileCount())
+	right:CreateDoubleLine("unused-profiles", Language["Unused Profiles:"], YxUI:CountUnusedProfiles())
 end)

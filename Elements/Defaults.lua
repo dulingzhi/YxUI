@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 -- These are just default values. Use the GUI to change settings.
 
@@ -7,15 +7,15 @@ Defaults["ui-display-welcome"] = true
 Defaults["ui-border-thickness"] = 0
 
 -- Main
-Defaults["ui-style"] = "HydraUI"
+Defaults["ui-style"] = "YxUI"
 
 Defaults["ui-header-font"] = "Roboto"
 Defaults["ui-widget-font"] = "Roboto"
 Defaults["ui-button-font"] = "Roboto"
 
-Defaults["ui-header-texture"] = "HydraUI 4"
-Defaults["ui-widget-texture"] = "HydraUI 4"
-Defaults["ui-button-texture"] = "HydraUI 4"
+Defaults["ui-header-texture"] = "YxUI 4"
+Defaults["ui-widget-texture"] = "YxUI 4"
+Defaults["ui-button-texture"] = "YxUI 4"
 
 Defaults["ui-header-font-color"] = "FFE6C0"
 Defaults["ui-header-texture-color"] = "424242"

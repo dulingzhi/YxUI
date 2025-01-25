@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetFramerate = GetFramerate
 local GetNetStats = GetNetStats
@@ -27,7 +27,7 @@ local Update = function(self, elapsed)
 	self.Elapsed = self.Elapsed + elapsed
 
 	if (self.Elapsed > 1) then
-		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r |cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], FPSLabel, HydraUI.ValueColor, floor(GetFramerate()), Settings["data-text-label-color"], MSLabel, HydraUI.ValueColor, select(4, GetNetStats()))
+		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r |cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], FPSLabel, YxUI.ValueColor, floor(GetFramerate()), Settings["data-text-label-color"], MSLabel, YxUI.ValueColor, select(4, GetNetStats()))
 
 		self.Elapsed = 0
 	end
@@ -53,4 +53,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("System", OnEnable, OnDisable, Update)
+YxUI:AddDataText("System", OnEnable, OnDisable, Update)

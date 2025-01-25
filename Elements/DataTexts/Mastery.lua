@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetMasteryEffect = GetMasteryEffect
 local GetCombatRatingBonus = GetCombatRatingBonus
@@ -33,9 +33,9 @@ local OnEnter = function(self)
 		end
 
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(format(STAT_MASTERY_TOOLTIP, HydraUI:Comma(GetCombatRating(CR_MASTERY)), MasteryBonus), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true)
+		GameTooltip:AddLine(format(STAT_MASTERY_TOOLTIP, YxUI:Comma(GetCombatRating(CR_MASTERY)), MasteryBonus), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true)
 	else
-		GameTooltip:AddLine(format(STAT_MASTERY_TOOLTIP, HydraUI:Comma(GetCombatRating(CR_MASTERY)), MasteryBonus), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true)
+		GameTooltip:AddLine(format(STAT_MASTERY_TOOLTIP, YxUI:Comma(GetCombatRating(CR_MASTERY)), MasteryBonus), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true)
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(STAT_MASTERY_TOOLTIP_NO_TALENT_SPEC, GRAY_FONT_COLOR.r, GRAY_FONT_COLOR.g, GRAY_FONT_COLOR.b, true)
 	end
@@ -55,7 +55,7 @@ local Update = function(self, event, unit)
 	local Mastery, Bonus = GetMasteryEffect()
 	local MasteryBonus = GetCombatRatingBonus(CR_MASTERY) * Bonus
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.2f%%|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, MasteryBonus)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.2f%%|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, MasteryBonus)
 end
 
 local OnEnable = function(self)
@@ -78,4 +78,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Mastery", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Mastery", OnEnable, OnDisable, Update)

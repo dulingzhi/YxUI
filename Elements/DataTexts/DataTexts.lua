@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-local DT = HydraUI:NewModule("DataText")
+local DT = YxUI:NewModule("DataText")
 
 -- Default settings values
 Defaults["data-text-font"] = "Roboto"
@@ -24,12 +24,12 @@ Defaults["data-text-classcolor"] = false
 DT.Anchors = {}
 DT.Types = {}
 DT.List = {}
-HydraUI.ValueColor = "ffffff"
+YxUI.ValueColor = "ffffff"
 
 local SetTooltip = function(anchor)
 	if Settings["data-text-hover-tooltips"] then
 		local X, Y = anchor:GetCenter()
-		local Position = (Y > HydraUI.UIParent:GetHeight() / 2) and "TOP" or "BOTTOM"
+		local Position = (Y > YxUI.UIParent:GetHeight() / 2) and "TOP" or "BOTTOM"
 
 		GameTooltip:SetOwner(anchor, "ANCHOR_NONE")
 		GameTooltip:ClearAllPoints()
@@ -60,7 +60,7 @@ function DT:NewAnchor(name, parent)
 	end
 
 	if (not parent) then
-		parent = HydraUI.UIParent
+		parent = YxUI.UIParent
 	end
 
 	local Anchor = CreateFrame("Frame", nil, parent)
@@ -70,7 +70,7 @@ function DT:NewAnchor(name, parent)
 	Anchor.SetTooltip = SetTooltip
 
 	Anchor.Text = Anchor:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(Anchor.Text, Settings["data-text-font"], Settings["data-text-font-size"], Settings["data-text-font-flags"])
+	YxUI:SetFontInfo(Anchor.Text, Settings["data-text-font"], Settings["data-text-font-size"], Settings["data-text-font-flags"])
 	Anchor.Text:SetPoint("LEFT", Anchor, 0, 0)
 	Anchor.Text:SetPoint("RIGHT", Anchor, 0, 0)
 	Anchor.Text:SetJustifyH("CENTER")
@@ -81,7 +81,7 @@ function DT:NewAnchor(name, parent)
 	Anchor.Highlight:SetPoint("BOTTOMLEFT", Anchor, "BOTTOMLEFT", 18, 1)
 	Anchor.Highlight:SetPoint("BOTTOMRIGHT", Anchor, "BOTTOMRIGHT", -18, 1)
 	Anchor.Highlight:SetTexture(Assets:GetTexture("RenHorizonUp"))
-	Anchor.Highlight:SetVertexColor(HydraUI:HexToRGB(Settings["ui-widget-color"]))
+	Anchor.Highlight:SetVertexColor(YxUI:HexToRGB(Settings["ui-widget-color"]))
 	Anchor.Highlight:SetAlpha(0)
 
 	self.Anchors[name] = Anchor
@@ -134,21 +134,21 @@ function DT:UpdateAllAnchors()
 end
 
 function DT:Load()
-	HydraUI.ValueColor = Settings["data-text-classcolor"] and HydraUI.ClassColors[HydraUI.UserClass].Hex or Settings["data-text-value-color"]
+	YxUI.ValueColor = Settings["data-text-classcolor"] and YxUI.ClassColors[YxUI.UserClass].Hex or Settings["data-text-value-color"]
 
 	if Settings["chat-enable"] then
-		local Width = HydraUIChatFrameBottom:GetWidth() / 3
-		local Height = HydraUIChatFrameBottom:GetHeight()
+		local Width = YxUIChatFrameBottom:GetWidth() / 3
+		local Height = YxUIChatFrameBottom:GetHeight()
 
-		local ChatLeft = self:NewAnchor("Chat-Left", HydraUIChatFrameBottom)
+		local ChatLeft = self:NewAnchor("Chat-Left", YxUIChatFrameBottom)
 		ChatLeft:SetSize(Width, Height)
-		ChatLeft:SetPoint("LEFT", HydraUIChatFrameBottom, 0, 0)
+		ChatLeft:SetPoint("LEFT", YxUIChatFrameBottom, 0, 0)
 
-		local ChatMiddle = self:NewAnchor("Chat-Middle", HydraUIChatFrameBottom)
+		local ChatMiddle = self:NewAnchor("Chat-Middle", YxUIChatFrameBottom)
 		ChatMiddle:SetSize(Width, Height)
 		ChatMiddle:SetPoint("LEFT", ChatLeft, "RIGHT", 0, 0)
 
-		local ChatRight = self:NewAnchor("Chat-Right", HydraUIChatFrameBottom)
+		local ChatRight = self:NewAnchor("Chat-Right", YxUIChatFrameBottom)
 		ChatRight:SetSize(Width, Height)
 		ChatRight:SetPoint("LEFT", ChatMiddle, "RIGHT", 0, 0)
 
@@ -158,13 +158,13 @@ function DT:Load()
 	end
 
 	if Settings["minimap-enable"] then
-		local MinimapTop = self:NewAnchor("Minimap-Top", HydraUIMinimapTop)
-		MinimapTop:SetSize(HydraUIMinimapTop:GetSize())
-		MinimapTop:SetPoint("CENTER", HydraUIMinimapTop, 0, 0)
+		local MinimapTop = self:NewAnchor("Minimap-Top", YxUIMinimapTop)
+		MinimapTop:SetSize(YxUIMinimapTop:GetSize())
+		MinimapTop:SetPoint("CENTER", YxUIMinimapTop, 0, 0)
 
-		local MinimapBottom = self:NewAnchor("Minimap-Bottom", HydraUIMinimapBottom)
-		MinimapBottom:SetSize(HydraUIMinimapBottom:GetSize())
-		MinimapBottom:SetPoint("CENTER", HydraUIMinimapBottom, 0, 0)
+		local MinimapBottom = self:NewAnchor("Minimap-Bottom", YxUIMinimapBottom)
+		MinimapBottom:SetSize(YxUIMinimapBottom:GetSize())
+		MinimapBottom:SetPoint("CENTER", YxUIMinimapBottom, 0, 0)
 
 		self:SetDataText("Minimap-Top", Settings["data-text-minimap-top"])
 		self:SetDataText("Minimap-Bottom", Settings["data-text-minimap-bottom"])
@@ -176,7 +176,7 @@ function DT:Load()
 	self:UpdateAllAnchors()
 end
 
-function HydraUI:AddDataText(name, enable, disable, update)
+function YxUI:AddDataText(name, enable, disable, update)
 	if DT.Types[name] then
 		return
 	end
@@ -223,7 +223,7 @@ end
 
 local UpdateFont = function()
 	for Name, Anchor in next, DT.Anchors do
-		HydraUI:SetFontInfo(Anchor.Text, Settings["data-text-font"], Settings["data-text-font-size"], Settings["data-text-font-flags"])
+		YxUI:SetFontInfo(Anchor.Text, Settings["data-text-font"], Settings["data-text-font-size"], Settings["data-text-font-flags"])
 	end
 end
 
@@ -232,11 +232,11 @@ local UpdateEnableTooltips = function(value)
 end
 
 local ResetOnAccept = function()
-	HydraUI:GetModule("Gold"):Reset()
+	YxUI:GetModule("Gold"):Reset()
 end
 
 local ResetGold = function()
-	HydraUI:DisplayPopup(Language["Attention"], Language["Are you sure you would like to reset all stored gold information?"], ACCEPT, ResetOnAccept, CANCEL)
+	YxUI:DisplayPopup(Language["Attention"], Language["Are you sure you would like to reset all stored gold information?"], ACCEPT, ResetOnAccept, CANCEL)
 end
 
 local UpdateTimeFormat = function(value)
@@ -245,28 +245,28 @@ local UpdateTimeFormat = function(value)
 end
 
 local DeleteGoldData = function(value)
-	if HydraUI.GoldData[HydraUI.UserRealm] then
-		for name, money in next, HydraUI.GoldData[HydraUI.UserRealm] do
+	if YxUI.GoldData[YxUI.UserRealm] then
+		for name, money in next, YxUI.GoldData[YxUI.UserRealm] do
 			if (string.match(name, "|cff%x%x%x%x%x%x(.*)|r") == value) then
-				HydraUI.GoldData[HydraUI.UserRealm][name] = nil
+				YxUI.GoldData[YxUI.UserRealm][name] = nil
 
-				HydraUI:print(format(Language["Deleted stored gold data for %s."], name))
+				YxUI:print(format(Language["Deleted stored gold data for %s."], name))
 
 				return
 			end
 		end
 
-		HydraUI:print(format(Language["No character data found for %s."], value))
+		YxUI:print(format(Language["No character data found for %s."], value))
 	end
 end
 
 local UpdateClassColor = function(value)
-	HydraUI.ValueColor = value and HydraUI.ClassColors[HydraUI.UserClass].Hex or Settings["data-text-value-color"]
+	YxUI.ValueColor = value and YxUI.ClassColors[YxUI.UserClass].Hex or Settings["data-text-value-color"]
 
 	DT:UpdateAllAnchors()
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Data Texts"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Data Texts"], function(left, right)
 	left:CreateHeader(Language["Chat Frame Texts"])
 	left:CreateDropdown("data-text-chat-left", Settings["data-text-chat-left"], DT.List, Language["Set Left Text"], Language["Set the information to be displayed in the left data text anchor"], UpdateChatLeftText)
 	left:CreateDropdown("data-text-chat-middle", Settings["data-text-chat-middle"], DT.List, Language["Set Middle Text"], Language["Set the information to be displayed in the middle data text anchor"], UpdateChatMiddleText)
@@ -298,7 +298,7 @@ HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Data Texts"],
 
 	right:CreateHeader(Language["Gold"])
 	right:CreateButton("", Language["Reset"], Language["Reset Gold"], Language["Reset stored information for each characters gold"], ResetGold)
-	right:CreateInput("gold-reset", HydraUI.UserName, Language["Delete Character Data"], Language["Remove the stored data for a character. Enter the character name and hit enter."], DeleteGoldData):DisableSaving()
+	right:CreateInput("gold-reset", YxUI.UserName, Language["Delete Character Data"], Language["Remove the stored data for a character. Enter the character name and hit enter."], DeleteGoldData):DisableSaving()
 
 	--left:CreateHeader(Language["Misc."])
 	--left:CreateSlider("data-text-max-lines", Settings["data-text-max-lines"], 5, 50, 1, "Max Lines", "Set the maximum number of players shown in the guild or friends data text tooltips")

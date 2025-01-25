@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-local Reputation = HydraUI:NewModule("Reputation")
+local Reputation = YxUI:NewModule("Reputation")
 
 local format = format
 local floor = floor
@@ -54,12 +54,12 @@ function Reputation:CreateBar()
 	self:SetFrameStrata("MEDIUM")
 
 	if (Settings["experience-enable"] and UnitLevel("player") ~= MAX_PLAYER_LEVEL) then
-		local A1, P, A2, X, Y = HydraUI:GetModule("Experience"):GetPoint()
+		local A1, P, A2, X, Y = YxUI:GetModule("Experience"):GetPoint()
 		local Spacing = Offset + (Settings["experience-height"] / 2) + 12
 
 		self:SetPoint(A1, P, A2, X, Y - Spacing)
 	else
-		self:SetPoint("TOP", HydraUI.UIParent, 0, -13)
+		self:SetPoint("TOP", YxUI.UIParent, 0, -13)
 	end
 
 	if Settings["reputation-mouseover"] then
@@ -80,8 +80,8 @@ function Reputation:CreateBar()
 	self.BarBG = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.BarBG:SetPoint("TOPLEFT", self, 0, 0)
 	self.BarBG:SetPoint("BOTTOMRIGHT", self, 0, 0)
-	HydraUI:AddBackdrop(self.BarBG)
-	self.BarBG.Outside:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-main-color"]))
+	YxUI:AddBackdrop(self.BarBG)
+	self.BarBG.Outside:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
 
 	self.Bar = CreateFrame("StatusBar", nil, self.BarBG)
 	self.Bar:SetStatusBarTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
@@ -92,7 +92,7 @@ function Reputation:CreateBar()
 	self.Bar.BG = self.Bar:CreateTexture(nil, "BORDER")
 	self.Bar.BG:SetAllPoints(self.Bar)
 	self.Bar.BG:SetTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
-	self.Bar.BG:SetVertexColor(HydraUI:HexToRGB(Settings["ui-window-main-color"]))
+	self.Bar.BG:SetVertexColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
 	self.Bar.BG:SetAlpha(0.2)
 
 	self.Bar.Spark = self.Bar:CreateTexture(nil, "OVERLAY")
@@ -131,7 +131,7 @@ function Reputation:CreateBar()
 
 	self.Progress = self.Bar:CreateFontString(nil, "OVERLAY")
 	self.Progress:SetPoint("LEFT", self.Bar, 5, 0)
-	HydraUI:SetFontInfo(self.Progress, Settings["ui-widget-font"], Settings["ui-font-size"])
+	YxUI:SetFontInfo(self.Progress, Settings["ui-widget-font"], Settings["ui-font-size"])
 	self.Progress:SetJustifyH("LEFT")
 
 	if (not Settings["reputation-display-progress"] or Settings["reputation-progress-visibility"] ~= "ALWAYS") then
@@ -140,20 +140,20 @@ function Reputation:CreateBar()
 
 	self.Percentage = self.Bar:CreateFontString(nil, "OVERLAY")
 	self.Percentage:SetPoint("RIGHT", self.Bar, -5, 0)
-	HydraUI:SetFontInfo(self.Percentage, Settings["ui-widget-font"], Settings["ui-font-size"])
+	YxUI:SetFontInfo(self.Percentage, Settings["ui-widget-font"], Settings["ui-font-size"])
 	self.Percentage:SetJustifyH("RIGHT")
 
 	if (not Settings["reputation-display-percent"] or Settings["reputation-percent-visibility"] ~= "ALWAYS") then
 		self.Percentage:Hide()
 	end
 
-	HydraUI:CreateMover(self, 6)
+	YxUI:CreateMover(self, 6)
 end
 
 function Reputation:OnEvent()
 	local Name, StandingID, Min, Max, Value
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		local Data = C_Reputation.GetWatchedFactionData()
 		
 		if Data then
@@ -172,9 +172,9 @@ function Reputation:OnEvent()
 		Value = Value - Min
 
 		self.Bar:SetMinMaxValues(0, Max)
-		self.Bar:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-reaction-" .. StandingID]))
+		self.Bar:SetStatusBarColor(YxUI:HexToRGB(Settings["color-reaction-" .. StandingID]))
 
-		self.Progress:SetText(format("%s: %s / %s", Name, HydraUI:Comma(Value), HydraUI:Comma(Max)))
+		self.Progress:SetText(format("%s: %s / %s", Name, YxUI:Comma(Value), YxUI:Comma(Max)))
 		self.Percentage:SetText(floor((Value / Max * 100 + 0.05) * 10) / 10 .. "%")
 
 		if Settings["reputation-animate"] then
@@ -240,11 +240,11 @@ function Reputation:OnEnter()
 	local RemainingPercent = floor((Remaining / Max * 100 + 0.05) * 10) / 10
 
 	GameTooltip:AddLine(Language["Current reputation"])
-	GameTooltip:AddDoubleLine(format("%s / %s", HydraUI:Comma(Value), HydraUI:Comma(Max)), format("%s%%", floor((Value / Max * 100 + 0.05) * 10) / 10), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(format("%s / %s", YxUI:Comma(Value), YxUI:Comma(Max)), format("%s%%", floor((Value / Max * 100 + 0.05) * 10) / 10), 1, 1, 1, 1, 1, 1)
 
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddLine(Language["Remaining reputation"])
-	GameTooltip:AddDoubleLine(format("%s", HydraUI:Comma(Remaining)), format("%s%%", RemainingPercent), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(format("%s", YxUI:Comma(Remaining)), format("%s%%", RemainingPercent), 1, 1, 1, 1, 1, 1)
 
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddLine(Language["Faction standing"])
@@ -357,9 +357,9 @@ local UpdateMouseoverOpacity = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Reputation"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Reputation"], function(left, right)
 	left:CreateHeader(Language["Enable"])
-	left:CreateSwitch("reputation-enable", true, Language["Enable Reputation Module"], Language["Enable the HydraUI reputation module"], ReloadUI):RequiresReload(true)
+	left:CreateSwitch("reputation-enable", true, Language["Enable Reputation Module"], Language["Enable the YxUI reputation module"], ReloadUI):RequiresReload(true)
 
 	left:CreateHeader(Language["Styling"])
 	left:CreateSwitch("reputation-display-progress", Settings["reputation-display-progress"], Language["Display Progress Value"], Language["Display your current progress information in the reputation bar"], UpdateDisplayProgress)

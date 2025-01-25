@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 Defaults["unitframes-pet-width"] = 110
 Defaults["unitframes-pet-health-height"] = 26
@@ -17,18 +17,18 @@ Defaults["unitframes-pet-buff-pos"] = "BOTTOM"
 Defaults["unitframes-pet-debuff-size"] = 20
 Defaults["unitframes-pet-debuff-pos"] = "BOTTOM"
 Defaults["pet-enable"] = true
-Defaults.PetHealthTexture = "HydraUI 4"
-Defaults.PetPowerTexture = "HydraUI 4"
+Defaults.PetHealthTexture = "YxUI 4"
+Defaults.PetPowerTexture = "YxUI 4"
 
-if HydraUI.IsMainline then
+if YxUI.IsMainline then
 	Defaults["unitframes-pet-health-left"] = "[Name(10)]"
 else
 	Defaults["unitframes-pet-health-left"] = "[HappinessColor][Name(10)]"
 end
 
-local UF = HydraUI:GetModule("Unit Frames")
+local UF = YxUI:GetModule("Unit Frames")
 
-HydraUI.StyleFuncs["pet"] = function(self, unit)
+YxUI.StyleFuncs["pet"] = function(self, unit)
 	-- General
 	self:RegisterForClicks("AnyUp")
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
@@ -43,7 +43,7 @@ HydraUI.StyleFuncs["pet"] = function(self, unit)
 	local Threat = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	Threat:SetPoint("TOPLEFT", -1, 1)
 	Threat:SetPoint("BOTTOMRIGHT", 1, -1)
-	Threat:SetBackdrop(HydraUI.Outline)
+	Threat:SetBackdrop(YxUI.Outline)
 	Threat.PostUpdate = UF.ThreatPostUpdate
 
 	self.ThreatIndicator = Threat
@@ -71,7 +71,7 @@ HydraUI.StyleFuncs["pet"] = function(self, unit)
 
 	self.HealBar = HealBar
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		local AbsorbsBar = CreateFrame("StatusBar", nil, Health)
 		AbsorbsBar:SetWidth(Settings["unitframes-pet-width"])
 		AbsorbsBar:SetHeight(Settings["unitframes-pet-health-height"])
@@ -94,16 +94,16 @@ HydraUI.StyleFuncs["pet"] = function(self, unit)
 	HealthBG.multiplier = 0.2
 
 	local HealthLeft = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthLeft, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+	YxUI:SetFontInfo(HealthLeft, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 	HealthLeft:SetPoint("LEFT", Health, 3, 0)
 	HealthLeft:SetJustifyH("LEFT")
 
 	local HealthRight = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthRight, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+	YxUI:SetFontInfo(HealthRight, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 	HealthRight:SetPoint("RIGHT", Health, -3, 0)
 	HealthRight:SetJustifyH("RIGHT")
 
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-header-texture-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-header-texture-color"])
 
 	-- Attributes
 	Health.colorTapping = true
@@ -215,21 +215,21 @@ HydraUI.StyleFuncs["pet"] = function(self, unit)
 end
 
 local UpdatePetWidth = function(value)
-	if HydraUI.UnitFrames["pet"] then
-		HydraUI.UnitFrames["pet"]:SetWidth(value)
+	if YxUI.UnitFrames["pet"] then
+		YxUI.UnitFrames["pet"]:SetWidth(value)
 	end
 end
 
 local UpdatePetHealthHeight = function(value)
-	if HydraUI.UnitFrames["pet"] then
-		HydraUI.UnitFrames["pet"].Health:SetHeight(value)
-		HydraUI.UnitFrames["pet"]:SetHeight(value + Settings["unitframes-pet-power-height"] + 3)
+	if YxUI.UnitFrames["pet"] then
+		YxUI.UnitFrames["pet"].Health:SetHeight(value)
+		YxUI.UnitFrames["pet"]:SetHeight(value + Settings["unitframes-pet-power-height"] + 3)
 	end
 end
 
 local UpdatePetPowerHeight = function(value)
-	if HydraUI.UnitFrames["pet"] then
-		local Frame = HydraUI.UnitFrames["pet"]
+	if YxUI.UnitFrames["pet"] then
+		local Frame = YxUI.UnitFrames["pet"]
 
 		Frame.Power:SetHeight(value)
 		Frame:SetHeight(Settings["unitframes-pet-health-height"] + value + 3)
@@ -237,8 +237,8 @@ local UpdatePetPowerHeight = function(value)
 end
 
 local UpdatePetHealthColor = function(value)
-	if HydraUI.UnitFrames["pet"] then
-		local Health = HydraUI.UnitFrames["pet"].Health
+	if YxUI.UnitFrames["pet"] then
+		local Health = YxUI.UnitFrames["pet"].Health
 
 		UF:SetHealthAttributes(Health, value)
 
@@ -247,8 +247,8 @@ local UpdatePetHealthColor = function(value)
 end
 
 local UpdatePetHealthFill = function(value)
-	if HydraUI.UnitFrames["pet"] then
-		local Unit = HydraUI.UnitFrames["pet"]
+	if YxUI.UnitFrames["pet"] then
+		local Unit = YxUI.UnitFrames["pet"]
 
 		Unit.Health:SetReverseFill(value)
 		Unit.HealBar:SetReverseFill(value)
@@ -275,8 +275,8 @@ local UpdatePetHealthFill = function(value)
 end
 
 local UpdatePetPowerColor = function(value)
-	if HydraUI.UnitFrames["pet"] then
-		local Power = HydraUI.UnitFrames["pet"].Power
+	if YxUI.UnitFrames["pet"] then
+		local Power = YxUI.UnitFrames["pet"].Power
 
 		UF:SetPowerAttributes(Power, value)
 
@@ -285,32 +285,32 @@ local UpdatePetPowerColor = function(value)
 end
 
 local UpdatePetPowerFill = function(value)
-	if HydraUI.UnitFrames["pet"] then
-		HydraUI.UnitFrames["pet"].Power:SetReverseFill(value)
+	if YxUI.UnitFrames["pet"] then
+		YxUI.UnitFrames["pet"].Power:SetReverseFill(value)
 	end
 end
 
 local UpdateEnableBuffs = function(value)
-	if HydraUI.UnitFrames["pet"] then
+	if YxUI.UnitFrames["pet"] then
 		if value then
-			HydraUI.UnitFrames["pet"]:EnableElement("Buffs")
+			YxUI.UnitFrames["pet"]:EnableElement("Buffs")
 		else
-			HydraUI.UnitFrames["pet"]:DisableElement("Buffs")
+			YxUI.UnitFrames["pet"]:DisableElement("Buffs")
 		end
 	end
 end
 
 local UpdateBuffSize = function(value)
-	if HydraUI.UnitFrames["pet"] then
-		HydraUI.UnitFrames["pet"].Buffs.size = value
-		HydraUI.UnitFrames["pet"].Buffs:SetSize(Settings["unitframes-pet-width"], value)
-		HydraUI.UnitFrames["pet"].Buffs:ForceUpdate()
+	if YxUI.UnitFrames["pet"] then
+		YxUI.UnitFrames["pet"].Buffs.size = value
+		YxUI.UnitFrames["pet"].Buffs:SetSize(Settings["unitframes-pet-width"], value)
+		YxUI.UnitFrames["pet"].Buffs:ForceUpdate()
 	end
 end
 
 local UpdateBuffPosition = function(value)
-	if HydraUI.UnitFrames["pet"] then
-		local Unit = HydraUI.UnitFrames["pet"]
+	if YxUI.UnitFrames["pet"] then
+		local Unit = YxUI.UnitFrames["pet"]
 
 		Unit.Buffs:ClearAllPoints()
 
@@ -327,16 +327,16 @@ local UpdateBuffPosition = function(value)
 end
 
 local UpdateDebuffSize = function(value)
-	if HydraUI.UnitFrames["pet"] then
-		HydraUI.UnitFrames["pet"].Debuffs.size = value
-		HydraUI.UnitFrames["pet"].Debuffs:SetSize(Settings["unitframes-pet-width"], value)
-		HydraUI.UnitFrames["pet"].Debuffs:ForceUpdate()
+	if YxUI.UnitFrames["pet"] then
+		YxUI.UnitFrames["pet"].Debuffs.size = value
+		YxUI.UnitFrames["pet"].Debuffs:SetSize(Settings["unitframes-pet-width"], value)
+		YxUI.UnitFrames["pet"].Debuffs:ForceUpdate()
 	end
 end
 
 local UpdateDebuffPosition = function(value)
-	if HydraUI.UnitFrames["pet"] then
-		local Unit = HydraUI.UnitFrames["pet"]
+	if YxUI.UnitFrames["pet"] then
+		local Unit = YxUI.UnitFrames["pet"]
 
 		Unit.Debuffs:ClearAllPoints()
 
@@ -372,8 +372,8 @@ local UpdateDebuffPosition = function(value)
 end
 
 local UpdateHealthTexture = function(value)
-	if HydraUI.UnitFrames["pet"] then
-		local Frame = HydraUI.UnitFrames["pet"]
+	if YxUI.UnitFrames["pet"] then
+		local Frame = YxUI.UnitFrames["pet"]
 
 		Frame.Health:SetStatusBarTexture(Assets:GetTexture(value))
 		Frame.Health.bg:SetTexture(Assets:GetTexture(value))
@@ -386,15 +386,15 @@ local UpdateHealthTexture = function(value)
 end
 
 local UpdatePowerTexture = function(value)
-	if HydraUI.UnitFrames["pet"] then
-		local Frame = HydraUI.UnitFrames["pet"]
+	if YxUI.UnitFrames["pet"] then
+		local Frame = YxUI.UnitFrames["pet"]
 
 		Frame.Power:SetStatusBarTexture(Assets:GetTexture(value))
 		Frame.Power.bg:SetTexture(Assets:GetTexture(value))
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Pet"], Language["Unit Frames"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Pet"], Language["Unit Frames"], function(left, right)
 	left:CreateHeader(Language["Styling"])
 	left:CreateSwitch("pet-enable", Settings["pet-enable"], Language["Enable Pet"], Language["Enable the pet unit frame"], ReloadUI):RequiresReload(true)
 	left:CreateSlider("unitframes-pet-width", Settings["unitframes-pet-width"], 60, 320, 1, "Width", "Set the width of the pet unit frame", UpdatePetWidth)

@@ -1,7 +1,7 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local Debug = HydraUI:NewModule("Debug")
-local GUI = HydraUI:GetModule("GUI")
+local Debug = YxUI:NewModule("Debug")
+local GUI = YxUI:GetModule("GUI")
 
 local format = format
 local select = select
@@ -32,7 +32,7 @@ local GetClient = function()
 end
 
 local CountMovedFrames = function()
-	local Profile = HydraUI:GetActiveProfile()
+	local Profile = YxUI:GetActiveProfile()
 
 	if (not Profile.Move) then
 		return 0
@@ -47,7 +47,7 @@ local CountMovedFrames = function()
 	return Count
 end
 
-if HydraUI.IsMainline then
+if YxUI.IsMainline then
 	GetQuests = function()
 		local NumQuests = select(2, C_QuestLog.GetNumQuestLogEntries())
 		local MaxQuests = C_QuestLog.GetMaxNumQuestsCanAccept()
@@ -58,7 +58,7 @@ if HydraUI.IsMainline then
 	GetSpecInfo = function()
 		return select(2, GetSpecializationInfo(GetSpecialization()))
 	end
-elseif HydraUI.IsCata then
+elseif YxUI.IsCata then
 	GetQuests = function()
 		local NumQuests = select(2, GetNumQuestLogEntries())
 		local MaxQuests = C_QuestLog.GetMaxNumQuestsCanAccept()
@@ -145,7 +145,7 @@ GUI:AddWidgets(Language["Info"], Language["Debug"], function(left, right)
 	local ScreenWidth, ScreenHeight = GetPhysicalScreenSize()
 
 	left:CreateHeader(Language["UI Information"])
-	left:CreateDoubleLine("dbg-ui-version", Language["UI Version"], HydraUI.UIVersion)
+	left:CreateDoubleLine("dbg-ui-version", Language["UI Version"], YxUI.UIVersion)
 	left:CreateDoubleLine("dbg-game-version", Language["Game Version"], format("%s (%s)", Version, Build))
 	left:CreateDoubleLine("dbg-client", Language["Client"], GetClient())
 	left:CreateDoubleLine("dbg-ui-scale", Language["UI Scale"], C_CVar.GetCVar("uiScale"))
@@ -153,18 +153,18 @@ GUI:AddWidgets(Language["Info"], Language["Debug"], function(left, right)
 	left:CreateDoubleLine("dbg-reso", Language["Resolution"], format("%sx%s", ScreenWidth, ScreenHeight))
 	left:CreateDoubleLine("dbg-screen-size", Language["Screen Size"], format("%sx%s", GetPhysicalScreenSize()))
 	left:CreateDoubleLine("dbg-fullscreen", Language["Fullscreen"], GetCVar("gxMaximize") == "1" and Language["Enabled"] or Language["Disabled"])
-	left:CreateDoubleLine("dbg-profile", Language["Profile"], HydraUI:GetActiveProfileName())
-	left:CreateDoubleLine("dbg-profile-count", Language["Profile Count"], HydraUI:GetProfileCount())
+	left:CreateDoubleLine("dbg-profile", Language["Profile"], YxUI:GetActiveProfileName())
+	left:CreateDoubleLine("dbg-profile-count", Language["Profile Count"], YxUI:GetProfileCount())
 	left:CreateDoubleLine("dbg-moved-frames", Language["Moved Frames"], CountMovedFrames())
-	left:CreateDoubleLine("dbg-locale", Language["Locale"], HydraUI.UserLocale)
+	left:CreateDoubleLine("dbg-locale", Language["Locale"], YxUI.UserLocale)
 	left:CreateDoubleLine("dbg-show-errors", Language["Display Errors"], GetCVar("scriptErrors") == "1" and Language["Enabled"] or Language["Disabled"])
 
 	right:CreateHeader(Language["User Information"])
 	right:CreateDoubleLine("dbg-level", Language["Level"], UnitLevel("player"))
-	right:CreateDoubleLine("dbg-race", Language["Race"], HydraUI.UserRace)
+	right:CreateDoubleLine("dbg-race", Language["Race"], YxUI.UserRace)
 	right:CreateDoubleLine("dbg-class", Language["Class"], UnitClass("player"))
 	right:CreateDoubleLine("dbg-spec", Language["Spec"], GetSpecInfo())
-	right:CreateDoubleLine("dbg-realm", Language["Realm"], HydraUI.UserRealm)
+	right:CreateDoubleLine("dbg-realm", Language["Realm"], YxUI.UserRealm)
 	right:CreateDoubleLine("dbg-zone", Language["Zone"], GetZoneText())
 	right:CreateDoubleLine("dbg-subzone", Language["Sub Zone"], GetMinimapZoneText())
 	right:CreateDoubleLine("dbg-quests", Language["Quests"], GetQuests())
@@ -173,12 +173,12 @@ GUI:AddWidgets(Language["Info"], Language["Debug"], function(left, right)
 	right:CreateHeader(Language["AddOns Information"])
 	right:CreateDoubleLine("dbg-total-addons", Language["Total AddOns"], GetNumAddOns())
 	right:CreateDoubleLine("dbg-loaded-addons", Language["Loaded AddOns"], GetNumLoadedAddOns())
-	right:CreateDoubleLine("dbg-loaded-plugins", Language["Loaded Plugins"], #HydraUI.Plugins)
+	right:CreateDoubleLine("dbg-loaded-plugins", Language["Loaded Plugins"], #YxUI.Plugins)
 end)
 
 function Debug:DISPLAY_SIZE_CHANGED()
 	GUI:GetWidget("dbg-suggested-scale").Right:SetText((768 / select(2, GetPhysicalScreenSize())))
-	GUI:GetWidget("dbg-reso").Right:SetText(HydraUI.ScreenResolution)
+	GUI:GetWidget("dbg-reso").Right:SetText(YxUI.ScreenResolution)
 	GUI:GetWidget("dbg-fullscreen").Right:SetText(GetCVar("gxMaximize") == "1" and Language["Enabled"] or Language["Disabled"])
 end
 

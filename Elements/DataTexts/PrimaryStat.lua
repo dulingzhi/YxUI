@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local UnitStat = UnitStat
 
@@ -38,7 +38,7 @@ local Update = function(self, event, unit)
 		end
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], ValidStat[Highest], HydraUI.ValueColor, HighestStat)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], ValidStat[Highest], YxUI.ValueColor, HighestStat)
 end
 
 local OnEnable = function(self)
@@ -59,4 +59,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Primary Stat", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Primary Stat", OnEnable, OnDisable, Update)

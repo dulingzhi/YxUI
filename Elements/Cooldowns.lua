@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-local Cooldowns = HydraUI:NewModule("Cooldowns")
+local Cooldowns = YxUI:NewModule("Cooldowns")
 
 -- Default settings values
 Defaults["cooldowns-enable"] = true
@@ -251,13 +251,13 @@ function Cooldowns:Load()
 		return
 	end
 
-	self.Anchor = CreateFrame("Frame", "HydraUI Cooldown Flash", HydraUI.UIParent)
+	self.Anchor = CreateFrame("Frame", "YxUI Cooldown Flash", YxUI.UIParent)
 	self.Anchor:SetSize(Settings["cooldowns-size"], Settings["cooldowns-size"])
-	self.Anchor:SetPoint("CENTER", HydraUI.UIParent, "CENTER", 0, 100)
+	self.Anchor:SetPoint("CENTER", YxUI.UIParent, "CENTER", 0, 100)
 
 	self:SetSize(Settings["cooldowns-size"], Settings["cooldowns-size"])
 	self:SetPoint("CENTER", self.Anchor, "CENTER", 0, 0)
-	self:SetBackdrop(HydraUI.Backdrop)
+	self:SetBackdrop(YxUI.Backdrop)
 	self:SetFrameStrata("HIGH")
 	self:SetBackdropColor(0, 0, 0)
 	self:SetAlpha(0)
@@ -269,7 +269,7 @@ function Cooldowns:Load()
 
 	self.Text = self:CreateFontString(nil, "OVERLAY")
 	self.Text:SetPoint("TOP", self, "BOTTOM", 0, -5)
-	HydraUI:SetFontInfo(self.Text, Settings["ui-widget-font"], 16)
+	YxUI:SetFontInfo(self.Text, Settings["ui-widget-font"], 16)
 	self.Text:SetWidth(Settings["cooldowns-size"] * 2.5)
 	self.Text:SetJustifyH("CENTER")
 
@@ -285,7 +285,7 @@ function Cooldowns:Load()
 	self.AnimOut:SetDuration(0.6)
 	self.AnimOut:SetEasing("out")
 
-	HydraUI:CreateMover(self.Anchor)
+	YxUI:CreateMover(self.Anchor)
 
 	self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
@@ -331,7 +331,7 @@ local TestCooldown = function()
 	Cooldowns.AnimIn:Play()
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
 	right:CreateHeader(Language["Cooldown Alert"])
 	right:CreateSwitch("cooldowns-enable", Settings["cooldowns-enable"], Language["Enable Cooldown Alert"], Language["When an ability comes off cooldown the icon will flash as an alert"], UpdateEnableCooldownFlash)
 	right:CreateSwitch("cooldowns-text", Settings["cooldowns-text"], Language["Enable Cooldown Text"], Language["Display text on the cooldown alert"])

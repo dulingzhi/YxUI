@@ -1,25 +1,25 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local Commands = {}
 
 Commands["move"] = function()
-	HydraUI:ToggleMovers()
+	YxUI:ToggleMovers()
 end
 
 Commands["movereset"] = function()
-	HydraUI:ResetAllMovers()
+	YxUI:ResetAllMovers()
 end
 
 Commands["settings"] = function()
-	HydraUI:GetModule("GUI"):Toggle()
+	YxUI:GetModule("GUI"):Toggle()
 end
 
 Commands["keybind"] = function()
-	HydraUI:GetModule("Key Binding"):Toggle()
+	YxUI:GetModule("Key Binding"):Toggle()
 end
 
 Commands["reset"] = function()
-	HydraUI:Reset()
+	YxUI:Reset()
 end
 
 Commands["texel"] = function()
@@ -48,13 +48,13 @@ Commands["texel"] = function()
 end
 
 Commands["help"] = function()
-	print(format(Language["|cFF%sHydraUI|r Commands"], Settings["ui-widget-color"]))
+	print(format(Language["|cFF%sYxUI|r Commands"], Settings["ui-widget-color"]))
 	print(" ")
-	print(format("|Hcommand:/hui|h|cFF%s/hui|r|h - Toggle the settings window", Settings["ui-widget-color"]))
-	print(format("|Hcommand:/hui move|h|cFF%s/hui move|r|h - Drag UI elements around the screen", Settings["ui-widget-color"]))
-	print(format("|Hcommand:/hui movereset|h|cFF%s/hui movereset|r|h - Reposition all movers to their default locations", Settings["ui-widget-color"]))
-	print(format("|Hcommand:/hui keybind|h|cFF%s/hui keybind|r|h - Toggle mouseover keybinding", Settings["ui-widget-color"]))
-	print(format("|Hcommand:/hui reset|h|cFF%s/hui reset|r|h - Reset all stored UI information and settings", Settings["ui-widget-color"]))
+	print(format("|Hcommand:/yxui|h|cFF%s/yxui|r|h - Toggle the settings window", Settings["ui-widget-color"]))
+	print(format("|Hcommand:/yxui move|h|cFF%s/yxui move|r|h - Drag UI elements around the screen", Settings["ui-widget-color"]))
+	print(format("|Hcommand:/yxui movereset|h|cFF%s/yxui movereset|r|h - Reposition all movers to their default locations", Settings["ui-widget-color"]))
+	print(format("|Hcommand:/yxui keybind|h|cFF%s/yxui keybind|r|h - Toggle mouseover keybinding", Settings["ui-widget-color"]))
+	print(format("|Hcommand:/yxui reset|h|cFF%s/yxui reset|r|h - Reset all stored UI information and settings", Settings["ui-widget-color"]))
 end
 
 local RunCommand = function(arg)
@@ -65,10 +65,8 @@ local RunCommand = function(arg)
 	end
 end
 
-SLASH_HYDRAUI1 = "/hui"
-SLASH_HYDRAUI2 = "/hydraui"
-SLASH_HYDRAUI3 = "/vui" -- Remove later, I just know people will still type this for now... including myself
-SlashCmdList["HYDRAUI"] = RunCommand
+SLASH_YXUI1 = "/yxui"
+SlashCmdList["YXUI"] = RunCommand
 
 SLASH_RELOAD1 = "/rl"
 SlashCmdList["RELOAD"] = C_UI.Reload

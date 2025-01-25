@@ -1,26 +1,26 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local Throttle = HydraUI:GetModule("Throttle")
-local GUI = HydraUI:GetModule("GUI")
+local Throttle = YxUI:GetModule("Throttle")
+local GUI = YxUI:GetModule("GUI")
 
-function HydraUI:WelcomeMessage()
+function YxUI:WelcomeMessage()
 	if (not Settings["ui-display-welcome"]) then
 		return
 	end
 
 	local Color = Settings["ui-widget-color"]
 
-	print(format(Language["Welcome to |cFF%sHydra|r|cFFEFFFFFUI|r version |cFF%s%s|r - https://discord.gg/XefDFa6nJR"], Color, Settings["ui-header-font-color"], HydraUI.UIVersion))
-	print(format(Language["Type |cFF%s/hui|r to access the settings window, or click |cFF%s|Hcommand:/hui|h[here]|h|r."], Color, Color))
+	print(format(Language["Welcome to |cFF%sHydra|r|cFFEFFFFFUI|r version |cFF%s%s|r - https://discord.gg/XefDFa6nJR"], Color, Settings["ui-header-font-color"], YxUI.UIVersion))
+	print(format(Language["Type |cFF%s/yxui|r to access the settings window, or click |cFF%s|Hcommand:/yxui|h[here]|h|r."], Color, Color))
 end
 
 local UpdateUIScale = function(value)
-	HydraUI:SetScale(tonumber(value))
+	YxUI:SetScale(tonumber(value))
 end
 
 local GetDiscordLink = function()
 	if (not Throttle:IsThrottled("discord-request")) then
-		HydraUI:print(Language["Join the Discord community for support and feedback https://discord.gg/XefDFa6nJR"])
+		YxUI:print(Language["Join the Discord community for support and feedback https://discord.gg/XefDFa6nJR"])
 
 		Throttle:Start("discord-request", 10)
 	end
@@ -28,18 +28,18 @@ end
 
 local GetYouTubeLink = function()
 	if (not Throttle:IsThrottled("yt-request")) then
-		HydraUI:print(Language["Subscribe to YouTube to see new features https://www.youtube.com/c/HydraMods"])
+		YxUI:print(Language["Subscribe to YouTube to see new features https://www.youtube.com/c/HydraMods"])
 
 		Throttle:Start("yt-request", 10)
 	end
 end
 
 local ToggleMove = function()
-	HydraUI:ToggleMovers()
+	YxUI:ToggleMovers()
 end
 
 local ResetMovers = function()
-	HydraUI:ResetAllMovers()
+	YxUI:ResetAllMovers()
 end
 
 local UpdateGUIEnableFade = function(value)
@@ -57,12 +57,12 @@ GUI:AddWidgets(Language["General"], Language["General"], function(left, right)
 	left:CreateHeader(Language["Welcome"])
 	left:CreateSwitch("ui-display-welcome", Settings["ui-display-welcome"], Language["Display Welcome Message"], Language["Display a welcome message on login with UI information"])
 	--left:CreateSwitch("ui-display-whats-new", Settings["ui-display-whats-new"], Language[ [[Display "What's New" Pop-ups]] ], "")
-	left:CreateButton("", Language["Get Link"], Language["Join Discord"], Language["Get a link to join the HydraUI Discord community"], GetDiscordLink)
-	left:CreateButton("", Language["Get Link"], Language["Watch YouTube"], Language["Get a link for the HydraUI YouTube channel"], GetYouTubeLink)
+	left:CreateButton("", Language["Get Link"], Language["Join Discord"], Language["Get a link to join the YxUI Discord community"], GetDiscordLink)
+	left:CreateButton("", Language["Get Link"], Language["Watch YouTube"], Language["Get a link for the YxUI YouTube channel"], GetYouTubeLink)
 
 	left:CreateHeader(Language["Move UI"])
-	left:CreateButton("", Language["Toggle"], Language["Move UI"], Language["While toggled, you can drag some elements of HydraUI around the screen"], ToggleMove)
-	left:CreateButton("", Language["Restore"], Language["Restore To Defaults"], Language["Restore all HydraUI movable frames to their default locations"], ResetMovers)
+	left:CreateButton("", Language["Toggle"], Language["Move UI"], Language["While toggled, you can drag some elements of YxUI around the screen"], ToggleMove)
+	left:CreateButton("", Language["Restore"], Language["Restore To Defaults"], Language["Restore all YxUI movable frames to their default locations"], ResetMovers)
 
 	right:CreateHeader(Language["Settings Window"])
 	right:CreateSwitch("gui-hide-in-combat", Settings["gui-hide-in-combat"], Language["Hide In Combat"], Language["Hide the settings window when engaging in combat"])
@@ -81,7 +81,7 @@ local AcceptNewStyle = function(value)
 end
 
 local UpdateStyle = function(value)
-	HydraUI:DisplayPopup(Language["Attention"], format(Language['Are you sure you would like to change to the current style to "%s"?'], value), ACCEPT, AcceptNewStyle, CANCEL, nil, value)
+	YxUI:DisplayPopup(Language["Attention"], format(Language['Are you sure you would like to change to the current style to "%s"?'], value), ACCEPT, AcceptNewStyle, CANCEL, nil, value)
 end
 
 GUI:AddWidgets(Language["General"], Language["Styles"], function(left, right)
@@ -107,7 +107,7 @@ GUI:AddWidgets(Language["General"], Language["Styles"], function(left, right)
 
 	right:CreateHeader(Language["Console"])
 	right:CreateButton("", Language["Reload"], Language["Reload UI"], Language["Reload the UI"], ReloadUI)
-	--right:CreateButton("", Language["Delete"], Language["Delete Saved Variables"], Language["Reset all saved variables"], HydraUI.Reset)
+	--right:CreateButton("", Language["Delete"], Language["Delete Saved Variables"], Language["Reset all saved variables"], YxUI.Reset)
 
 	right:CreateHeader(Language["Windows"])
 	right:CreateColorSelection("ui-window-bg-color", Settings["ui-window-bg-color"], Language["Background Color"], "")
@@ -125,7 +125,7 @@ GUI:AddWidgets(Language["General"], Language["Styles"], function(left, right)
 	left:CreateSlider("ui-title-font-size", Settings["ui-title-font-size"], 8, 32, 1, Language["Title Font Size"], Language["Set the font size of title elements in the UI"])
 end)
 
-local Durability = HydraUI:NewModule("Durability")
+local Durability = YxUI:NewModule("Durability")
 
 local SetDurabilityPosition = function(self, anchor, parent)
 	if (parent ~= Durability) then
@@ -136,17 +136,17 @@ end
 
 function Durability:Load() -- Maybe a setting to hide the whole frame?
 	self:SetSize(DurabilityFrame:GetSize())
-	self:SetPoint("BOTTOM", HydraUIParent, -360, 10)
+	self:SetPoint("BOTTOM", YxUIParent, -360, 10)
 
 	DurabilityFrame:SetScript("OnShow", nil)
 	DurabilityFrame:SetScript("OnHide", nil)
 	hooksecurefunc(DurabilityFrame, "SetPoint", SetDurabilityPosition)
 
-	HydraUI:CreateMover(self)
+	YxUI:CreateMover(self)
 end
 
-if (not HydraUI.IsClassic) then
-	local SeatIndicator = HydraUI:NewModule("Vehicle Seats")
+if (not YxUI.IsClassic) then
+	local SeatIndicator = YxUI:NewModule("Vehicle Seats")
 
 	local SetSeatIndicatorPosition = function(self, anchor, parent)
 		if (parent ~= SeatIndicator) then
@@ -170,6 +170,6 @@ if (not HydraUI.IsClassic) then
 		VehicleSeatIndicator:SetScript("OnHide", nil)
 		hooksecurefunc(VehicleSeatIndicator, "SetPoint", SetSeatIndicatorPosition)
 
-		HydraUI:CreateMover(self)
+		YxUI:CreateMover(self)
 	end
 end

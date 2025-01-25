@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local IsInGuild = IsInGuild
 local GuildRoster = C_GuildInfo.GuildRoster
@@ -81,7 +81,7 @@ local OnEnter = function(self)
 			Name = match(Name, "(%S+)-%S+")
 			Color = RAID_CLASS_COLORS[Class].colorStr
 			LevelColor = GetQuestDifficultyColor(Level)
-			LevelColor = HydraUI:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
+			LevelColor = YxUI:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
 
 			if StatusLabels[Status] then
 				Name = format("|cFF%s%s |c%s%s|r %s", LevelColor, Level, Color, Name, StatusLabels[Status])
@@ -152,7 +152,7 @@ local Update = function(self, event)
 			OnlineAndMobile = Online
 		end
 
-		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, OnlineAndMobile)
+		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, OnlineAndMobile)
 	end
 end
 
@@ -161,9 +161,9 @@ local OnMouseUp = function()
 		return print(ERR_NOT_IN_COMBAT)
 	end
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		ToggleCommunitiesFrame()
-	elseif HydraUI.IsCata then
+	elseif YxUI.IsCata then
 		ToggleGuildFrame()
 	else
 		ToggleFriendsFrame(3)
@@ -201,4 +201,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Guild", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Guild", OnEnable, OnDisable, Update)

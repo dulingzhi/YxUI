@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetBestMapForUnit = C_Map.GetBestMapForUnit
 local GetPlayerMapPosition = C_Map.GetPlayerMapPosition
@@ -10,7 +10,7 @@ local OnEnter = function(self)
 	local ZoneText = GetRealZoneText()
 	local SubZoneText = GetMinimapZoneText()
 	local PVPType, IsFFA, Faction = GetZonePVPInfo()
-	local Color = HydraUI.ZoneColors[PVPType or "other"]
+	local Color = YxUI.ZoneColors[PVPType or "other"]
 	local Label
 
 	if (ZoneText ~= SubZoneText) then
@@ -68,7 +68,7 @@ local Update = function(self, elapsed)
 			if Position then
 				local X, Y = GetPlayerMapPosition(MapID, "player"):GetXY()
 
-				self.Text:SetFormattedText("|cFF%s%.2f|r, |cFF%s%.2f|r", HydraUI.ValueColor, X * 100, HydraUI.ValueColor, Y * 100)
+				self.Text:SetFormattedText("|cFF%s%.2f|r, |cFF%s%.2f|r", YxUI.ValueColor, X * 100, YxUI.ValueColor, Y * 100)
 
 				if self.TooltipShown then
 					GameTooltip:ClearLines()
@@ -99,4 +99,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Coordinates", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Coordinates", OnEnable, OnDisable, Update)

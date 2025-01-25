@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetMinimapZoneText = GetMinimapZoneText
 local GetZonePVPInfo = GetZonePVPInfo
@@ -9,7 +9,7 @@ local OnEnter = function(self)
 	local ZoneText = GetRealZoneText()
 	local SubZoneText = GetMinimapZoneText()
 	local PVPType, IsFFA, Faction = GetZonePVPInfo()
-	local Color = HydraUI.ZoneColors[PVPType or "other"]
+	local Color = YxUI.ZoneColors[PVPType or "other"]
 	local Label
 
 	if (ZoneText and ZoneText ~= SubZoneText) then
@@ -47,7 +47,7 @@ local OnMouseUp = function(self)
 end
 
 local Update = function(self)
-	local Color = HydraUI.ZoneColors[GetZonePVPInfo() or "other"]
+	local Color = YxUI.ZoneColors[GetZonePVPInfo() or "other"]
 
 	self.Text:SetText(GetMinimapZoneText())
 	self.Text:SetTextColor(Color[1], Color[2], Color[3])
@@ -83,4 +83,4 @@ local OnDisable = function(self)
 	self.Text:SetTextColor(1, 1, 1)
 end
 
-HydraUI:AddDataText("Location", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Location", OnEnable, OnDisable, Update)

@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-local Map = HydraUI:NewModule("Minimap")
+local Map = YxUI:NewModule("Minimap")
 
 -- Default settings values
 Defaults["minimap-enable"] = true
@@ -43,38 +43,38 @@ local OnMouseWheel = function(self, delta)
 end
 
 local MailOnEnter = function()
-	MiniMapMailIcon:SetVertexColor(HydraUI:HexToRGB("FFFFFF"))
+	MiniMapMailIcon:SetVertexColor(YxUI:HexToRGB("FFFFFF"))
 end
 
 local MailOnLeave = function()
-	MiniMapMailIcon:SetVertexColor(HydraUI:HexToRGB("EEEEEE"))
+	MiniMapMailIcon:SetVertexColor(YxUI:HexToRGB("EEEEEE"))
 end
 
 function Map:Style()
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 	local Border = Settings["ui-border-thickness"]
 	local Width = Settings["minimap-size"] + (Border * 2)
 
 	-- Backdrop
-	self:SetPoint("TOPRIGHT", HydraUI.UIParent, -12, -12)
+	self:SetPoint("TOPRIGHT", YxUI.UIParent, -12, -12)
 	self:SetSize((Settings["minimap-size"] + 8), ((Settings["minimap-show-top"] == true and 22 or 0) + (Settings["minimap-show-bottom"] == true and 22 or 0) + 8 + Settings["minimap-size"]))
 
-	self.TopFrame = CreateFrame("Frame", "HydraUIMinimapTop", self, "BackdropTemplate")
+	self.TopFrame = CreateFrame("Frame", "YxUIMinimapTop", self, "BackdropTemplate")
 	self.TopFrame:SetSize(Width, Settings["minimap-top-height"])
 	self.TopFrame:SetPoint("TOP", self, 0, 0)
-	HydraUI:AddBackdrop(self.TopFrame, Assets:GetTexture("HydraUI 4"))
+	YxUI:AddBackdrop(self.TopFrame, Assets:GetTexture("YxUI 4"))
 	self.TopFrame.Outside:SetBackdropColor(R, G, B, (Settings["minimap-top-fill"] / 100))
 
 	self.Middle = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.Middle:SetSize(Width, Settings["minimap-size"])
 	self.Middle:SetPoint("TOP", self.TopFrame, "BOTTOM", 0, 1 > Border and 1 or (Border + 2))
-	HydraUI:AddBackdrop(self.Middle)
+	YxUI:AddBackdrop(self.Middle)
 	self.Middle.Outside:SetBackdropColor(R, G, B, 0)
 
-	self.BottomFrame = CreateFrame("Frame", "HydraUIMinimapBottom", self, "BackdropTemplate")
+	self.BottomFrame = CreateFrame("Frame", "YxUIMinimapBottom", self, "BackdropTemplate")
 	self.BottomFrame:SetSize(Width, Settings["minimap-bottom-height"])
 	self.BottomFrame:SetPoint("TOP", self.Middle, "BOTTOM", 0, 1 > Border and 1 or (Border + 2))
-	HydraUI:AddBackdrop(self.BottomFrame, Assets:GetTexture("HydraUI 4"))
+	YxUI:AddBackdrop(self.BottomFrame, Assets:GetTexture("YxUI 4"))
 	self.BottomFrame.Outside:SetBackdropColor(R, G, B, (Settings["minimap-bottom-fill"] / 100))
 
 	-- Style minimap
@@ -91,13 +91,13 @@ function Map:Style()
 		MinimapCompassTexture:SetTexture(nil)
 	end
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 	    Minimap:SetArchBlobRingScalar(0)
 		Minimap:SetQuestBlobRingScalar(0)
 
 		if QueueStatusButton then
 			QueueStatusButton:ClearAllPoints()
-			QueueStatusButton:SetPoint("BOTTOMLEFT", HydraUI.UIParent, "BOTTOMRIGHT", -460, 13)
+			QueueStatusButton:SetPoint("BOTTOMLEFT", YxUI.UIParent, "BOTTOMRIGHT", -460, 13)
 
 			if (not QueueStatusButton:IsMovable()) then
 				QueueStatusButton:SetMovable(true)
@@ -171,7 +171,7 @@ function Map:Style()
 
 		MiniMapMailIcon:SetSize(32, 32)
 		MiniMapMailIcon:SetTexture(Assets:GetTexture("Mail 2"))
-		MiniMapMailIcon:SetVertexColor(HydraUI:HexToRGB("EEEEEE"))
+		MiniMapMailIcon:SetVertexColor(YxUI:HexToRGB("EEEEEE"))
 	end
 
 	if MinimapNorthTag then
@@ -187,7 +187,7 @@ function Map:Style()
 		self.Tracking:SetSize(24, 24)
 		self.Tracking:SetPoint("TOPLEFT", Minimap, 2, -2)
 		self.Tracking:SetFrameLevel(10)
-		self.Tracking:SetBackdrop(HydraUI.BackdropAndBorder)
+		self.Tracking:SetBackdrop(YxUI.BackdropAndBorder)
 		self.Tracking:SetBackdropColor(0, 0, 0)
 		self.Tracking:SetBackdropBorderColor(0, 0, 0)
 
@@ -195,7 +195,7 @@ function Map:Style()
 		self.Tracking.Tex:SetPoint("TOPLEFT", self.Tracking, 1, -1)
 		self.Tracking.Tex:SetPoint("BOTTOMRIGHT", self.Tracking, -1, 1)
 		self.Tracking.Tex:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-		self.Tracking.Tex:SetVertexColor(HydraUI:HexToRGB(Settings["ui-header-texture-color"]))
+		self.Tracking.Tex:SetVertexColor(YxUI:HexToRGB(Settings["ui-header-texture-color"]))
 
 		MiniMapTracking:SetParent(self.Tracking)
 		MiniMapTracking:ClearAllPoints()
@@ -234,7 +234,7 @@ function Map:Style()
 	self:Disable(MiniMapMailBorder)
 	self:Disable(TimeManagerClockButton)
 
-	if (HydraUI.ClientVersion > 30000) then
+	if (YxUI.ClientVersion > 30000) then
 		GameTimeFrame:ClearAllPoints()
 		GameTimeFrame:SetParent(Minimap)
 		GameTimeFrame:SetPoint("TOPRIGHT", Minimap, 1, -1)
@@ -261,7 +261,7 @@ function Map:Style()
 		self.BottomFrame:Hide()
 	end
 
-	HydraUI:CreateMover(self)
+	YxUI:CreateMover(self)
 end
 
 local UpdateMinimapSize = function(value)
@@ -278,7 +278,7 @@ local UpdateMinimapSize = function(value)
 end
 
 local UpdateShowTopBar = function(value)
-	local Anchor = HydraUI:GetModule("DataText"):GetAnchor("Minimap-Top")
+	local Anchor = YxUI:GetModule("DataText"):GetAnchor("Minimap-Top")
 
 	if value then
 		Map.TopFrame:Show()
@@ -298,7 +298,7 @@ local UpdateShowTopBar = function(value)
 end
 
 local UpdateShowBottomBar = function(value)
-	local Anchor = HydraUI:GetModule("DataText"):GetAnchor("Minimap-Bottom")
+	local Anchor = YxUI:GetModule("DataText"):GetAnchor("Minimap-Bottom")
 
 	if value then
 		Map.BottomFrame:Show()
@@ -326,13 +326,13 @@ local UpdateBottomHeight = function(value)
 end
 
 local UpdateTopFill = function(value)
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 
 	Map.TopFrame.Outside:SetBackdropColor(R, G, B, (value / 100))
 end
 
 local UpdateBottomFill = function(value)
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 
 	Map.BottomFrame.Outside:SetBackdropColor(R, G, B, (value / 100))
 end
@@ -365,15 +365,15 @@ function Map:Load()
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Minimap"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Minimap"], function(left, right)
 	left:CreateHeader(Language["Enable"])
-	left:CreateSwitch("minimap-enable", Settings["minimap-enable"], Language["Enable Minimap Module"], Language["Enable the HydraUI mini map module"], ReloadUI):RequiresReload(true)
+	left:CreateSwitch("minimap-enable", Settings["minimap-enable"], Language["Enable Minimap Module"], Language["Enable the YxUI mini map module"], ReloadUI):RequiresReload(true)
 
 	left:CreateHeader(Language["Styling"])
 	left:CreateSwitch("minimap-show-top", Settings["minimap-show-top"], Language["Enable Top Bar"], Language["Enable the data text bar on top of the mini map"], UpdateShowTopBar)
 	left:CreateSwitch("minimap-show-bottom", Settings["minimap-show-bottom"], Language["Enable Bottom Bar"], Language["Enable the data text bar on the bottom of the mini map"], UpdateShowBottomBar)
 
-	if (HydraUI.ClientVersion > 30000) then
+	if (YxUI.ClientVersion > 30000) then
 		left:CreateSwitch("minimap-show-calendar", Settings["minimap-show-calendar"], Language["Enable Calendar"], Language["Enable the calendar button on the minimap"], UpdateShowCalendar)
 	end
 

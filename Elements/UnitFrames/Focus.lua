@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 Defaults["unitframes-focus-width"] = 200
 Defaults["unitframes-focus-health-height"] = 26
@@ -14,12 +14,12 @@ Defaults["unitframes-focus-health-right"] = "[HealthPercent]"
 Defaults["focus-enable"] = true
 Defaults["focus-enable-castbar"] = true
 Defaults["focus-enable-buffs"] = true
-Defaults.FocusHealthTexture = "HydraUI 4"
-Defaults.FocusPowerTexture = "HydraUI 4"
+Defaults.FocusHealthTexture = "YxUI 4"
+Defaults.FocusPowerTexture = "YxUI 4"
 
-local UF = HydraUI:GetModule("Unit Frames")
+local UF = YxUI:GetModule("Unit Frames")
 
-HydraUI.StyleFuncs["focus"] = function(self, unit)
+YxUI.StyleFuncs["focus"] = function(self, unit)
 	-- General
 	self:RegisterForClicks("AnyUp")
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
@@ -34,7 +34,7 @@ HydraUI.StyleFuncs["focus"] = function(self, unit)
 	local Threat = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	Threat:SetPoint("TOPLEFT", -1, 1)
 	Threat:SetPoint("BOTTOMRIGHT", 1, -1)
-	Threat:SetBackdrop(HydraUI.Outline)
+	Threat:SetBackdrop(YxUI.Outline)
 	Threat.PostUpdate = UF.ThreatPostUpdate
 
 	self.ThreatIndicator = Threat
@@ -62,7 +62,7 @@ HydraUI.StyleFuncs["focus"] = function(self, unit)
 
 	self.HealBar = HealBar
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		local AbsorbsBar = CreateFrame("StatusBar", nil, Health)
 		AbsorbsBar:SetWidth(Settings["unitframes-focus-width"])
 		AbsorbsBar:SetHeight(Settings["unitframes-focus-health-height"])
@@ -85,16 +85,16 @@ HydraUI.StyleFuncs["focus"] = function(self, unit)
 	HealthBG.multiplier = 0.2
 
 	local HealthLeft = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthLeft, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+	YxUI:SetFontInfo(HealthLeft, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 	HealthLeft:SetPoint("LEFT", Health, 3, 0)
 	HealthLeft:SetJustifyH("LEFT")
 
 	local HealthRight = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthRight, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+	YxUI:SetFontInfo(HealthRight, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 	HealthRight:SetPoint("RIGHT", Health, -3, 0)
 	HealthRight:SetJustifyH("RIGHT")
 
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-header-texture-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-header-texture-color"])
 
 	-- Attributes
 	Health.Smooth = true
@@ -141,12 +141,12 @@ HydraUI.StyleFuncs["focus"] = function(self, unit)
 		Background:SetVertexColor(0, 0, 0)
 
 		local Time = Castbar:CreateFontString(nil, "OVERLAY")
-		HydraUI:SetFontInfo(Time, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+		YxUI:SetFontInfo(Time, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 		Time:SetPoint("RIGHT", Castbar, -3, 0)
 		Time:SetJustifyH("RIGHT")
 
 		local Text = Castbar:CreateFontString(nil, "OVERLAY")
-		HydraUI:SetFontInfo(Text, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+		YxUI:SetFontInfo(Text, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 		Text:SetPoint("LEFT", Castbar, 3, 0)
 		Text:SetSize(250 * 0.7, Settings["unitframes-font-size"])
 		Text:SetJustifyH("LEFT")
@@ -219,21 +219,21 @@ HydraUI.StyleFuncs["focus"] = function(self, unit)
 end
 
 local UpdateFocusWidth = function(value)
-	if HydraUI.UnitFrames["focus"] then
-		HydraUI.UnitFrames["focus"]:SetWidth(value)
+	if YxUI.UnitFrames["focus"] then
+		YxUI.UnitFrames["focus"]:SetWidth(value)
 	end
 end
 
 local UpdateFocusHealthHeight = function(value)
-	if HydraUI.UnitFrames["focus"] then
-		HydraUI.UnitFrames["focus"].Health:SetHeight(value)
-		HydraUI.UnitFrames["focus"]:SetHeight(value + Settings["unitframes-focus-power-height"] + 3)
+	if YxUI.UnitFrames["focus"] then
+		YxUI.UnitFrames["focus"].Health:SetHeight(value)
+		YxUI.UnitFrames["focus"]:SetHeight(value + Settings["unitframes-focus-power-height"] + 3)
 	end
 end
 
 local UpdateFocusPowerHeight = function(value)
-	if HydraUI.UnitFrames["focus"] then
-		local Frame = HydraUI.UnitFrames["focus"]
+	if YxUI.UnitFrames["focus"] then
+		local Frame = YxUI.UnitFrames["focus"]
 
 		Frame.Power:SetHeight(value)
 		Frame:SetHeight(Settings["unitframes-focus-health-height"] + value + 3)
@@ -241,8 +241,8 @@ local UpdateFocusPowerHeight = function(value)
 end
 
 local UpdateFocusHealthColor = function(value)
-	if HydraUI.UnitFrames["focus"] then
-		local Health = HydraUI.UnitFrames["focus"].Health
+	if YxUI.UnitFrames["focus"] then
+		local Health = YxUI.UnitFrames["focus"].Health
 
 		UF:SetHealthAttributes(Health, value)
 
@@ -251,8 +251,8 @@ local UpdateFocusHealthColor = function(value)
 end
 
 local UpdateFocusHealthFill = function(value)
-	if HydraUI.UnitFrames["focus"] then
-		local Unit = HydraUI.UnitFrames["focus"]
+	if YxUI.UnitFrames["focus"] then
+		local Unit = YxUI.UnitFrames["focus"]
 
 		Unit.Health:SetReverseFill(value)
 		Unit.AbsorbsBar:SetReverseFill(value)
@@ -272,8 +272,8 @@ local UpdateFocusHealthFill = function(value)
 end
 
 local UpdateFocusPowerColor = function(value)
-	if HydraUI.UnitFrames["focus"] then
-		local Power = HydraUI.UnitFrames["focus"].Power
+	if YxUI.UnitFrames["focus"] then
+		local Power = YxUI.UnitFrames["focus"].Power
 
 		UF:SetPowerAttributes(Power, value)
 
@@ -282,25 +282,25 @@ local UpdateFocusPowerColor = function(value)
 end
 
 local UpdateShowFocusBuffs = function(value)
-	if HydraUI.UnitFrames["focus"] then
+	if YxUI.UnitFrames["focus"] then
 		if value then
-			HydraUI.UnitFrames["focus"]:EnableElement("Auras")
-			HydraUI.UnitFrames["focus"]:UpdateAllElements("ForceUpdate")
+			YxUI.UnitFrames["focus"]:EnableElement("Auras")
+			YxUI.UnitFrames["focus"]:UpdateAllElements("ForceUpdate")
 		else
-			HydraUI.UnitFrames["focus"]:DisableElement("Auras")
+			YxUI.UnitFrames["focus"]:DisableElement("Auras")
 		end
 	end
 end
 
 local UpdateFocusPowerFill = function(value)
-	if HydraUI.UnitFrames["focus"] then
-		HydraUI.UnitFrames["focus"].Power:SetReverseFill(value)
+	if YxUI.UnitFrames["focus"] then
+		YxUI.UnitFrames["focus"].Power:SetReverseFill(value)
 	end
 end
 
 local UpdateHealthTexture = function(value)
-	if HydraUI.UnitFrames["focus"] then
-		local Frame = HydraUI.UnitFrames["focus"]
+	if YxUI.UnitFrames["focus"] then
+		local Frame = YxUI.UnitFrames["focus"]
 
 		Frame.Health:SetStatusBarTexture(Assets:GetTexture(value))
 		Frame.Health.bg:SetTexture(Assets:GetTexture(value))
@@ -313,15 +313,15 @@ local UpdateHealthTexture = function(value)
 end
 
 local UpdatePowerTexture = function(value)
-	if HydraUI.UnitFrames["focus"] then
-		local Frame = HydraUI.UnitFrames["focus"]
+	if YxUI.UnitFrames["focus"] then
+		local Frame = YxUI.UnitFrames["focus"]
 
 		Frame.Power:SetStatusBarTexture(Assets:GetTexture(value))
 		Frame.Power.bg:SetTexture(Assets:GetTexture(value))
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Focus"], Language["Unit Frames"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Focus"], Language["Unit Frames"], function(left, right)
 	left:CreateHeader(Language["Styling"])
 	left:CreateSwitch("focus-enable", Settings["focus-enable"], Language["Enable Focus"], Language["Enable the focus unit frame"], ReloadUI):RequiresReload(true)
 	left:CreateSlider("unitframes-focus-width", Settings["unitframes-focus-width"], 60, 320, 1, "Width", "Set the width of the focus unit frame", UpdateFocusWidth)

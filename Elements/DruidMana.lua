@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-if (HydraUI.UserClass ~= "DRUID") then
+if (YxUI.UserClass ~= "DRUID") then
 	return
 end
 
@@ -10,7 +10,7 @@ local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
 local UnitPowerType = UnitPowerType
 
-local DruidMana = HydraUI:NewModule("Druid Mana")
+local DruidMana = YxUI:NewModule("Druid Mana")
 local ManaID = Enum.PowerType.Mana
 
 function DruidMana:UNIT_POWER_UPDATE()
@@ -20,7 +20,7 @@ function DruidMana:UNIT_POWER_UPDATE()
 	self.Bar:SetValue(Mana)
 	self.Bar:SetMinMaxValues(0, MaxMana)
 
-	self.Progress:SetText(format("%s / %s", HydraUI:ShortValue(Mana), HydraUI:ShortValue(MaxMana)))
+	self.Progress:SetText(format("%s / %s", YxUI:ShortValue(Mana), YxUI:ShortValue(MaxMana)))
 	self.Percentage:SetText(floor((Mana / MaxMana * 100 + 0.05) * 10) / 10 .. "%")
 end
 
@@ -30,7 +30,7 @@ function DruidMana:UNIT_POWER_FREQUENT()
 
 	self.Bar:SetValue(Mana)
 
-	self.Progress:SetText(format("%s / %s", HydraUI:ShortValue(Mana), HydraUI:ShortValue(MaxMana)))
+	self.Progress:SetText(format("%s / %s", YxUI:ShortValue(Mana), YxUI:ShortValue(MaxMana)))
 	self.Percentage:SetText(floor((Mana / MaxMana * 100 + 0.05) * 10) / 10 .. "%")
 end
 
@@ -44,7 +44,7 @@ end
 
 function DruidMana:CreateBar()
 	self:SetSize(Settings["unitframes-player-width"], Settings["unitframes-player-power-height"] + 2)
-	self:SetPoint("CENTER", HydraUI.UIParent, 0, -180)
+	self:SetPoint("CENTER", YxUI.UIParent, 0, -180)
 
 	self.Fade = LibMotion:CreateAnimationGroup()
 
@@ -62,7 +62,7 @@ function DruidMana:CreateBar()
 	self.BarBG = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.BarBG:SetPoint("TOPLEFT", self, 0, 0)
 	self.BarBG:SetPoint("BOTTOMRIGHT", self, 0, 0)
-	self.BarBG:SetBackdrop(HydraUI.BackdropAndBorder)
+	self.BarBG:SetBackdrop(YxUI.BackdropAndBorder)
 	self.BarBG:SetBackdropColor(0, 0, 0)
 	self.BarBG:SetBackdropBorderColor(0, 0, 0)
 
@@ -73,25 +73,25 @@ function DruidMana:CreateBar()
 	self.Bar:SetFrameLevel(6)
 
 	self.Bar:SetMinMaxValues(0, UnitPowerMax("player", ManaID))
-	self.Bar:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-mana"]))
+	self.Bar:SetStatusBarColor(YxUI:HexToRGB(Settings["color-mana"]))
 
 	self.Bar.BG = self.Bar:CreateTexture(nil, "BORDER")
 	self.Bar.BG:SetAllPoints(self.Bar)
 	self.Bar.BG:SetTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
-	self.Bar.BG:SetVertexColor(HydraUI:HexToRGB(Settings["color-mana"]))
+	self.Bar.BG:SetVertexColor(YxUI:HexToRGB(Settings["color-mana"]))
 	self.Bar.BG:SetAlpha(0.2)
 
 	self.Percentage = self.Bar:CreateFontString(nil, "OVERLAY")
 	self.Percentage:SetPoint("LEFT", self.Bar, 3, 0)
-	HydraUI:SetFontInfo(self.Percentage, Settings["ui-widget-font"], Settings["ui-font-size"])
+	YxUI:SetFontInfo(self.Percentage, Settings["ui-widget-font"], Settings["ui-font-size"])
 	self.Percentage:SetJustifyH("LEFT")
 
 	self.Progress = self.Bar:CreateFontString(nil, "OVERLAY")
 	self.Progress:SetPoint("RIGHT", self.Bar, -3, 0)
-	HydraUI:SetFontInfo(self.Progress, Settings["ui-widget-font"], Settings["ui-font-size"])
+	YxUI:SetFontInfo(self.Progress, Settings["ui-widget-font"], Settings["ui-font-size"])
 	self.Progress:SetJustifyH("RIGHT")
 
-	HydraUI:CreateMover(self)
+	YxUI:CreateMover(self)
 end
 
 function DruidMana:Enable()
@@ -136,7 +136,7 @@ local UpdateEnableDruidMana = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Unit Frames"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Unit Frames"], function(left, right)
 	right:CreateHeader(Language["Druid Mana"])
 	right:CreateSwitch("unitframes-show-druid-mana", Settings["unitframes-show-druid-mana"], Language["Enable Druid Mana"], Language["Enable a bar displaying your mana while in other forms"], UpdateEnableDruidMana)
 end)

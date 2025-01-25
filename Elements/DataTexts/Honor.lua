@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local floor = floor
 local UnitHonor = UnitHonor
@@ -22,16 +22,16 @@ local OnEnter = function(self)
 	GameTooltip:AddLine(format(HONOR_LEVEL_TOOLTIP, HonorLevel))
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddLine(Language["Current honor"])
-	GameTooltip:AddDoubleLine(format("%s / %s", HydraUI:Comma(Honor), HydraUI:Comma(MaxHonor)), format("%s%%", Percent), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(format("%s / %s", YxUI:Comma(Honor), YxUI:Comma(MaxHonor)), format("%s%%", Percent), 1, 1, 1, 1, 1, 1)
 
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddLine(Language["Remaining honor"])
-	GameTooltip:AddDoubleLine(format("%s", HydraUI:Comma(Remaining)), format("%s%%", RemainingPercent), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(format("%s", YxUI:Comma(Remaining)), format("%s%%", RemainingPercent), 1, 1, 1, 1, 1, 1)
 
 	if (Kills > 0) then
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(HONORABLE_KILLS)
-		GameTooltip:AddLine(HydraUI:Comma(Kills), 1, 1, 1)
+		GameTooltip:AddLine(YxUI:Comma(Kills), 1, 1, 1)
 	end
 
 	if RewardInfo then
@@ -60,7 +60,7 @@ local Update = function(self, event, unit)
 		return
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s / %s|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, UnitHonor("player"), UnitHonorMax("player"))
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s / %s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, UnitHonor("player"), UnitHonorMax("player"))
 end
 
 local OnEnable = function(self)
@@ -85,4 +85,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Honor", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Honor", OnEnable, OnDisable, Update)

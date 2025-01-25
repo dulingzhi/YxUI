@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local floor = floor
 local GetSpeed = GetSpeed
@@ -18,7 +18,7 @@ local OnEnter = function(self)
 	local Speed = GetSpeed()
 
 	GameTooltip:AddLine(Label, 1, 1, 1)
-	GameTooltip:AddLine(format(CR_SPEED_TOOLTIP, HydraUI:Comma(GetCombatRating(CR_SPEED)), GetCombatRatingBonus(CR_SPEED)), nil, nil, nil, true)
+	GameTooltip:AddLine(format(CR_SPEED_TOOLTIP, YxUI:Comma(GetCombatRating(CR_SPEED)), GetCombatRatingBonus(CR_SPEED)), nil, nil, nil, true)
 
 	GameTooltip:Show()
 end
@@ -28,7 +28,7 @@ local OnLeave = function()
 end
 
 local Update = function(self)
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.2f%%|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, GetSpeed())
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.2f%%|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, GetSpeed())
 end
 
 local OnEnable = function(self)
@@ -50,4 +50,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Speed", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Speed", OnEnable, OnDisable, Update)

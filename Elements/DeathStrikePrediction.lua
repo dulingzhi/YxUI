@@ -1,5 +1,5 @@
 -- This is my death strike module from Legion, I need to rewrite it as an oUF plugin
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local Frame = CreateFrame("Frame")
 Frame:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -222,11 +222,11 @@ function Frame:PLAYER_TALENT_UPDATE()
 		self:RegisterEvent("RUNE_POWER_UPDATE")
 
 		if (not self.DSBar) then
-			local DSBar = CreateFrame("StatusBar", nil, HydraUI.UnitFrames["player"])
-			DSBar:SetAllPoints(HydraUI.UnitFrames["player"].Health)
+			local DSBar = CreateFrame("StatusBar", nil, YxUI.UnitFrames["player"])
+			DSBar:SetAllPoints(YxUI.UnitFrames["player"].Health)
 			DSBar:SetStatusBarTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
 			DSBar:SetStatusBarColor(0.6, 0.02, 0.8)
-			DSBar:SetFrameLevel(HydraUI.UnitFrames["player"].Health:GetFrameLevel() - 1)
+			DSBar:SetFrameLevel(YxUI.UnitFrames["player"].Health:GetFrameLevel() - 1)
 			DSBar:SetMinMaxValues(0, 1)
 			DSBar:SetValue(0)
 			DSBar:Hide()

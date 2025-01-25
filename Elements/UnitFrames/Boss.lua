@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 Defaults["unitframes-boss-enable"] = true
 Defaults["unitframes-boss-width"] = 240
@@ -18,12 +18,12 @@ Defaults["unitframes-boss-power-right"] = "[PowerValues:Short]"
 Defaults["unitframes-boss-buffs"] = true
 Defaults["unitframes-boss-buff-size"] = 47
 Defaults["unitframes-boss-debuff-size"] = 47
-Defaults.BossHealthTexture = "HydraUI 4"
-Defaults.BossPowerTexture = "HydraUI 4"
+Defaults.BossHealthTexture = "YxUI 4"
+Defaults.BossPowerTexture = "YxUI 4"
 
-local UF = HydraUI:GetModule("Unit Frames")
+local UF = YxUI:GetModule("Unit Frames")
 
-HydraUI.StyleFuncs["boss"] = function(self, unit)
+YxUI.StyleFuncs["boss"] = function(self, unit)
 	-- General
 	self:RegisterForClicks("AnyUp")
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
@@ -53,7 +53,7 @@ HydraUI.StyleFuncs["boss"] = function(self, unit)
 
 	self.HealBar = HealBar
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		local AbsorbsBar = CreateFrame("StatusBar", nil, Health)
 		AbsorbsBar:SetWidth(Settings["unitframes-boss-width"])
 		AbsorbsBar:SetHeight(Settings["unitframes-boss-health-height"])
@@ -71,12 +71,12 @@ HydraUI.StyleFuncs["boss"] = function(self, unit)
 	HealthBG.multiplier = 0.2
 
 	local HealthLeft = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthLeft, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+	YxUI:SetFontInfo(HealthLeft, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 	HealthLeft:SetPoint("LEFT", Health, 3, 0)
 	HealthLeft:SetJustifyH("LEFT")
 
 	local HealthRight = Health:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(HealthRight, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+	YxUI:SetFontInfo(HealthRight, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 	HealthRight:SetPoint("RIGHT", Health, -3, 0)
 	HealthRight:SetJustifyH("RIGHT")
 
@@ -85,7 +85,7 @@ HydraUI.StyleFuncs["boss"] = function(self, unit)
 	RaidTarget:SetSize(16, 16)
 	RaidTarget:SetPoint("CENTER", Health, "TOP")
 
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-header-texture-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-header-texture-color"])
 
 	-- Attributes
 	Health.Smooth = true
@@ -108,12 +108,12 @@ HydraUI.StyleFuncs["boss"] = function(self, unit)
 	PowerBG:SetAlpha(0.2)
 
 	local PowerLeft = Power:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(PowerLeft, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+	YxUI:SetFontInfo(PowerLeft, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 	PowerLeft:SetPoint("LEFT", Power, 3, 0)
 	PowerLeft:SetJustifyH("LEFT")
 
 	local PowerRight = Power:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(PowerRight, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+	YxUI:SetFontInfo(PowerRight, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 	PowerRight:SetPoint("RIGHT", Power, -3, 0)
 	PowerRight:SetJustifyH("RIGHT")
 
@@ -171,12 +171,12 @@ HydraUI.StyleFuncs["boss"] = function(self, unit)
     Background:SetVertexColor(0, 0, 0)
 
     local Time = Castbar:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(Time, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+	YxUI:SetFontInfo(Time, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 	Time:SetPoint("RIGHT", Castbar, -3, 0)
 	Time:SetJustifyH("RIGHT")
 
     local Text = Castbar:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(Text, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
+	YxUI:SetFontInfo(Text, Settings["unitframes-font"], Settings["unitframes-font-size"], Settings["unitframes-font-flags"])
 	Text:SetPoint("LEFT", Castbar, 3, 0)
 	Text:SetSize(250 * 0.7, Settings["unitframes-font-size"])
 	Text:SetJustifyH("LEFT")
@@ -230,35 +230,35 @@ end
 
 local UpdateWidth = function(value)
 	for i = 1, 8 do
-		if HydraUI.UnitFrames["boss"..i] then
-			HydraUI.UnitFrames["boss"..i]:SetWidth(value)
+		if YxUI.UnitFrames["boss"..i] then
+			YxUI.UnitFrames["boss"..i]:SetWidth(value)
 		end
 	end
 end
 
 local UpdateHealthHeight = function(value)
 	for i = 1, 8 do
-		if HydraUI.UnitFrames["boss"..i] then
-			HydraUI.UnitFrames["boss"..i].Health:SetHeight(value)
-			HydraUI.UnitFrames["boss"..i]:SetHeight(value + Settings["unitframes-boss-power-height"] + 3)
+		if YxUI.UnitFrames["boss"..i] then
+			YxUI.UnitFrames["boss"..i].Health:SetHeight(value)
+			YxUI.UnitFrames["boss"..i]:SetHeight(value + Settings["unitframes-boss-power-height"] + 3)
 		end
 	end
 end
 
 local UpdatePowerHeight = function(value)
 	for i = 1, 8 do
-		if HydraUI.UnitFrames["boss"..i] then
-			HydraUI.UnitFrames["boss"..i].Power:SetHeight(value)
-			HydraUI.UnitFrames["boss"..i]:SetHeight(value + Settings["unitframes-boss-health-height"] + 3)
+		if YxUI.UnitFrames["boss"..i] then
+			YxUI.UnitFrames["boss"..i].Power:SetHeight(value)
+			YxUI.UnitFrames["boss"..i]:SetHeight(value + Settings["unitframes-boss-health-height"] + 3)
 		end
 	end
 end
 
 local UpdateHealthColor = function(value)
 	for i = 1, 8 do
-		if HydraUI.UnitFrames["boss"..i] then
-			UF:SetHealthAttributes(HydraUI.UnitFrames["boss"..i].Health, value)
-			HydraUI.UnitFrames["boss"..i].Health:ForceUpdate()
+		if YxUI.UnitFrames["boss"..i] then
+			UF:SetHealthAttributes(YxUI.UnitFrames["boss"..i].Health, value)
+			YxUI.UnitFrames["boss"..i].Health:ForceUpdate()
 		end
 	end
 end
@@ -267,8 +267,8 @@ local UpdateHealthFill = function(value)
 	local Unit
 
 	for i = 1, 8 do
-		if HydraUI.UnitFrames["boss"..i] then
-			Unit = HydraUI.UnitFrames["boss"..i]
+		if YxUI.UnitFrames["boss"..i] then
+			Unit = YxUI.UnitFrames["boss"..i]
 
 			Unit.Health:SetReverseFill(value)
 			Unit.HealBar:SetReverseFill(value)
@@ -297,28 +297,28 @@ end
 
 local UpdatePowerColor = function(value)
 	for i = 1, 8 do
-		if HydraUI.UnitFrames["boss"..i] then
-			UF:SetPowerAttributes(HydraUI.UnitFrames["boss"..i].Power, value)
-			HydraUI.UnitFrames["boss"..i].Power:ForceUpdate()
+		if YxUI.UnitFrames["boss"..i] then
+			UF:SetPowerAttributes(YxUI.UnitFrames["boss"..i].Power, value)
+			YxUI.UnitFrames["boss"..i].Power:ForceUpdate()
 		end
 	end
 end
 
 local UpdatePowerFill = function(value)
 	for i = 1, 8 do
-		if HydraUI.UnitFrames["boss"..i] then
-			HydraUI.UnitFrames["boss"..i].Power:SetReverseFill(value)
+		if YxUI.UnitFrames["boss"..i] then
+			YxUI.UnitFrames["boss"..i].Power:SetReverseFill(value)
 		end
 	end
 end
 
 local UpdateEnableBuffs = function(value)
 	for i = 1, 8 do
-		if HydraUI.UnitFrames["boss"..i] then
+		if YxUI.UnitFrames["boss"..i] then
 			if value then
-				HydraUI.UnitFrames["boss"..i]:EnableElement("Auras")
+				YxUI.UnitFrames["boss"..i]:EnableElement("Auras")
 			else
-				HydraUI.UnitFrames["boss"..i]:DisableElement("Auras")
+				YxUI.UnitFrames["boss"..i]:DisableElement("Auras")
 			end
 		end
 	end
@@ -326,33 +326,33 @@ end
 
 local UpdateBuffSize = function(value)
 	for i = 1, 8 do
-		if HydraUI.UnitFrames["boss"..i] then
-			HydraUI.UnitFrames["boss"..i].Buffs.size = value
-			HydraUI.UnitFrames["boss"..i].Buffs:SetSize(Settings["unitframes-boss-width"], value)
-			HydraUI.UnitFrames["boss"..i].Buffs:ForceUpdate()
+		if YxUI.UnitFrames["boss"..i] then
+			YxUI.UnitFrames["boss"..i].Buffs.size = value
+			YxUI.UnitFrames["boss"..i].Buffs:SetSize(Settings["unitframes-boss-width"], value)
+			YxUI.UnitFrames["boss"..i].Buffs:ForceUpdate()
 		end
 	end
 end
 
 local UpdateDebuffSize = function(value)
 	for i = 1, 8 do
-		if HydraUI.UnitFrames["boss"..i] then
-			HydraUI.UnitFrames["boss"..i].Debuffs.size = value
-			HydraUI.UnitFrames["boss"..i].Debuffs:SetSize(Settings["unitframes-boss-width"], value)
-			HydraUI.UnitFrames["boss"..i].Debuffs:ForceUpdate()
+		if YxUI.UnitFrames["boss"..i] then
+			YxUI.UnitFrames["boss"..i].Debuffs.size = value
+			YxUI.UnitFrames["boss"..i].Debuffs:SetSize(Settings["unitframes-boss-width"], value)
+			YxUI.UnitFrames["boss"..i].Debuffs:ForceUpdate()
 		end
 	end
 end
 
 local UpdateHealthTexture = function(value)
 	for i = 1, 8 do
-		if HydraUI.UnitFrames["boss"..i] then
-			HydraUI.UnitFrames["boss"..i].Health:SetStatusBarTexture(Assets:GetTexture(value))
-			HydraUI.UnitFrames["boss"..i].Health.bg:SetTexture(Assets:GetTexture(value))
-			HydraUI.UnitFrames["boss"..i].HealBar:SetStatusBarTexture(Assets:GetTexture(value))
+		if YxUI.UnitFrames["boss"..i] then
+			YxUI.UnitFrames["boss"..i].Health:SetStatusBarTexture(Assets:GetTexture(value))
+			YxUI.UnitFrames["boss"..i].Health.bg:SetTexture(Assets:GetTexture(value))
+			YxUI.UnitFrames["boss"..i].HealBar:SetStatusBarTexture(Assets:GetTexture(value))
 
-			if HydraUI.UnitFrames["boss"..i].AbsorbsBar then
-				HydraUI.UnitFrames["boss"..i].AbsorbsBar:SetStatusBarTexture(Assets:GetTexture(value))
+			if YxUI.UnitFrames["boss"..i].AbsorbsBar then
+				YxUI.UnitFrames["boss"..i].AbsorbsBar:SetStatusBarTexture(Assets:GetTexture(value))
 			end
 		end
 	end
@@ -360,14 +360,14 @@ end
 
 local UpdatePowerTexture = function(value)
 	for i = 1, 8 do
-		if HydraUI.UnitFrames["boss"..i] then
-			HydraUI.UnitFrames["boss"..i].Power:SetStatusBarTexture(Assets:GetTexture(value))
-			HydraUI.UnitFrames["boss"..i].Power.bg:SetTexture(Assets:GetTexture(value))
+		if YxUI.UnitFrames["boss"..i] then
+			YxUI.UnitFrames["boss"..i].Power:SetStatusBarTexture(Assets:GetTexture(value))
+			YxUI.UnitFrames["boss"..i].Power.bg:SetTexture(Assets:GetTexture(value))
 		end
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Bosses"], Language["Unit Frames"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Bosses"], Language["Unit Frames"], function(left, right)
 	left:CreateHeader(Language["Styling"])
 	left:CreateSwitch("unitframes-boss-enable", Settings["unitframes-boss-enable"], Language["Enable Boss Frames"], Language["Enable the boss unit frames"], ReloadUI):RequiresReload(true)
 	left:CreateSlider("unitframes-boss-width", Settings["unitframes-boss-width"], 60, 320, 1, "Width", "Set the width of the unit frame", UpdateWidth)

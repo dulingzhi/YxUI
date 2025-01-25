@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local AutoDismount = HydraUI:NewModule("Dismount")
+local AutoDismount = YxUI:NewModule("Dismount")
 
 AutoDismount.Mount = {
 	[SPELL_FAILED_NOT_MOUNTED] = true,
@@ -76,7 +76,7 @@ local UpdateEnableDismount = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
 	right:CreateHeader(Language["Auto Dismount"])
 	right:CreateSwitch("dismount-enable", Settings["dismount-enable"], Language["Enable Auto Dismount"], Language["Automatically dismount during actions that can't be performed while mounted"], UpdateEnableDismount)
 end)

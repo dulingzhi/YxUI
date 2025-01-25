@@ -1,12 +1,12 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local Quest = HydraUI:NewModule("Quest Watch")
+local Quest = YxUI:NewModule("Quest Watch")
 
 function Quest:StyleFrame()
 	self:SetSize(204, 204) -- Not sure why, Blizzard did it.
-	self:SetPoint("TOPRIGHT", HydraUI.UIParent, "TOPRIGHT", -300, -400)
+	self:SetPoint("TOPRIGHT", YxUI.UIParent, "TOPRIGHT", -300, -400)
 
-	local Mover = HydraUI:CreateMover(self)
+	local Mover = YxUI:CreateMover(self)
 
 	WatchFrame:SetMovable(true)
 	WatchFrame:SetUserPlaced(true)

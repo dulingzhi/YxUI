@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetAverageItemLevel = GetAverageItemLevel
 local Label = STAT_AVERAGE_ITEM_LEVEL
@@ -33,7 +33,7 @@ end
 local Update = function(self)
 	local Average, Equipped = GetAverageItemLevel()
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%d|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, Equipped)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%d|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Equipped)
 end
 
 local OnEnable = function(self)
@@ -56,4 +56,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Item Level", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Item Level", OnEnable, OnDisable, Update)

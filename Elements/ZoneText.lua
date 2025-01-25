@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local ZT = HydraUI:NewModule("Zone Text")
+local ZT = YxUI:NewModule("Zone Text")
 
 local GetZoneText = GetZoneText
 local GetSubZoneText = GetSubZoneText
@@ -27,7 +27,7 @@ function ZT:OnEvent(event)
 	local Zone = GetZoneText()
 	local SubZone = GetSubZoneText()
 	local PVPType, IsSubZonePVP, Faction = GetZonePVPInfo()
-	local Color = HydraUI.ZoneColors[PVPType or "other"]
+	local Color = YxUI.ZoneColors[PVPType or "other"]
 
 	self.ZoneText:SetTextColor(Color[1], Color[2], Color[3])
 	self.SubZoneText:SetTextColor(Color[1], Color[2], Color[3])
@@ -84,14 +84,14 @@ function ZT:OnEvent(event)
 end
 
 function ZT:CreateFontObjects()
-	local ZoneFrame = CreateFrame("Frame", nil, HydraUI.UIParent)
+	local ZoneFrame = CreateFrame("Frame", nil, YxUI.UIParent)
 	ZoneFrame:SetSize(32, 32)
-	ZoneFrame:SetPoint("TOP", HydraUI.UIParent, 0, -220)
+	ZoneFrame:SetPoint("TOP", YxUI.UIParent, 0, -220)
 
 	local SubFrame
 
 	for i = 1, 3 do
-		SubFrame = CreateFrame("Frame", nil, HydraUI.UIParent)
+		SubFrame = CreateFrame("Frame", nil, YxUI.UIParent)
 		SubFrame:SetSize(32, 32)
 		SubFrame:SetPoint("CENTER", ZoneFrame, 0, 0)
 		SubFrame:SetAlpha(0)

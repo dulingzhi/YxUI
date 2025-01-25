@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local UnitAttackPower = UnitAttackPower
 local UnitRangedAttackPower = UnitRangedAttackPower
@@ -25,13 +25,13 @@ local Update = function(self, event, unit)
 	local RangedBase, RangedPositiveBuffs, RangedNegativeBuffs = UnitRangedAttackPower("player")
 	local Ranged = RangedBase + RangedPositiveBuffs + RangedNegativeBuffs
 
-	if (HydraUI.UserClass == "HUNTER") then
+	if (YxUI.UserClass == "HUNTER") then
 		Rating = Ranged
 	else
 		Rating = Attack
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, Rating)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Rating)
 end
 
 local OnEnable = function(self)
@@ -56,4 +56,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Attack Power", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Attack Power", OnEnable, OnDisable, Update)

@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local Slots = {1, 3, 5, 9, 10, 6, 7, 8, 16, 17, 18}
 local GetRepairAllCost = GetRepairAllCost
@@ -82,9 +82,9 @@ local Update = function(self)
 	local Percent = floor(Total / Count * 100)
 
 	if (Count > 0) then
-		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s%%|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, Percent)
+		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s%%|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Percent)
 	else
-		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%sN/A|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor)
+		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%sN/A|r", Settings["data-text-label-color"], Label, YxUI.ValueColor)
 	end
 
 	if (25 > Percent and not self.Anim:IsPlaying()) then
@@ -131,4 +131,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Durability", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Durability", OnEnable, OnDisable, Update)

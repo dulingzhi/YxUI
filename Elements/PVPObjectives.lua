@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local Objectives = HydraUI:NewModule("PVP Objectives")
+local Objectives = YxUI:NewModule("PVP Objectives")
 
 local SetBelowMinimapPosition = function(self, anchor, parent)
 	if (parent ~= Objectives.MinimapAnchor) then
@@ -11,11 +11,11 @@ local SetBelowMinimapPosition = function(self, anchor, parent)
 end
 
 function Objectives:Load()
-	self.MinimapAnchor = CreateFrame("Frame", "PVP Objectives", HydraUI.UIParent)
+	self.MinimapAnchor = CreateFrame("Frame", "PVP Objectives", YxUI.UIParent)
 	self.MinimapAnchor:SetSize(173, 26)
-	self.MinimapAnchor:SetPoint("TOP", HydraUI.UIParent, 0, -70)
+	self.MinimapAnchor:SetPoint("TOP", YxUI.UIParent, 0, -70)
 
 	hooksecurefunc(UIWidgetBelowMinimapContainerFrame, "SetPoint", SetBelowMinimapPosition)
 
-	HydraUI:CreateMover(self.MinimapAnchor)
+	YxUI:CreateMover(self.MinimapAnchor)
 end

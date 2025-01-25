@@ -1,14 +1,14 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
--- HydraUI Default
-Assets:SetStyle("HydraUI", {
+-- YxUI Default
+Assets:SetStyle("YxUI", {
 	["ui-widget-font"] = "Roboto",
 	["ui-header-font"] = "Roboto",
 	["ui-button-font"] = "Roboto",
 
-	["ui-widget-texture"] = "HydraUI 4",
-	["ui-header-texture"] = "HydraUI 4",
-	["ui-button-texture"] = "HydraUI 4",
+	["ui-widget-texture"] = "YxUI 4",
+	["ui-header-texture"] = "YxUI 4",
+	["ui-button-texture"] = "YxUI 4",
 
 	["ui-header-font-color"] = "FFE6C0",
 	["ui-header-texture-color"] = "424242",
@@ -103,8 +103,8 @@ Assets:SetStyle("HydraUI", {
 	["replacement-ui-font"] = "Roboto",
 })
 
--- HydraUI 2
-Assets:SetStyle("HydraUI 2", {
+-- YxUI 2
+Assets:SetStyle("YxUI 2", {
 	["ui-widget-font"] = "PT Sans",
 	["ui-header-font"] = "PT Sans",
 	["ui-button-font"] = "PT Sans",
@@ -212,9 +212,9 @@ Assets:SetStyle("Conjured Muffin", {
 	["ui-header-font"] = "Roboto",
 	["ui-button-font"] = "Roboto",
 
-	["ui-widget-texture"] = "HydraUI 4",
-	["ui-header-texture"] = "HydraUI 4",
-	["ui-button-texture"] = "HydraUI 4",
+	["ui-widget-texture"] = "YxUI 4",
+	["ui-header-texture"] = "YxUI 4",
+	["ui-button-texture"] = "YxUI 4",
 
 	["ui-header-font-color"] = "EFEBE9",
 	["ui-header-texture-color"] = "37474F",

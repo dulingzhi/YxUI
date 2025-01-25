@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local format = format
 local date = date
@@ -24,7 +24,7 @@ local Update = function(self, event)
 		self.Throttle = 0
 		self:SetScript("OnUpdate", OnUpdate)
 		self.Text:SetText(SecondsToTime(0))
-		self.Text:SetTextColor(HydraUI:HexToRGB(HydraUI.ValueColor))
+		self.Text:SetTextColor(YxUI:HexToRGB(YxUI.ValueColor))
 	elseif (event == "PLAYER_REGEN_ENABLED") then
 		self:SetScript("OnUpdate", nil)
 		self.Text:SetTextColor(1, 1, 1)
@@ -52,4 +52,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Combat Time", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Combat Time", OnEnable, OnDisable, Update)

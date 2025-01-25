@@ -1,4 +1,4 @@
--- LibMotion by Hydra
+-- LibMotion by Yx
 local Version = 1.00
 
 if LibMotion and LibMotion.Version >= Version then

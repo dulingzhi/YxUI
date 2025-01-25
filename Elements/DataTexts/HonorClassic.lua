@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
 local Label = HONOR
@@ -21,7 +21,7 @@ local OnEnter = function(self)
 		end
 
 		GameTooltip:AddLine(HONOR_TODAY)
-		GameTooltip:AddDoubleLine(HONORABLE_KILLS, HydraUI:Comma(HK), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(HONORABLE_KILLS, YxUI:Comma(HK), 1, 1, 1, 1, 1, 1)
 	end
 
 	local LHK = GetPVPLifetimeStats()
@@ -32,7 +32,7 @@ local OnEnter = function(self)
 		end
 
 		GameTooltip:AddLine(HONOR_LIFETIME)
-		GameTooltip:AddDoubleLine(HONORABLE_KILLS, HydraUI:Comma(LHK), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(HONORABLE_KILLS, YxUI:Comma(LHK), 1, 1, 1, 1, 1, 1)
 	end
 
 	-- GetCurrentArenaSeason()
@@ -59,9 +59,9 @@ local OnLeave = function()
 end
 
 local OnMouseUp = function()
-	if HydraUI.IsClassic then
+	if YxUI.IsClassic then
 		ToggleCharacter("HonorFrame")
-	elseif HydraUI.IsWrath then
+	elseif YxUI.IsWrath then
 		TogglePVPFrame()
 	else
 		ToggleCharacter("PVPFrame")
@@ -71,7 +71,7 @@ end
 local Update = function(self)
 	local Info = GetCurrencyInfo(1901)
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s |r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, HydraUI:Comma(Info.quantity))
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s |r", Settings["data-text-label-color"], Label, YxUI.ValueColor, YxUI:Comma(Info.quantity))
 end
 
 local OnEnable = function(self)
@@ -94,4 +94,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Honor", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Honor", OnEnable, OnDisable, Update)

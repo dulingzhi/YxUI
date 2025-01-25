@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local select = select
 local GetMaxNumQuestsCanAccept = C_QuestLog.GetMaxNumQuestsCanAccept
@@ -6,18 +6,18 @@ local Label = QUESTS_LABEL
 
 local GetNumQuests
 
-if HydraUI.IsMainline then
+if YxUI.IsMainline then
 	GetNumQuests = C_QuestLog.GetNumQuestLogEntries
 else
 	GetNumQuests = GetNumQuestLogEntries
 end
 
 local OnMouseUp = function()
-	ToggleFrame(HydraUI.IsMainline and QuestMapFrame or QuestLogFrame)
+	ToggleFrame(YxUI.IsMainline and QuestMapFrame or QuestLogFrame)
 end
 
 local Update = function(self)
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s/%s|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, select(2, GetNumQuests()), GetMaxNumQuestsCanAccept())
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s/%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, select(2, GetNumQuests()), GetMaxNumQuestsCanAccept())
 end
 
 local OnEnable = function(self)
@@ -36,4 +36,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Quests", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Quests", OnEnable, OnDisable, Update)

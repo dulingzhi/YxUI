@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-local AutoVendor = HydraUI:NewModule("Auto Vendor") -- Automatically sell useless items
+local AutoVendor = YxUI:NewModule("Auto Vendor") -- Automatically sell useless items
 
 local select = select
 local GetContainerNumSlots = GetContainerNumSlots
@@ -28,7 +28,7 @@ if C_Container and C_Container.GetContainerItemID then GetContainerItemID = C_Co
 if C_Container and C_Container.GetContainerItemInfo then GetContainerItemInfo = C_Container.GetContainerItemInfo end
 if C_Container and C_Container.UseContainerItem then UseContainerItem = C_Container.UseContainerItem end
 
-function HydraUI:GetTrashValue()
+function YxUI:GetTrashValue()
 	local Profit = 0
 	local TotalCount = 0
 
@@ -42,7 +42,7 @@ function HydraUI:GetTrashValue()
 				local TotalPrice = VendorPrice
 				local Count
 
-				if HydraUI.IsClassic then
+				if YxUI.IsClassic then
 					Count = select(2, GetContainerItemInfo(Bag, Slot)) or 1
 				else
 					Count = GetContainerItemInfo(Bag, Slot).stackCount or 1
@@ -78,7 +78,7 @@ function AutoVendor:OnEvent()
 				local VendorPrice = select(11, GetItemInfo(Link))
 				local Count
 
-				if HydraUI.IsClassic then
+				if YxUI.IsClassic then
 					Count = select(2, GetContainerItemInfo(Bag, Slot)) or 1
 				else
 					Count = GetContainerItemInfo(Bag, Slot).stackCount or 1
@@ -99,7 +99,7 @@ function AutoVendor:OnEvent()
 	end
 
 	if (Profit > 0 and Settings["auto-vendor-report"]) then
-		HydraUI:print(format(Language["You sold %d %s for a total of %s"], TotalCount, TotalCount > 0 and "items" or "item", GetCoinTextureString(Profit)))
+		YxUI:print(format(Language["You sold %d %s for a total of %s"], TotalCount, TotalCount > 0 and "items" or "item", GetCoinTextureString(Profit)))
 	end
 end
 
@@ -110,7 +110,7 @@ function AutoVendor:Load()
 	end
 end
 
-local AutoRepair = HydraUI:NewModule("Auto Repair")
+local AutoRepair = YxUI:NewModule("Auto Repair")
 
 Defaults["auto-repair-enable"] = true
 Defaults["auto-repair-use-guild"] = true
@@ -131,21 +131,21 @@ function AutoRepair:OnEvent()
 			RepairAllItems(1)
 
 			if Settings["auto-repair-report"] then
-				HydraUI:print(format(Language["Your equipped items have been repaired for %s using guild funds"], CostString))
+				YxUI:print(format(Language["Your equipped items have been repaired for %s using guild funds"], CostString))
 			end
 		else
 			if (Money > Cost) then
 				RepairAllItems()
 
 				if Settings["auto-repair-report"] then
-					HydraUI:print(format(Language["Your equipped items have been repaired for %s"], CostString))
+					YxUI:print(format(Language["Your equipped items have been repaired for %s"], CostString))
 				end
 			else
 				local Required = Cost - Money
 				local RequiredString = GetCoinTextureString(Required)
 
 				if Settings["auto-repair-report"] then
-					HydraUI:print(format(Language["You require %s to repair all equipped items (costs %s total)"], RequiredString, CostString))
+					YxUI:print(format(Language["You require %s to repair all equipped items (costs %s total)"], RequiredString, CostString))
 				end
 			end
 		end
@@ -175,7 +175,7 @@ local UpdateAutoRepair = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
 	right:CreateHeader(Language["Merchant"])
 	right:CreateSwitch("auto-repair-enable", Settings["auto-repair-enable"], Language["Auto Repair Equipment"], Language["Automatically repair damaged items when visiting a repair merchant"], UpdateAutoRepair)
 	right:CreateSwitch("auto-repair-use-guild", Settings["auto-repair-use-guild"], Language["Use Guild Funds"], Language["Use guild funds if available for automatic repairs"])

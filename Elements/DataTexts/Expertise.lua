@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetExpertisePercent = GetExpertisePercent
 local Label = STAT_EXPERTISE
@@ -50,7 +50,7 @@ local Update = function(self, event, unit)
 		return
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, GetExpertisePercent() .. "%")
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, GetExpertisePercent() .. "%")
 end
 
 local OnEnable = function(self)
@@ -73,4 +73,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText(Label, OnEnable, OnDisable, Update)
+YxUI:AddDataText(Label, OnEnable, OnDisable, Update)

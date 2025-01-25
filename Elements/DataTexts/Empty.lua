@@ -1,4 +1,4 @@
-local HydraUI = select(2, ...):get()
+local YxUI = select(2, ...):get()
 
 local Update = function()
 
@@ -12,4 +12,4 @@ local OnDisable = function()
 
 end
 
-HydraUI:AddDataText("Empty", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Empty", OnEnable, OnDisable, Update)

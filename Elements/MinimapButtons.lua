@@ -1,8 +1,8 @@
--- File written by Smelly, maintained by Hydra
+-- File written by Smelly, maintained by Jai
 
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local MinimapButtons = HydraUI:NewModule("Minimap Buttons")
+local MinimapButtons = YxUI:NewModule("Minimap Buttons")
 
 local lower = string.lower
 local find = string.find
@@ -170,7 +170,7 @@ function MinimapButtons:SkinButtons()
 				Child.Backdrop = CreateFrame("Frame", nil, Child, "BackdropTemplate")
 				Child.Backdrop:SetPoint("TOPLEFT", Child, 0, 0)
 				Child.Backdrop:SetPoint("BOTTOMRIGHT", Child, 0, 0)
-				Child.Backdrop:SetBackdrop(HydraUI.Backdrop)
+				Child.Backdrop:SetBackdrop(YxUI.Backdrop)
 				Child.Backdrop:SetBackdropColor(0, 0, 0)
 				Child.Backdrop:SetFrameLevel(Child:GetFrameLevel() - 1)
 
@@ -178,7 +178,7 @@ function MinimapButtons:SkinButtons()
 				Child.Backdrop.Texture:SetPoint("TOPLEFT", Child.Backdrop, 1, -1)
 				Child.Backdrop.Texture:SetPoint("BOTTOMRIGHT", Child.Backdrop, -1, 1)
 				Child.Backdrop.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-				Child.Backdrop.Texture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-window-main-color"]))
+				Child.Backdrop.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
 
 				Child:SetFrameLevel(Minimap:GetFrameLevel() + 10)
 				Child:SetFrameStrata(Minimap:GetFrameStrata())
@@ -214,12 +214,12 @@ function MinimapButtons:SkinButtons()
 end
 
 function MinimapButtons:CreatePanel()
-	local Frame = CreateFrame("Frame", "HydraUI Minimap Buttons", HydraUI.UIParent, "BackdropTemplate")
-	Frame:SetBackdrop(HydraUI.BackdropAndBorder)
-	Frame:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-bg-color"]))
+	local Frame = CreateFrame("Frame", "YxUI Minimap Buttons", YxUI.UIParent, "BackdropTemplate")
+	Frame:SetBackdrop(YxUI.BackdropAndBorder)
+	Frame:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-bg-color"]))
 	Frame:SetBackdropBorderColor(0, 0, 0)
 	Frame:SetFrameStrata("LOW")
-	Frame:SetPoint("TOPRIGHT", HydraUI:GetModule("Minimap").BottomFrame, "BOTTOMRIGHT", 0, -2)
+	Frame:SetPoint("TOPRIGHT", YxUI:GetModule("Minimap").BottomFrame, "BOTTOMRIGHT", 0, -2)
 
 	self.Panel = Frame
 end
@@ -244,7 +244,7 @@ local DelayedLoad = function()
 
 	UpdateBar()
 
-	HydraUI:CreateMover(MinimapButtons.Panel)
+	YxUI:CreateMover(MinimapButtons.Panel)
 end
 
 function MinimapButtons:Load()
@@ -255,7 +255,7 @@ function MinimapButtons:Load()
 	C_Timer.After(2, DelayedLoad)
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Minimap"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Minimap"], function(left, right)
 	right:CreateHeader(Language["Minimap Buttons"])
 	right:CreateSwitch("minimap-buttons-enable", Settings["minimap-buttons-enable"], Language["Enable Minimap Button Bar"], "", ReloadUI):RequiresReload(true)
 	right:CreateSlider("minimap-buttons-size", Settings["minimap-buttons-size"], 16, 44, 1, Language["Button Size"], "", UpdateBar)

@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-local Experience = HydraUI:NewModule("Experience")
+local Experience = YxUI:NewModule("Experience")
 
 local format = format
 local floor = floor
@@ -20,9 +20,9 @@ local LEVEL = LEVEL
 local HasXPBuff
 local XPMod = 1
 
-if HydraUI.IsMainline then
+if YxUI.IsMainline then
 	GetNumQuests = C_QuestLog.GetNumQuestLogEntries
-elseif HydraUI.IsCata then
+elseif YxUI.IsCata then
 	GetNumQuests = GetNumQuestLogEntries
 	HasXPBuff = IsSpellKnown(78632) -- Fast Track +10%
 	XPMod = 1.10
@@ -127,7 +127,7 @@ function Experience:CreateBar()
 	local Offset = 1 > Border and 1 or (Border + 2)
 
 	self:SetSize(Settings["experience-width"], Settings["experience-height"])
-	self:SetPoint("TOP", HydraUI.UIParent, 0, -13)
+	self:SetPoint("TOP", YxUI.UIParent, 0, -13)
 	self:SetFrameStrata("MEDIUM")
 	self.Elapsed = 0
 
@@ -143,12 +143,12 @@ function Experience:CreateBar()
 	self.BarBG = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.BarBG:SetPoint("TOPLEFT", self, 0, 0)
 	self.BarBG:SetPoint("BOTTOMRIGHT", self, 0, 0)
-	HydraUI:AddBackdrop(self.BarBG)
-	self.BarBG.Outside:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-main-color"]))
+	YxUI:AddBackdrop(self.BarBG)
+	self.BarBG.Outside:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
 
 	self.Bar = CreateFrame("StatusBar", nil, self.BarBG)
 	self.Bar:SetStatusBarTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
-	self.Bar:SetStatusBarColor(HydraUI:HexToRGB(Settings["experience-bar-color"]))
+	self.Bar:SetStatusBarColor(YxUI:HexToRGB(Settings["experience-bar-color"]))
 	self.Bar:SetPoint("TOPLEFT", self.BarBG, Offset, -Offset)
 	self.Bar:SetPoint("BOTTOMRIGHT", self.BarBG, -Offset, Offset)
 	self.Bar:SetFrameLevel(6)
@@ -156,7 +156,7 @@ function Experience:CreateBar()
 	self.Bar.BG = self.Bar:CreateTexture(nil, "BORDER")
 	self.Bar.BG:SetAllPoints(self.Bar)
 	self.Bar.BG:SetTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
-	self.Bar.BG:SetVertexColor(HydraUI:HexToRGB(Settings["ui-window-main-color"]))
+	self.Bar.BG:SetVertexColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
 	self.Bar.BG:SetAlpha(0.2)
 
 	self.Bar.Spark = self.Bar:CreateTexture(nil, "OVERLAY")
@@ -195,7 +195,7 @@ function Experience:CreateBar()
 
 	self.Bar.Rested = CreateFrame("StatusBar", nil, self.Bar)
 	self.Bar.Rested:SetStatusBarTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
-	self.Bar.Rested:SetStatusBarColor(HydraUI:HexToRGB(Settings["experience-rested-color"]))
+	self.Bar.Rested:SetStatusBarColor(YxUI:HexToRGB(Settings["experience-rested-color"]))
 	self.Bar.Rested:SetFrameLevel(5)
 	self.Bar.Rested:SetAllPoints(self.Bar)
 
@@ -208,7 +208,7 @@ function Experience:CreateBar()
 
 	self.Bar.Quest = CreateFrame("StatusBar", nil, self.Bar)
 	self.Bar.Quest:SetStatusBarTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
-	self.Bar.Quest:SetStatusBarColor(HydraUI:HexToRGB(Settings.XPQuestColor))
+	self.Bar.Quest:SetStatusBarColor(YxUI:HexToRGB(Settings.XPQuestColor))
 	self.Bar.Quest:SetFrameLevel(6)
 	self.Bar.Quest:SetAllPoints(self.Bar)
 
@@ -221,15 +221,15 @@ function Experience:CreateBar()
 
 	self.Progress = self.Bar:CreateFontString(nil, "OVERLAY")
 	self.Progress:SetPoint("LEFT", self.Bar, 5, 0)
-	HydraUI:SetFontInfo(self.Progress, Settings["ui-widget-font"], Settings["ui-font-size"])
+	YxUI:SetFontInfo(self.Progress, Settings["ui-widget-font"], Settings["ui-font-size"])
 	self.Progress:SetJustifyH("LEFT")
 
 	self.Percentage = self.Bar:CreateFontString(nil, "OVERLAY")
 	self.Percentage:SetPoint("RIGHT", self.Bar, -5, 0)
-	HydraUI:SetFontInfo(self.Percentage, Settings["ui-widget-font"], Settings["ui-font-size"])
+	YxUI:SetFontInfo(self.Percentage, Settings["ui-widget-font"], Settings["ui-font-size"])
 	self.Percentage:SetJustifyH("RIGHT")
 
-	HydraUI:CreateMover(self, 6)
+	YxUI:CreateMover(self, 6)
 end
 
 function Experience:Update()
@@ -255,7 +255,7 @@ function Experience:Update()
 		CurrentZone = GetRealZoneText()
 	end
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		for i = 1, GetNumQuests() do
 			local Info = GetQuestInfo(i)
 
@@ -302,13 +302,13 @@ function Experience:Update()
 		self.Bar.Rested:SetValue(XP + Rested)
 
 		if Settings["experience-display-rested-value"] then
-			self.Progress:SetFormattedText("%s%s / %s (+%s) %s", Level, HydraUI:Comma(XP), HydraUI:Comma(MaxXP), HydraUI:Comma(Rested), RestingText)
+			self.Progress:SetFormattedText("%s%s / %s (+%s) %s", Level, YxUI:Comma(XP), YxUI:Comma(MaxXP), YxUI:Comma(Rested), RestingText)
 		else
-			self.Progress:SetFormattedText("%s%s / %s %s", Level, HydraUI:Comma(XP), HydraUI:Comma(MaxXP), RestingText)
+			self.Progress:SetFormattedText("%s%s / %s %s", Level, YxUI:Comma(XP), YxUI:Comma(MaxXP), RestingText)
 		end
 	else
 		self.Bar.Rested:SetValue(0)
-		self.Progress:SetFormattedText("%s%s / %s %s", Level, HydraUI:Comma(XP), HydraUI:Comma(MaxXP), RestingText)
+		self.Progress:SetFormattedText("%s%s / %s %s", Level, YxUI:Comma(XP), YxUI:Comma(MaxXP), RestingText)
 	end
 
 	self.Percentage:SetText(floor((XP / MaxXP * 100 + 0.05) * 10) / 10 .. "%")
@@ -448,24 +448,24 @@ function Experience:OnEnter()
 	GameTooltip:AddLine(LEVEL .. " " .. UnitLevel("player"))
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddLine(Language["Current Experience"])
-	GameTooltip:AddDoubleLine(format("%s / %s", HydraUI:Comma(XP), HydraUI:Comma(Max)), format("%s%%", Percent), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(format("%s / %s", YxUI:Comma(XP), YxUI:Comma(Max)), format("%s%%", Percent), 1, 1, 1, 1, 1, 1)
 
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddLine(Language["Remaining Experience"])
-	GameTooltip:AddDoubleLine(format("%s", HydraUI:Comma(Remaining)), format("%s%%", RemainingPercent), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(format("%s", YxUI:Comma(Remaining)), format("%s%%", RemainingPercent), 1, 1, 1, 1, 1, 1)
 
 	if Rested then
 		local RestedPercent = floor((Rested / Max * 100 + 0.05) * 10) / 10
 
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(Language["Rested Experience"])
-		GameTooltip:AddDoubleLine(HydraUI:Comma(Rested), format("%s%%", RestedPercent), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(YxUI:Comma(Rested), format("%s%%", RestedPercent), 1, 1, 1, 1, 1, 1)
 	end
 
 	if (self.Bar.QuestXP and self.Bar.QuestXP > 0) then
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(Language["Quest Experience"])
-		GameTooltip:AddDoubleLine(HydraUI:Comma(self.Bar.QuestXP), format("%s%%", floor((self.Bar.QuestXP / Max * 100 + 0.05) * 10) / 10), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(YxUI:Comma(self.Bar.QuestXP), format("%s%%", floor((self.Bar.QuestXP / Max * 100 + 0.05) * 10) / 10), 1, 1, 1, 1, 1, 1)
 	end
 
 	-- Advanced information
@@ -476,10 +476,10 @@ function Experience:OnEnter()
 
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(Language["Session Stats"])
-		GameTooltip:AddDoubleLine(Language["Experience gained"], HydraUI:Comma(self.Gained), 1, 1, 1, 1, 1, 1)
-		GameTooltip:AddDoubleLine(Language["Per hour"], HydraUI:Comma(((PerSec * 60) * 60)), 1, 1, 1, 1, 1, 1)
-		GameTooltip:AddDoubleLine(Language["Time to level:"], HydraUI:FormatFullTime((Max - XP) / PerSec), 1, 1, 1, 1, 1, 1)
-		GameTooltip:AddDoubleLine(Language["Duration"], HydraUI:FormatFullTime(Duration), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(Language["Experience gained"], YxUI:Comma(self.Gained), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(Language["Per hour"], YxUI:Comma(((PerSec * 60) * 60)), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(Language["Time to level:"], YxUI:FormatFullTime((Max - XP) / PerSec), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(Language["Duration"], YxUI:FormatFullTime(Duration), 1, 1, 1, 1, 1, 1)
 	end
 
 	self.TooltipShown = true
@@ -554,8 +554,8 @@ local UpdateBarColor = function(value)
 		return
 	end
 
-	Experience.Bar:SetStatusBarColor(HydraUI:HexToRGB(value))
-	Experience.Bar.BG:SetVertexColor(HydraUI:HexToRGB(value))
+	Experience.Bar:SetStatusBarColor(YxUI:HexToRGB(value))
+	Experience.Bar.BG:SetVertexColor(YxUI:HexToRGB(value))
 end
 
 local UpdateRestedColor = function(value)
@@ -563,7 +563,7 @@ local UpdateRestedColor = function(value)
 		return
 	end
 
-	Experience.Bar.Rested:SetStatusBarColor(HydraUI:HexToRGB(value))
+	Experience.Bar.Rested:SetStatusBarColor(YxUI:HexToRGB(value))
 end
 
 local UpdateQuestColor = function(value)
@@ -571,7 +571,7 @@ local UpdateQuestColor = function(value)
 		return
 	end
 
-	Experience.Bar.Quest:SetStatusBarColor(HydraUI:HexToRGB(value))
+	Experience.Bar.Quest:SetStatusBarColor(YxUI:HexToRGB(value))
 end
 
 local UpdateExperience = function()
@@ -600,9 +600,9 @@ local UpdateMouseoverOpacity = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Experience"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Experience"], function(left, right)
 	left:CreateHeader(Language["Enable"])
-	left:CreateSwitch("experience-enable", Settings["experience-enable"], Language["Enable Experience Module"], Language["Enable the HydraUI experience module"], ReloadUI):RequiresReload(true)
+	left:CreateSwitch("experience-enable", Settings["experience-enable"], Language["Enable Experience Module"], Language["Enable the YxUI experience module"], ReloadUI):RequiresReload(true)
 
 	left:CreateHeader(Language["Styling"])
 	left:CreateSwitch("experience-display-level", Settings["experience-display-level"], Language["Display Level"], Language["Display your current level in the experience bar"], UpdateExperience)

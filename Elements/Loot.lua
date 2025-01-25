@@ -1,8 +1,8 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 Defaults["fast-loot"] = true
 
-local Loot = HydraUI:NewModule("Loot")
+local Loot = YxUI:NewModule("Loot")
 
 local GetCVar = GetCVar
 local IsModifiedClick = IsModifiedClick
@@ -88,7 +88,7 @@ local UpdateFastLoot = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
 	right:CreateHeader(Language["Loot"])
 	right:CreateSwitch("fast-loot", Settings["fast-loot"], Language["Enable Fast Loot"], Language["Speed up auto looting"], UpdateFastLoot)
 end)

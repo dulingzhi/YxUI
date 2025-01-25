@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local floor = floor
 local UnitHasMana = UnitHasMana
@@ -16,8 +16,8 @@ local OnEnter = function(self)
 
 	local Base, Combat = GetManaRegen()
 
-	GameTooltip:AddLine(format("%s %s", Label, HydraUI:Comma(floor(Combat * 5))), 1, 1, 1)
-	GameTooltip:AddLine(format(MANA_REGEN_TOOLTIP, HydraUI:Comma(floor(Base * 5))))
+	GameTooltip:AddLine(format("%s %s", Label, YxUI:Comma(floor(Combat * 5))), 1, 1, 1)
+	GameTooltip:AddLine(format(MANA_REGEN_TOOLTIP, YxUI:Comma(floor(Base * 5))))
 
 	GameTooltip:Show()
 end
@@ -53,7 +53,7 @@ local Update = function(self, event, unit)
 		Result = NOT_APPLICABLE
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, Result)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Result)
 end
 
 local OnEnable = function(self)
@@ -80,4 +80,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Mana Regen", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Mana Regen", OnEnable, OnDisable, Update)

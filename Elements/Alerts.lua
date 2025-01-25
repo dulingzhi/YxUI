@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local Alerts = CreateFrame("Frame")
 
@@ -20,7 +20,7 @@ local SortAlerts = function()
 		ActiveAlerts[i]:ClearAllPoints()
 
 		if (i == 1) then
-			ActiveAlerts[i]:SetPoint("TOPRIGHT", _G["HydraUI Minimap"], "BOTTOMRIGHT", 0, -3)
+			ActiveAlerts[i]:SetPoint("TOPRIGHT", _G["YxUI Minimap"], "BOTTOMRIGHT", 0, -3)
 		else
 			ActiveAlerts[i]:SetPoint("BOTTOM", ActiveAlerts[i-1], "TOP", 0, 2)
 		end
@@ -89,10 +89,10 @@ local CloseOnMouseUp = function(self)
 end
 
 local CreateAlertFrame = function()
-	local AlertFrame = CreateFrame("Frame", nil, HydraUI.UIParent, "BackdropTemplate")
+	local AlertFrame = CreateFrame("Frame", nil, YxUI.UIParent, "BackdropTemplate")
 	AlertFrame:SetSize(ALERT_WIDTH, (HEADER_HEIGHT + (LINE_HEIGHT * 2)))
-	AlertFrame:SetBackdrop(HydraUI.BackdropAndBorder)
-	AlertFrame:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-main-color"]))
+	AlertFrame:SetBackdrop(YxUI.BackdropAndBorder)
+	AlertFrame:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
 	AlertFrame:SetBackdropBorderColor(0, 0, 0)
 	AlertFrame:SetFrameStrata("DIALOG")
 	AlertFrame:EnableMouse(true)
@@ -120,7 +120,7 @@ local CreateAlertFrame = function()
 	AlertFrame.Header = CreateFrame("Frame", nil, AlertFrame, "BackdropTemplate")
 	AlertFrame.Header:SetSize(ALERT_WIDTH, HEADER_HEIGHT)
 	AlertFrame.Header:SetPoint("TOP", AlertFrame, 0, 0)
-	AlertFrame.Header:SetBackdrop(HydraUI.BackdropAndBorder)
+	AlertFrame.Header:SetBackdrop(YxUI.BackdropAndBorder)
 	AlertFrame.Header:SetBackdropColor(0, 0, 0, 0)
 	AlertFrame.Header:SetBackdropBorderColor(0, 0, 0)
 
@@ -128,7 +128,7 @@ local CreateAlertFrame = function()
 	AlertFrame.Header.Texture:SetPoint("TOPLEFT", AlertFrame.Header, 1, -1)
 	AlertFrame.Header.Texture:SetPoint("BOTTOMRIGHT", AlertFrame.Header, -1, 1)
 	AlertFrame.Header.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-	AlertFrame.Header.Texture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-header-texture-color"]))
+	AlertFrame.Header.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-header-texture-color"]))
 
 	AlertFrame.Header.Text = AlertFrame.Header:CreateFontString(nil, "OVERLAY")
 	AlertFrame.Header.Text:SetPoint("LEFT", AlertFrame.Header, 5, 0)
@@ -136,7 +136,7 @@ local CreateAlertFrame = function()
 	AlertFrame.Header.Text:SetJustifyH("LEFT")
 	AlertFrame.Header.Text:SetShadowColor(0, 0, 0)
 	AlertFrame.Header.Text:SetShadowOffset(1, -1)
-	AlertFrame.Header.Text:SetTextColor(HydraUI:HexToRGB(Settings["ui-header-font-color"]))
+	AlertFrame.Header.Text:SetTextColor(YxUI:HexToRGB(Settings["ui-header-font-color"]))
 
 	-- Line 1
 	AlertFrame.Line1 = CreateFrame("Frame", nil, AlertFrame)
@@ -149,7 +149,7 @@ local CreateAlertFrame = function()
 	AlertFrame.Line1.Text:SetJustifyH("LEFT")
 	AlertFrame.Line1.Text:SetShadowColor(0, 0, 0)
 	AlertFrame.Line1.Text:SetShadowOffset(1, -1)
-	AlertFrame.Line1.Text:SetTextColor(HydraUI:HexToRGB(Settings["ui-widget-font-color"]))
+	AlertFrame.Line1.Text:SetTextColor(YxUI:HexToRGB(Settings["ui-widget-font-color"]))
 
 	-- Line 2
 	AlertFrame.Line2 = CreateFrame("Frame", nil, AlertFrame)
@@ -162,13 +162,13 @@ local CreateAlertFrame = function()
 	AlertFrame.Line2.Text:SetJustifyH("LEFT")
 	AlertFrame.Line2.Text:SetShadowColor(0, 0, 0)
 	AlertFrame.Line2.Text:SetShadowOffset(1, -1)
-	AlertFrame.Line2.Text:SetTextColor(HydraUI:HexToRGB(Settings["ui-widget-font-color"]))
+	AlertFrame.Line2.Text:SetTextColor(YxUI:HexToRGB(Settings["ui-widget-font-color"]))
 
 	-- Close button
 	AlertFrame.CloseButton = CreateFrame("Frame", nil, AlertFrame.Header, "BackdropTemplate")
 	AlertFrame.CloseButton:SetSize(HEADER_HEIGHT - 2, HEADER_HEIGHT - 2)
 	AlertFrame.CloseButton:SetPoint("RIGHT", AlertFrame.Header, -1, 0)
-	AlertFrame.CloseButton:SetBackdrop(HydraUI.Backdrop)
+	AlertFrame.CloseButton:SetBackdrop(YxUI.Backdrop)
 	AlertFrame.CloseButton:SetBackdropColor(0, 0, 0, 0)
 	AlertFrame.CloseButton:SetScript("OnEnter", function(self) self.Text:SetTextColor(1, 0, 0) end)
 	AlertFrame.CloseButton:SetScript("OnLeave", function(self) self.Text:SetTextColor(1, 1, 1) end)
@@ -200,7 +200,7 @@ local GetAlertFrame = function()
 	return AlertFrame
 end
 
-function HydraUI:SendAlert(header, line1, line2, func, nofade)
+function YxUI:SendAlert(header, line1, line2, func, nofade)
 	local AlertFrame = GetAlertFrame()
 
 	if nofade then

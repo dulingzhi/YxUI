@@ -1,10 +1,10 @@
-local HydraUI = select(2, ...):get()
+local YxUI = select(2, ...):get()
 
 local tinsert = table.insert
 local tremove = table.remove
 local GetTime = GetTime
 
-local Throttle = HydraUI:NewModule("Throttle")
+local Throttle = YxUI:NewModule("Throttle")
 local Active = {}
 local Inactive = {}
 

@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 -- Default setting values
 Defaults["chat-enable"] = true
@@ -18,7 +18,7 @@ Defaults["chat-tab-font-flags"] = ""
 Defaults["chat-tab-font-color"] = "FFFFFF"
 Defaults["chat-tab-font-color-mouseover"] = "FFCE54"
 Defaults["chat-frame-width"] = 392
-Defaults["chat-frame-height"] = 104
+Defaults["chat-frame-height"] = 180
 Defaults["chat-bottom-height"] = 26
 Defaults["chat-top-height"] = 26
 Defaults["chat-enable-fading"] = false
@@ -26,7 +26,7 @@ Defaults["chat-fade-time"] = 15
 Defaults["chat-link-tooltip"] = true
 Defaults["chat-shorten-channels"] = true
 
-Defaults["right-window-enable"] = true
+Defaults["right-window-enable"] = false
 Defaults["right-window-size"] = "SINGLE"
 Defaults["right-window-width"] = 392
 Defaults["right-window-height"] = 128
@@ -57,8 +57,8 @@ local ChatEdit_ParseText = ChatEdit_ParseText
 local ChatEdit_UpdateHeader = ChatEdit_UpdateHeader
 local CHAT_LABEL = CHAT_LABEL
 
-local Window = HydraUI:NewModule("Right Window")
-local Chat = HydraUI:NewModule("Chat")
+local Window = YxUI:NewModule("Right Window")
+local Chat = YxUI:NewModule("Chat")
 
 -- When hovering over a chat frame, fade in the scroll controls
 
@@ -239,41 +239,41 @@ Chat.RemoveTextures = {
 }
 
 function Chat:CreateChatWindow()
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 	local Border = Settings["ui-border-thickness"]
 	local Width = Settings["chat-frame-width"]
 
 	self:SetSize(Width, Settings["chat-frame-height"] + Settings["chat-bottom-height"] + Settings["chat-top-height"] + (4 * 2))
-	self:SetPoint("BOTTOMLEFT", HydraUI.UIParent, 12, 12)
+	self:SetPoint("BOTTOMLEFT", YxUI.UIParent, 12, 12)
 	self:SetFrameStrata("BACKGROUND")
 
-	self.Bottom = CreateFrame("Frame", "HydraUIChatFrameBottom", self, "BackdropTemplate")
+	self.Bottom = CreateFrame("Frame", "YxUIChatFrameBottom", self, "BackdropTemplate")
 	self.Bottom:SetSize(Width, Settings["chat-bottom-height"])
 	self.Bottom:SetPoint("BOTTOMLEFT", self, 0, 0)
-	HydraUI:AddBackdrop(self.Bottom, Assets:GetTexture(Settings["ui-header-texture"]))
+	YxUI:AddBackdrop(self.Bottom, Assets:GetTexture(Settings["ui-header-texture"]))
 	self.Bottom.Outside:SetBackdropColor(R, G, B, (Settings["chat-bottom-opacity"] / 100))
 
 	self.EditBox = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.EditBox:SetSize(Width, Settings["chat-bottom-height"])
 	self.EditBox:SetPoint("BOTTOMLEFT", self, 0, 0)
-	HydraUI:AddBackdrop(self.EditBox, Assets:GetTexture(Settings["ui-header-texture"]))
+	YxUI:AddBackdrop(self.EditBox, Assets:GetTexture(Settings["ui-header-texture"]))
 	self.EditBox.Outside:SetBackdropColor(R, G, B, (Settings["chat-bottom-opacity"] / 100))
 	self.EditBox:Hide()
 
-	self.Middle = CreateFrame("Frame", "HydraUIChatFrameMiddle", self, "BackdropTemplate")
+	self.Middle = CreateFrame("Frame", "YxUIChatFrameMiddle", self, "BackdropTemplate")
 	self.Middle:SetSize(Width, Settings["chat-frame-height"])
 	self.Middle:SetPoint("BOTTOM", self.Bottom, "TOP", 0, 1 > Border and -1 or -(Border + 2))
-	HydraUI:AddBackdrop(self.Middle)
+	YxUI:AddBackdrop(self.Middle)
 	self.Middle.Outside:SetBackdropColor(R, G, B, (Settings["chat-bg-opacity"] / 100))
 	self.Middle.Outside:SetFrameStrata("BACKGROUND")
 
-	self.Top = CreateFrame("Frame", "HydraUIChatFrameTop", self, "BackdropTemplate")
+	self.Top = CreateFrame("Frame", "YxUIChatFrameTop", self, "BackdropTemplate")
 	self.Top:SetSize(Width, Settings["chat-top-height"])
 	self.Top:SetPoint("BOTTOM", self.Middle, "TOP", 0, 1 > Border and -1 or -(Border + 2))
-	HydraUI:AddBackdrop(self.Top, Assets:GetTexture(Settings["ui-header-texture"]))
+	YxUI:AddBackdrop(self.Top, Assets:GetTexture(Settings["ui-header-texture"]))
 	self.Top.Outside:SetBackdropColor(R, G, B, (Settings["chat-top-opacity"] / 100))
 
-	HydraUI:CreateMover(self, 2)
+	YxUI:CreateMover(self, 2)
 end
 
 local Disable = function(object)
@@ -325,12 +325,12 @@ local UpdateHeader = function(editbox)
 			local ID = GetChannelName(editbox:GetAttribute("channelTarget"))
 
 			if (ID == 0) then
-				Chat.EditBox.Outside:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-header-texture-color"]))
+				Chat.EditBox.Outside:SetBackdropColor(YxUI:HexToRGB(Settings["ui-header-texture-color"]))
 			else
 				Chat.EditBox.Outside:SetBackdropColor(ChatTypeInfo[ChatType..ID].r * 0.2, ChatTypeInfo[ChatType..ID].g * 0.2, ChatTypeInfo[ChatType..ID].b * 0.2)
 			end
 		else
-			Chat.EditBox.Outside:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-header-texture-color"]))
+			Chat.EditBox.Outside:SetBackdropColor(YxUI:HexToRGB(Settings["ui-header-texture-color"]))
 		end
 	else
 		Chat.EditBox.Outside:SetBackdropColor(ChatTypeInfo[ChatType].r * 0.2, ChatTypeInfo[ChatType].g * 0.2, ChatTypeInfo[ChatType].b * 0.2)
@@ -411,7 +411,7 @@ local JumpButtonOnEnter = function(self)
 end
 
 local JumpButtonOnLeave = function(self)
-	self.Arrow:SetVertexColor(HydraUI:HexToRGB(Settings["ui-widget-color"]))
+	self.Arrow:SetVertexColor(YxUI:HexToRGB(Settings["ui-widget-color"]))
 end
 
 local JumpButtonOnFinished = function(self)
@@ -419,11 +419,11 @@ local JumpButtonOnFinished = function(self)
 end
 
 local TabOnEnter = function(self)
-	self.TabText:_SetTextColor(HydraUI:HexToRGB(Settings["chat-tab-font-color-mouseover"]))
+	self.TabText:_SetTextColor(YxUI:HexToRGB(Settings["chat-tab-font-color-mouseover"]))
 end
 
 local TabOnLeave = function(self)
-	self.TabText:_SetTextColor(HydraUI:HexToRGB(Settings["chat-tab-font-color"]))
+	self.TabText:_SetTextColor(YxUI:HexToRGB(Settings["chat-tab-font-color"]))
 end
 
 local CopyWindowOnEnterPressed = function(self)
@@ -444,11 +444,11 @@ function Chat:CreateCopyWindow()
 		return
 	end
 
-	local Window = CreateFrame("Frame", nil, HydraUI.UIParent, "BackdropTemplate")
+	local Window = CreateFrame("Frame", nil, YxUI.UIParent, "BackdropTemplate")
 	Window:SetSize(Settings["chat-frame-width"] + 6, Settings["chat-frame-height"] + 6)
 	Window:SetPoint("BOTTOM", self, "TOP", 0, 3)
-	Window:SetBackdrop(HydraUI.BackdropAndBorder)
-	Window:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-bg-color"]))
+	Window:SetBackdrop(YxUI.BackdropAndBorder)
+	Window:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-bg-color"]))
 	Window:SetBackdropBorderColor(0, 0, 0)
 	Window:SetFrameStrata("DIALOG")
 	Window:SetMovable(true)
@@ -465,7 +465,7 @@ function Chat:CreateCopyWindow()
 	Window.Header:SetHeight(20)
 	Window.Header:SetPoint("TOPLEFT", Window, 3, -3)
 	Window.Header:SetPoint("TOPRIGHT", Window, -((3 + 2) + 20), -3)
-	Window.Header:SetBackdrop(HydraUI.BackdropAndBorder)
+	Window.Header:SetBackdrop(YxUI.BackdropAndBorder)
 	Window.Header:SetBackdropColor(0, 0, 0)
 	Window.Header:SetBackdropBorderColor(0, 0, 0)
 
@@ -473,11 +473,11 @@ function Chat:CreateCopyWindow()
 	Window.HeaderTexture:SetPoint("TOPLEFT", Window.Header, 1, -1)
 	Window.HeaderTexture:SetPoint("BOTTOMRIGHT", Window.Header, -1, 1)
 	Window.HeaderTexture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-	Window.HeaderTexture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-header-texture-color"]))
+	Window.HeaderTexture:SetVertexColor(YxUI:HexToRGB(Settings["ui-header-texture-color"]))
 
 	Window.Header.Text = Window.Header:CreateFontString(nil, "OVERLAY")
 	Window.Header.Text:SetPoint("LEFT", Window.Header, 5, -1)
-	HydraUI:SetFontInfo(Window.Header.Text, Settings["chat-tab-font"], Settings["chat-tab-font-size"])
+	YxUI:SetFontInfo(Window.Header.Text, Settings["chat-tab-font"], Settings["chat-tab-font-size"])
 	Window.Header.Text:SetJustifyH("LEFT")
 	Window.Header.Text:SetText("|cFF" .. Settings["chat-tab-font-color"] .. Language["Copy text"] .. "|r")
 
@@ -485,19 +485,19 @@ function Chat:CreateCopyWindow()
 	Window.CloseButton = CreateFrame("Frame", nil, Window, "BackdropTemplate")
 	Window.CloseButton:SetSize(20, 20)
 	Window.CloseButton:SetPoint("TOPRIGHT", Window, -3, -3)
-	Window.CloseButton:SetBackdrop(HydraUI.BackdropAndBorder)
+	Window.CloseButton:SetBackdrop(YxUI.BackdropAndBorder)
 	Window.CloseButton:SetBackdropColor(0, 0, 0, 0)
 	Window.CloseButton:SetBackdropBorderColor(0, 0, 0)
-	Window.CloseButton:SetScript("OnEnter", function(self) self.Cross:SetVertexColor(HydraUI:HexToRGB("C0392B")) end)
-	Window.CloseButton:SetScript("OnLeave", function(self) self.Cross:SetVertexColor(HydraUI:HexToRGB("EEEEEE")) end)
+	Window.CloseButton:SetScript("OnEnter", function(self) self.Cross:SetVertexColor(YxUI:HexToRGB("C0392B")) end)
+	Window.CloseButton:SetScript("OnLeave", function(self) self.Cross:SetVertexColor(YxUI:HexToRGB("EEEEEE")) end)
 	Window.CloseButton:SetScript("OnMouseUp", function(self)
-		self.Texture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-header-texture-color"]))
+		self.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-header-texture-color"]))
 
 		self:GetParent().FadeOut:Play()
 	end)
 
 	Window.CloseButton:SetScript("OnMouseDown", function(self)
-		local R, G, B = HydraUI:HexToRGB(Settings["ui-header-texture-color"])
+		local R, G, B = YxUI:HexToRGB(Settings["ui-header-texture-color"])
 
 		self.Texture:SetVertexColor(R * 0.85, G * 0.85, B * 0.85)
 	end)
@@ -506,23 +506,23 @@ function Chat:CreateCopyWindow()
 	Window.CloseButton.Texture:SetPoint("TOPLEFT", Window.CloseButton, 1, -1)
 	Window.CloseButton.Texture:SetPoint("BOTTOMRIGHT", Window.CloseButton, -1, 1)
 	Window.CloseButton.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-	Window.CloseButton.Texture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-header-texture-color"]))
+	Window.CloseButton.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-header-texture-color"]))
 
 	Window.CloseButton.Cross = Window.CloseButton:CreateTexture(nil, "OVERLAY")
 	Window.CloseButton.Cross:SetPoint("CENTER", Window.CloseButton, 0, 0)
 	Window.CloseButton.Cross:SetSize(16, 16)
 	Window.CloseButton.Cross:SetTexture(Assets:GetTexture("Close"))
-	Window.CloseButton.Cross:SetVertexColor(HydraUI:HexToRGB("EEEEEE"))
+	Window.CloseButton.Cross:SetVertexColor(YxUI:HexToRGB("EEEEEE"))
 
 	Window.Inner = CreateFrame("Frame", nil, Window, "BackdropTemplate")
 	Window.Inner:SetPoint("TOPLEFT", Window.Header, "BOTTOMLEFT", 0, -2)
 	Window.Inner:SetPoint("BOTTOMRIGHT", Window, -3, 3)
-	Window.Inner:SetBackdrop(HydraUI.BackdropAndBorder)
-	Window.Inner:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-main-color"]))
+	Window.Inner:SetBackdrop(YxUI.BackdropAndBorder)
+	Window.Inner:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
 	Window.Inner:SetBackdropBorderColor(0, 0, 0)
 
 	Window.Input = CreateFrame("EditBox", nil, Window.Inner)
-	HydraUI:SetFontInfo(Window.Input, Settings["ui-widget-font"], Settings["ui-font-size"])
+	YxUI:SetFontInfo(Window.Input, Settings["ui-widget-font"], Settings["ui-font-size"])
 	Window.Input:SetPoint("TOPLEFT", Window.Inner, 3, -3)
 	Window.Input:SetPoint("BOTTOMRIGHT", Window.Inner, -3, 3)
 	Window.Input:SetFrameStrata("DIALOG")
@@ -686,11 +686,11 @@ function Chat:StyleChatFrame(frame)
 	Tab:HookScript("OnLeave", TabOnLeave)
 
 	if TabText then
-		HydraUI:SetFontInfo(TabText, Settings["chat-tab-font"], Settings["chat-tab-font-size"], Settings["chat-tab-font-flags"])
+		YxUI:SetFontInfo(TabText, Settings["chat-tab-font"], Settings["chat-tab-font-size"], Settings["chat-tab-font-flags"])
 		TabText._SetFont = TabText.SetFont
 		TabText.SetFont = NoCall
 
-		TabText:SetTextColor(HydraUI:HexToRGB(Settings["chat-tab-font-color"]))
+		TabText:SetTextColor(YxUI:HexToRGB(Settings["chat-tab-font-color"]))
 		TabText._SetTextColor = TabText.SetTextColor
 		TabText.SetTextColor = NoCall
 
@@ -731,7 +731,7 @@ function Chat:StyleChatFrame(frame)
 	EditBox:ClearAllPoints()
 	EditBox:SetPoint("TOPLEFT", self.EditBox, -2, 0)
 	EditBox:SetPoint("BOTTOMRIGHT", self.EditBox, 0, 0)
-	HydraUI:SetFontInfo(EditBox, Settings["chat-font"], Settings["chat-font-size"], Settings["chat-font-flags"])
+	YxUI:SetFontInfo(EditBox, Settings["chat-font"], Settings["chat-font-size"], Settings["chat-font-flags"])
 	EditBox:SetAltArrowKeyMode(false)
 	EditBox:SetTextInsets(0, 0, 0, 0)
 	EditBox:SetAlpha(0)
@@ -739,15 +739,15 @@ function Chat:StyleChatFrame(frame)
 	EditBox:HookScript("OnEditFocusLost", OnEditFocusLost)
 	EditBox:HookScript("OnEditFocusGained", OnEditFocusGained)
 
-	HydraUI:SetFontInfo(EditBox.header, Settings["chat-font"], Settings["chat-font-size"], Settings["chat-font-flags"])
+	YxUI:SetFontInfo(EditBox.header, Settings["chat-font"], Settings["chat-font-size"], Settings["chat-font-flags"])
 
 	-- Scroll to bottom
-	--if (not HydraUI.IsMainline) then
+	--if (not YxUI.IsMainline) then
 		local JumpButton = CreateFrame("Frame", nil, frame, "BackdropTemplate")
 		JumpButton:SetSize(20, 20)
 		JumpButton:SetPoint("BOTTOMRIGHT", frame, 0, 0)
-		JumpButton:SetBackdrop(HydraUI.BackdropAndBorder)
-		JumpButton:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-main-color"]))
+		JumpButton:SetBackdrop(YxUI.BackdropAndBorder)
+		JumpButton:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
 		JumpButton:SetBackdropBorderColor(0, 0, 0)
 		JumpButton:SetFrameStrata("HIGH")
 		JumpButton:SetScript("OnMouseUp", JumpButtonOnMouseUp)
@@ -760,13 +760,13 @@ function Chat:StyleChatFrame(frame)
 		JumpButton.Texture:SetPoint("TOPLEFT", JumpButton, 1, -1)
 		JumpButton.Texture:SetPoint("BOTTOMRIGHT", JumpButton, -1, 1)
 		JumpButton.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-		JumpButton.Texture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-header-texture-color"]))
+		JumpButton.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-header-texture-color"]))
 
 		JumpButton.Arrow = JumpButton:CreateTexture(nil, "OVERLAY")
 		JumpButton.Arrow:SetPoint("CENTER", JumpButton, 0, 0)
 		JumpButton.Arrow:SetSize(16, 16)
 		JumpButton.Arrow:SetTexture(Assets:GetTexture("Arrow Down"))
-		JumpButton.Arrow:SetVertexColor(HydraUI:HexToRGB(Settings["ui-widget-color"]))
+		JumpButton.Arrow:SetVertexColor(YxUI:HexToRGB(Settings["ui-widget-color"]))
 
 		JumpButton.Fade = LibMotion:CreateAnimationGroup()
 
@@ -797,8 +797,8 @@ function Chat:StyleChatFrame(frame)
 	local CopyButton = CreateFrame("Frame", nil, frame, "BackdropTemplate")
 	CopyButton:SetSize(24, 24)
 	CopyButton:SetPoint("TOPRIGHT", frame, 0, 0)
-	CopyButton:SetBackdrop(HydraUI.BackdropAndBorder)
-	CopyButton:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-main-color"]))
+	CopyButton:SetBackdrop(YxUI.BackdropAndBorder)
+	CopyButton:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
 	CopyButton:SetBackdropBorderColor(0, 0, 0)
 	CopyButton:SetFrameStrata("HIGH")
 	CopyButton:SetScript("OnMouseUp", CopyButtonOnMouseUp)
@@ -856,7 +856,7 @@ function Chat:MoveChatFrames()
 		end
 
 		if (Settings["right-window-enable"] and (Settings["right-window-size"] == "SINGLE") and (Frame.name and Frame.name == Settings["rw-single-embed"])) then
-			local Window = HydraUI:GetModule("Right Window")
+			local Window = YxUI:GetModule("Right Window")
 
 			FCF_UnDockFrame(Frame)
 			FCF_SetTabPosition(Frame, 0)
@@ -903,7 +903,7 @@ function Chat:MoveChatFrames()
 	GeneralDockManager:ClearAllPoints()
 	GeneralDockManager:SetFrameStrata("MEDIUM")
 
-	if (HydraUI.ClientVersion >= 100000) then
+	if (YxUI.ClientVersion >= 100000) then
 		GeneralDockManager:SetPoint("LEFT", self.Top, 0, 0)
 		GeneralDockManager:SetPoint("RIGHT", self.Top, 0, 0)
 	else
@@ -949,7 +949,7 @@ function Chat:StyleChatFrames()
 			local Region = select(i, Child:GetRegions())
 
 			if (Region:GetObjectType() == "FontString") then
-				HydraUI:SetFontInfo(Region, Settings["chat-tab-font"], Settings["chat-tab-font-size"], Settings["chat-tab-font-flags"])
+				YxUI:SetFontInfo(Region, Settings["chat-tab-font"], Settings["chat-tab-font-size"], Settings["chat-tab-font-flags"])
 			end
 		end
 	end
@@ -1024,7 +1024,7 @@ function Chat:Install()
 	ChatFrame_AddChannel(Trade, TRADE)
 	ChatFrame_AddChannel(Trade, GENERAL)
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		ChatFrame_AddChannel(Trade, "Services")
 	end
 
@@ -1140,7 +1140,7 @@ function Chat:SetChatTypeInfo()
 	ChatTypeInfo["CHANNEL19"].colorNameByClass = true
 	ChatTypeInfo["CHANNEL20"].colorNameByClass = true
 
-	if (not HydraUI.IsClassic) then
+	if (not YxUI.IsClassic) then
 		ChatTypeInfo["GUILD_ACHIEVEMENT"].colorNameByClass = true
 	end
 
@@ -1166,14 +1166,14 @@ function Chat:Load()
 	self:CreateChatWindow()
 	self:StyleChatFrames()
 
-	if (not HydraUIData) then
-		HydraUIData = {}
+	if (not YxUIData) then
+		YxUIData = {}
 	end
 
-	if (not HydraUIData.ChatInstalled) then
+	if (not YxUIData.ChatInstalled) then
 		self:Install()
 
-		HydraUIData.ChatInstalled = true
+		YxUIData.ChatInstalled = true
 	end
 
 	self:MoveChatFrames()
@@ -1185,7 +1185,7 @@ function Chat:Load()
 	hooksecurefunc("FCF_OpenTemporaryWindow", OpenTemporaryWindow)
 	hooksecurefunc("FCF_RestorePositionAndDimensions", MoveChatFrames)
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		self:RegisterEvent("PLAYER_ENTERING_WORLD")
 		self:RegisterEvent("CVAR_UPDATE")
 		self:RegisterEvent("PLAYER_LEVEL_CHANGED")
@@ -1194,7 +1194,7 @@ function Chat:Load()
 	self:RegisterEvent("UI_SCALE_CHANGED")
 	self:SetScript("OnEvent", self.MoveChatFrames)
 
-	local Hider = CreateFrame("Frame", nil, HydraUI.UIParent, "SecureHandlerStateTemplate")
+	local Hider = CreateFrame("Frame", nil, YxUI.UIParent, "SecureHandlerStateTemplate")
 	Hider:Hide()
 
 	-- Needs styling for 10.1.0
@@ -1203,7 +1203,7 @@ function Chat:Load()
 	end
 end
 
-HydraUI.FormatLinks = FormatLinks
+YxUI.FormatLinks = FormatLinks
 
 local UpdateChatFrameHeight = function(value)
 	Chat.Middle:SetHeight(value)
@@ -1231,19 +1231,19 @@ local UpdateBottomHeight = function(value)
 end
 
 local UpdateTopOpacity = function(value)
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 
 	Chat.Top.Outside:SetBackdropColor(R, G, B, (value / 100))
 end
 
 local UpdateMiddleOpacity = function(value)
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 
 	Chat.Middle.Outside:SetBackdropColor(R, G, B, (value / 100))
 end
 
 local UpdateBottomOpacity = function(value)
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 
 	Chat.Bottom.Outside:SetBackdropColor(R, G, B, (value / 100))
 end
@@ -1268,7 +1268,7 @@ local UpdateChatFont = function()
 end
 
 local UpdateChatTabFont = function()
-	local R, G, B = HydraUI:HexToRGB(Settings["chat-tab-font-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["chat-tab-font-color"])
 
 	for i = 1, NUM_CHAT_WINDOWS do
 		local TabText = _G["ChatFrame" .. i .. "TabText"]
@@ -1335,9 +1335,9 @@ local UpdateShortenChannels = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Chat"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Chat"], function(left, right)
 	left:CreateHeader(Language["Enable"])
-	left:CreateSwitch("chat-enable", Settings["chat-enable"], Language["Enable Chat Module"], Language["Enable the HydraUI chat module"], ReloadUI):RequiresReload(true)
+	left:CreateSwitch("chat-enable", Settings["chat-enable"], Language["Enable Chat Module"], Language["Enable the YxUI chat module"], ReloadUI):RequiresReload(true)
 
 	left:CreateHeader(Language["General"])
 	left:CreateSlider("chat-fade-time", Settings["chat-enable-fading"], 0, 60, 5, Language["Set Fade Time"], Language["Set the duration to display text before fading out"], UpdateFadeTime, nil, "s")
@@ -1367,7 +1367,7 @@ HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Chat"], funct
 	right:CreateColorSelection("chat-tab-font-color-mouseover", Settings["chat-tab-font-color-mouseover"], Language["Font Color Mouseover"], Language["Set the color of the chat frame tab while mousing over it"])
 end)
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Left"], Language["Chat"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Left"], Language["Chat"], function(left, right)
 	left:CreateHeader(Language["General"])
 	left:CreateSlider("chat-frame-width", Settings["chat-frame-width"], 300, 650, 1, Language["Chat Width"], Language["Set the width of the chat frame"], UpdateChatFrameWidth)
 	left:CreateSlider("chat-frame-height", Settings["chat-frame-height"], 40, 350, 1, Language["Chat Height"], Language["Set the height of the chat frame"], UpdateChatFrameHeight)
@@ -1377,34 +1377,34 @@ HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Left"], Langu
 end)
 
 function Window:CreateSingleWindow()
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 	local Border = Settings["ui-border-thickness"]
 	local Width = Settings["right-window-width"]
 
 	self.Bottom = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.Bottom:SetSize(Width, Settings["right-window-bottom-height"])
 	self.Bottom:SetPoint("BOTTOMRIGHT", self, 0, 0)
-	HydraUI:AddBackdrop(self.Bottom, Assets:GetTexture(Settings["ui-header-texture"]))
+	YxUI:AddBackdrop(self.Bottom, Assets:GetTexture(Settings["ui-header-texture"]))
 	self.Bottom.Outside:SetBackdropColor(R, G, B, (Settings["rw-bottom-fill"] / 100))
 	self.Bottom.Outside:SetFrameStrata("BACKGROUND")
 
 	self.Middle = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.Middle:SetSize(Width, Settings["right-window-height"])
 	self.Middle:SetPoint("BOTTOMLEFT", self.Bottom, "TOPLEFT", 0, 1 > Border and -1 or -(Border + 2))
-	HydraUI:AddBackdrop(self.Middle)
+	YxUI:AddBackdrop(self.Middle)
 	self.Middle.Outside:SetBackdropColor(R, G, B, (Settings["right-window-fill"] / 100))
 	self.Middle.Outside:SetFrameStrata("BACKGROUND")
 
 	self.Top = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.Top:SetSize(Width, Settings["right-window-top-height"])
 	self.Top:SetPoint("BOTTOMLEFT", self.Middle, "TOPLEFT", 0, 1 > Border and -1 or -(Border + 2))
-	HydraUI:AddBackdrop(self.Top, Assets:GetTexture(Settings["ui-header-texture"]))
+	YxUI:AddBackdrop(self.Top, Assets:GetTexture(Settings["ui-header-texture"]))
 	self.Top.Outside:SetBackdropColor(R, G, B, (Settings["rw-top-fill"] / 100))
 	self.Top.Outside:SetFrameStrata("BACKGROUND")
 end
 
 function Window:CreateDoubleWindow()
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 	local Border = Settings["ui-border-thickness"]
 	local Adjust = 1 > Border and -1 or -(Border + 2)
 	local Width = Settings["right-window-width"]
@@ -1414,33 +1414,33 @@ function Window:CreateDoubleWindow()
 	self.Bottom = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.Bottom:SetSize(Width, Settings["right-window-bottom-height"])
 	self.Bottom:SetPoint("BOTTOMRIGHT", self, 0, 0)
-	HydraUI:AddBackdrop(self.Bottom, Assets:GetTexture(Settings["ui-header-texture"]))
+	YxUI:AddBackdrop(self.Bottom, Assets:GetTexture(Settings["ui-header-texture"]))
 	self.Bottom.Outside:SetBackdropColor(R, G, B, 1)
 
 	self.Left = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.Left:SetSize(LeftWidth, Settings["right-window-height"])
 	self.Left:SetPoint("BOTTOMLEFT", self.Bottom, "TOPLEFT", 0, Adjust) -- -4
-	HydraUI:AddBackdrop(self.Left)
+	YxUI:AddBackdrop(self.Left)
 	self.Left.Outside:SetBackdropColor(R, G, B, (Settings["right-window-fill"] / 100))
 	self.Left.Outside:SetFrameStrata("BACKGROUND")
 
 	self.Right = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.Right:SetSize(RightWidth, Settings["right-window-height"])
 	self.Right:SetPoint("BOTTOMRIGHT", self.Bottom, "TOPRIGHT", 0, Adjust) -- -4
-	HydraUI:AddBackdrop(self.Right)
+	YxUI:AddBackdrop(self.Right)
 	self.Right.Outside:SetBackdropColor(R, G, B, (Settings["right-window-fill"] / 100))
 	self.Right.Outside:SetFrameStrata("BACKGROUND")
 
 	self.TopLeft = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.TopLeft:SetSize(LeftWidth, Settings["right-window-top-height"])
 	self.TopLeft:SetPoint("BOTTOMLEFT", self.Left, "TOPLEFT", 0, Adjust) -- -4
-	HydraUI:AddBackdrop(self.TopLeft, Assets:GetTexture(Settings["ui-header-texture"]))
+	YxUI:AddBackdrop(self.TopLeft, Assets:GetTexture(Settings["ui-header-texture"]))
 	self.TopLeft.Outside:SetBackdropColor(R, G, B)
 
 	self.TopRight = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.TopRight:SetSize(RightWidth, Settings["right-window-top-height"])
 	self.TopRight:SetPoint("BOTTOMRIGHT", self.Right, "TOPRIGHT", 0, Adjust) -- -4
-	HydraUI:AddBackdrop(self.TopRight, Assets:GetTexture(Settings["ui-header-texture"]))
+	YxUI:AddBackdrop(self.TopRight, Assets:GetTexture(Settings["ui-header-texture"]))
 	self.TopRight.Outside:SetBackdropColor(R, G, B)
 end
 
@@ -1485,14 +1485,14 @@ function Window:UpdateDataTexts()
 end
 
 function Window:Load()
-	DT = HydraUI:GetModule("DataText")
+	DT = YxUI:GetModule("DataText")
 
 	if (not Settings["right-window-enable"]) then
 		return
 	end
 
 	self:SetSize(Settings["right-window-width"], Settings["right-window-height"] + Settings["right-window-bottom-height"] + Settings["right-window-top-height"]) -- Border fix me
-	self:SetPoint("BOTTOMRIGHT", HydraUI.UIParent, -13, 13)
+	self:SetPoint("BOTTOMRIGHT", YxUI.UIParent, -13, 13)
 	self:SetFrameStrata("BACKGROUND")
 
 	if (Settings["right-window-size"] == "SINGLE") then
@@ -1503,12 +1503,12 @@ function Window:Load()
 
 	self:AddDataTexts()
 
-	HydraUI:CreateMover(self)
+	YxUI:CreateMover(self)
 end
 
 local UpdateOpacity = function(value)
 	if (Settings["right-window-size"] == "SINGLE") then
-		local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+		local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 
 		Window.Middle.Outside:SetBackdropColor(R, G, B, (Settings["right-window-fill"] / 100))
 	end
@@ -1516,7 +1516,7 @@ end
 
 local UpdateLeftOpacity = function(value)
 	if (Settings["right-window-size"] ~= "SINGLE") then
-		local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+		local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 
 		Window.Left.Outside:SetBackdropColor(R, G, B, (value / 100))
 	end
@@ -1524,7 +1524,7 @@ end
 
 local UpdateRightOpacity = function(value)
 	if (Settings["right-window-size"] ~= "SINGLE") then
-		local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+		local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 
 		Window.Right.Outside:SetBackdropColor(R, G, B, (value / 100))
 	end
@@ -1596,7 +1596,7 @@ local GetChatFrameList = function()
 	return Frames
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Right"], Language["Chat"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Right"], Language["Chat"], function(left, right)
 	left:CreateHeader(Language["General"])
 	left:CreateSwitch("right-window-enable", Settings["right-window-enable"], Language["Enable Right Window"], Language["Enable the right side window, for placing chat or addons into"], ReloadUI):RequiresReload(true)
 	left:CreateSlider("right-window-width", Settings["right-window-width"], 300, 650, 1, Language["Window Width"], Language["Set the width of the window"], UpdateWidth)

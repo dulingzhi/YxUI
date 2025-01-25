@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local UnitLevel = UnitLevel
 local Label = Language["Level"]
@@ -12,7 +12,7 @@ local OnMouseUp = function()
 end
 
 local Update = function(self)
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, UnitLevel("player"))
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, UnitLevel("player"))
 end
 
 local OnEnable = function(self)
@@ -31,4 +31,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Level", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Level", OnEnable, OnDisable, Update)

@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetSpellBonusDamage = GetSpellBonusDamage
 local GetSpellBonusHealing = GetSpellBonusHealing
@@ -56,7 +56,7 @@ local Update = function(self, event, unit)
 	local Healing = GetSpellBonusHealing()
 
 	if (Spell > 0 or Healing > 0) then
-		if (Spell > Healing) or (HydraUI.UserClass == "SHAMAN" and GetSpecInfo() ~= 3) then
+		if (Spell > Healing) or (YxUI.UserClass == "SHAMAN" and GetSpecInfo() ~= 3) then
 			Rating = Spell
 			Label = SpellLabel
 		else
@@ -68,7 +68,7 @@ local Update = function(self, event, unit)
 		Rating = 0
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, Rating)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Rating)
 end
 
 local OnEnable = function(self)
@@ -89,4 +89,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Spell Power", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Spell Power", OnEnable, OnDisable, Update)

@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local CR_HASTE_MELEE = CR_HASTE_MELEE
 local GetHaste = GetHaste
@@ -17,13 +17,13 @@ local OnEnter = function(self)
 
 	GameTooltip:AddLine(Label, 1, 1, 1)
 
-	if _G["STAT_HASTE_" .. HydraUI.UserClass .. "_TOOLTIP"] then
-		GameTooltip:AddLine(_G["STAT_HASTE_" .. HydraUI.UserClass .. "_TOOLTIP"])
+	if _G["STAT_HASTE_" .. YxUI.UserClass .. "_TOOLTIP"] then
+		GameTooltip:AddLine(_G["STAT_HASTE_" .. YxUI.UserClass .. "_TOOLTIP"])
 	else
 		GameTooltip:AddLine(STAT_HASTE_TOOLTIP)
 	end
 
-	GameTooltip:AddLine(format(STAT_HASTE_BASE_TOOLTIP, HydraUI:Comma(GetCombatRating(CR_HASTE_MELEE)), HydraUI:Comma(GetCombatRatingBonus(CR_HASTE_MELEE))))
+	GameTooltip:AddLine(format(STAT_HASTE_BASE_TOOLTIP, YxUI:Comma(GetCombatRating(CR_HASTE_MELEE)), YxUI:Comma(GetCombatRatingBonus(CR_HASTE_MELEE))))
 
 	GameTooltip:Show()
 end
@@ -37,7 +37,7 @@ local Update = function(self, event, unit)
 		return
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.2f%%|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, GetHaste())
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.2f%%|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, GetHaste())
 end
 
 local OnEnable = function(self)
@@ -60,4 +60,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Haste", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Haste", OnEnable, OnDisable, Update)

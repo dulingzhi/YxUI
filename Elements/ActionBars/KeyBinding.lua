@@ -1,7 +1,7 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local KeyBinding = HydraUI:NewModule("Key Binding")
-local GUI = HydraUI:GetModule("GUI")
+local KeyBinding = YxUI:NewModule("Key Binding")
+local GUI = YxUI:GetModule("GUI")
 
 local match = string.match
 
@@ -70,7 +70,7 @@ function KeyBinding:OnKeyUp(key)
 		if OldAction then
 			local OldName = GetBindingName(OldAction)
 
-			HydraUI:print(format(Language['Unbound "%s" from %s'], key, OldName))
+			YxUI:print(format(Language['Unbound "%s" from %s'], key, OldName))
 		end
 
 		SetBinding(key, self.TargetBindingName, 1)
@@ -78,7 +78,7 @@ function KeyBinding:OnKeyUp(key)
 		local NewAction = GetBindingAction(key, true)
 		local NewName = GetBindingName(NewAction)
 
-		HydraUI:print(format(Language['Bound "%s" to %s'], key, NewName))
+		YxUI:print(format(Language['Bound "%s" to %s'], key, NewName))
 
 		GUI:GetWidget("kb-save"):Enable()
 		GUI:GetWidget("kb-discard"):Enable()
@@ -138,7 +138,7 @@ function KeyBinding:OnMouseWheel(delta)
 		if OldAction then
 			local OldName = GetBindingName(OldAction)
 
-			HydraUI:print(format(Language['Unbound "%s" from %s'], key, OldName))
+			YxUI:print(format(Language['Unbound "%s" from %s'], key, OldName))
 		end
 
 		SetBinding(key, self.TargetBindingName, 1)
@@ -146,7 +146,7 @@ function KeyBinding:OnMouseWheel(delta)
 		local NewAction = GetBindingAction(key, true)
 		local NewName = GetBindingName(NewAction)
 
-		HydraUI:print(format(Language['Bound "%s" to %s'], key, NewName))
+		YxUI:print(format(Language['Bound "%s" to %s'], key, NewName))
 
 		GUI:GetWidget("kb-save"):Enable()
 		GUI:GetWidget("kb-discard"):Enable()
@@ -187,7 +187,7 @@ function KeyBinding:OnEvent(event, button)
 		if OldAction then
 			local OldName = GetBindingName(OldAction)
 
-			HydraUI:print(format(Language['Unbound "%s" from %s'], button, OldName))
+			YxUI:print(format(Language['Unbound "%s" from %s'], button, OldName))
 		end
 
 		SetBinding(button, self.TargetBindingName, 1)
@@ -195,7 +195,7 @@ function KeyBinding:OnEvent(event, button)
 		local NewAction = GetBindingAction(button, true)
 		local NewName = GetBindingName(NewAction)
 
-		HydraUI:print(format(Language['Bound "%s" to %s'], button, NewName))
+		YxUI:print(format(Language['Bound "%s" to %s'], button, NewName))
 
 		GUI:GetWidget("kb-save"):Enable()
 		GUI:GetWidget("kb-discard"):Enable()
@@ -229,7 +229,7 @@ local PopupOnCancel = function()
 end
 
 local OnAccept = function()
-	if HydraUI.IsClassic then
+	if YxUI.IsClassic then
 		AttemptToSaveBindings(GetCurrentBindingSet())
 	else
 		SaveBindings(GetCurrentBindingSet())
@@ -255,7 +255,7 @@ function KeyBinding:Enable()
 	self:SetScript("OnEvent", self.OnEvent)
 	self.Active = true
 
-	HydraUI:DisplayPopup(Language["Attention"], Language["Key binding mode is active. Would you like to save your changes?"], ACCEPT, OnAccept, CANCEL, OnCancel)
+	YxUI:DisplayPopup(Language["Attention"], Language["Key binding mode is active. Would you like to save your changes?"], ACCEPT, OnAccept, CANCEL, OnCancel)
 end
 
 function KeyBinding:Disable()
@@ -269,7 +269,7 @@ function KeyBinding:Disable()
 	self.Active = false
 	self.TargetBindingName = nil
 
-	HydraUI:ClearPopup()
+	YxUI:ClearPopup()
 end
 
 function KeyBinding:Toggle()
@@ -283,14 +283,14 @@ end
 function KeyBinding:Load()
 	self.Elapsed = 0
 	self:SetFrameStrata("DIALOG")
-	self:SetAllPoints(HydraUI.UIParent)
+	self:SetAllPoints(YxUI.UIParent)
 
 	self.Hover = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.Hover:SetFrameLevel(50)
 	self.Hover:SetFrameStrata("DIALOG")
-	self.Hover:SetBackdrop(HydraUI.BackdropAndBorder)
-	self.Hover:SetBackdropColor(HydraUI:HexToRGB("FFC44D"))
-	self.Hover:SetBackdropBorderColor(HydraUI:HexToRGB("FFC44D"))
+	self.Hover:SetBackdrop(YxUI.BackdropAndBorder)
+	self.Hover:SetBackdropColor(YxUI:HexToRGB("FFC44D"))
+	self.Hover:SetBackdropBorderColor(YxUI:HexToRGB("FFC44D"))
 	self.Hover:SetAlpha(0.6)
 	self.Hover:Hide()
 end
@@ -300,11 +300,11 @@ local ToggleBindingMode = function()
 end
 
 local SaveChanges = function()
-	HydraUI:DisplayPopup(Language["Attention"], Language["Are you sure you would like to save these key binding changes?"], ACCEPT, OnAccept, CANCEL, OnCancel)
+	YxUI:DisplayPopup(Language["Attention"], Language["Are you sure you would like to save these key binding changes?"], ACCEPT, OnAccept, CANCEL, OnCancel)
 end
 
 local DiscardChanges = function()
-	HydraUI:DisplayPopup(Language["Attention"], Language["Are you sure you would like to discard these key binding changes?"], ACCEPT, ReloadUI, CANCEL)
+	YxUI:DisplayPopup(Language["Attention"], Language["Are you sure you would like to discard these key binding changes?"], ACCEPT, ReloadUI, CANCEL)
 end
 
 GUI:AddWidgets(Language["General"], Language["Action Bars"], function(left, right)

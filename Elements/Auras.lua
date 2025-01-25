@@ -1,8 +1,8 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-if HydraUI.IsMainline then return end -- Needs a rewrite for TWW
+if YxUI.IsMainline then return end -- Needs a rewrite for TWW
 
-local Auras = HydraUI:NewModule("Auras")
+local Auras = YxUI:NewModule("Auras")
 
 -- Big thank you to Tukz for allowing me to derive my aura code from Tukui
 
@@ -15,7 +15,7 @@ local GetInventoryItemTexture = GetInventoryItemTexture
 local GetInventoryItemQuality = GetInventoryItemQuality
 local ITEM_QUALITY_COLORS = ITEM_QUALITY_COLORS
 
-local DebuffColors = HydraUI.DebuffColors
+local DebuffColors = YxUI.DebuffColors
 
 -- Default settings values
 Defaults["auras-enable"] = true
@@ -69,7 +69,7 @@ local OnUpdate = function(button, elapsed)
 
 		button:SetScript("OnUpdate", nil)
 	else
-		button.Duration:SetText(HydraUI:FormatTime(TimeLeft))
+		button.Duration:SetText(YxUI:FormatTime(TimeLeft))
 	end
 end
 
@@ -119,7 +119,7 @@ local OnAttributeChanged = function(button, attribute, index)
 	end
 end
 
-HydraUIAuraOnEnter = function(self)
+YxUIAuraOnEnter = function(self)
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
 	GameTooltip:SetFrameLevel(self:GetFrameLevel() + 2)
 
@@ -130,13 +130,13 @@ HydraUIAuraOnEnter = function(self)
 	end
 end
 
-HydraUISkinAura = function(button)
+YxUISkinAura = function(button)
 	button:RegisterForClicks("RightButtonUp")
 
 	local Backdrop = CreateFrame("Frame", nil, button, "BackdropTemplate")
 	Backdrop:SetAllPoints(button)
 	Backdrop:SetFrameLevel(button:GetFrameLevel() - 2)
-	Backdrop:SetBackdrop(HydraUI.BackdropAndBorder)
+	Backdrop:SetBackdrop(YxUI.BackdropAndBorder)
 	Backdrop:SetBackdropColor(0, 0, 0, 0)
 	Backdrop:SetBackdropBorderColor(0, 0, 0)
 
@@ -147,14 +147,14 @@ HydraUISkinAura = function(button)
 	Icon:SetPoint("BOTTOMRIGHT", button, -1, 1)
 
 	local Count = button:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(Count, Settings["auras-font"], Settings["auras-font-size"], Settings["auras-font-flags"])
-	Count:SetTextColor(HydraUI:HexToRGB(Settings["auras-count-color"]))
+	YxUI:SetFontInfo(Count, Settings["auras-font"], Settings["auras-font-size"], Settings["auras-font-flags"])
+	Count:SetTextColor(YxUI:HexToRGB(Settings["auras-count-color"]))
 	Count:SetPoint("CENTER", button, Settings["auras-count-xoffset"], Settings["auras-count-yoffset"])
 	Count:SetJustifyH(Settings["auras-count-align"])
 
 	local Duration = button:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(Duration, Settings["auras-font"], Settings["auras-font-size"], Settings["auras-font-flags"])
-	Duration:SetTextColor(HydraUI:HexToRGB(Settings["auras-duration-color"]))
+	YxUI:SetFontInfo(Duration, Settings["auras-font"], Settings["auras-font-size"], Settings["auras-font-flags"])
+	Duration:SetTextColor(YxUI:HexToRGB(Settings["auras-duration-color"]))
 	Duration:SetPoint("CENTER", button, Settings["auras-duration-xoffset"], Settings["auras-duration-yoffset"])
 	Duration:SetJustifyH(Settings["auras-duration-align"])
 
@@ -214,18 +214,18 @@ function Auras:Load()
 
 	local Header
 
-	self.Buffs = CreateFrame("Frame", "HydraUI Buffs", HydraUI.UIParent)
+	self.Buffs = CreateFrame("Frame", "YxUI Buffs", YxUI.UIParent)
 	self.Buffs:SetSize((Settings["auras-per-row"] * Settings["auras-size"] + Settings["auras-per-row"] * Settings["auras-spacing"]), ((Settings["auras-size"] * 3) + (Settings["auras-row-spacing"] * (3 - 1))))
-	self.Buffs:SetPoint("TOPRIGHT", HydraUI.UIParent, "TOPRIGHT", -(Settings["minimap-size"] + 22), -12)
+	self.Buffs:SetPoint("TOPRIGHT", YxUI.UIParent, "TOPRIGHT", -(Settings["minimap-size"] + 22), -12)
 
-	self.Debuffs = CreateFrame("Frame", "HydraUI Debuffs", HydraUI.UIParent)
+	self.Debuffs = CreateFrame("Frame", "YxUI Debuffs", YxUI.UIParent)
 	self.Debuffs:SetSize((Settings["auras-per-row"] * Settings["auras-size"] + Settings["auras-per-row"] * Settings["auras-spacing"]), ((Settings["auras-size"] * 2) + Settings["auras-row-spacing"]))
 	self.Debuffs:SetPoint("TOPRIGHT", self.Buffs, "BOTTOMRIGHT", 0, -2)
 
-	local Template = format("HydraUIAuraTemplate%s", Settings["auras-size"])
+	local Template = format("YxUIAuraTemplate%s", Settings["auras-size"])
 
 	for i = 1, 2 do
-		Header = CreateFrame("Frame", (i == 1 and "HydraUI Buffs" or "HydraUI Debuffs"), HydraUI.UIParent, "SecureAuraHeaderTemplate")
+		Header = CreateFrame("Frame", (i == 1 and "YxUI Buffs" or "YxUI Debuffs"), YxUI.UIParent, "SecureAuraHeaderTemplate")
 		Header:SetClampedToScreen(true)
 		Header:SetMovable(true)
 		Header:SetAttribute("minWidth", Settings["auras-per-row"] * (Settings["auras-size"] + Settings["auras-spacing"]))
@@ -281,8 +281,8 @@ function Auras:Load()
 		TemporaryEnchantFrame:SetScript("OnUpdate", nil)
 	end
 
-	HydraUI:CreateMover(self.Buffs)
-	HydraUI:CreateMover(self.Debuffs)
+	YxUI:CreateMover(self.Buffs)
+	YxUI:CreateMover(self.Debuffs)
 
 	if Settings["auras-show"] then
 		Buffs:Show()
@@ -340,8 +340,8 @@ local UpdateAuraFont = function()
 		local Index = 1
 
 		while Child do
-			HydraUI:SetFontInfo(Child.Count, Settings["auras-font"], Settings["auras-font-size"], Settings["auras-font-flags"])
-			HydraUI:SetFontInfo(Child.Duration, Settings["auras-font"], Settings["auras-font-size"], Settings["auras-font-flags"])
+			YxUI:SetFontInfo(Child.Count, Settings["auras-font"], Settings["auras-font-size"], Settings["auras-font-flags"])
+			YxUI:SetFontInfo(Child.Duration, Settings["auras-font"], Settings["auras-font-size"], Settings["auras-font-flags"])
 
 			Index = Index + 1
 			Child = Auras.Headers[i]:GetAttribute("child" .. Index)
@@ -355,7 +355,7 @@ local UpdateCountColor = function(value)
 		local Index = 1
 
 		while Child do
-			Child.Count:SetTextColor(HydraUI:HexToRGB(value))
+			Child.Count:SetTextColor(YxUI:HexToRGB(value))
 
 			Index = Index + 1
 			Child = Auras.Headers[i]:GetAttribute("child" .. Index)
@@ -369,7 +369,7 @@ local UpdateDurationColor = function(value)
 		local Index = 1
 
 		while Child do
-			Child.Duration:SetTextColor(HydraUI:HexToRGB(value))
+			Child.Duration:SetTextColor(YxUI:HexToRGB(value))
 
 			Index = Index + 1
 			Child = Auras.Headers[i]:GetAttribute("child" .. Index)
@@ -435,9 +435,9 @@ local UpdateCountAlignment = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Auras"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Auras"], function(left, right)
 	left:CreateHeader(Language["Enable"])
-	left:CreateSwitch("auras-enable", Settings["auras-enable"], Language["Enable Auras Module"], Language["Enable the HydraUI auras module"], ReloadUI):RequiresReload(true)
+	left:CreateSwitch("auras-enable", Settings["auras-enable"], Language["Enable Auras Module"], Language["Enable the YxUI auras module"], ReloadUI):RequiresReload(true)
 
 	left:CreateHeader(Language["Display"])
 	left:CreateSwitch("auras-show", Settings["auras-show"], Language["Display Auras"], Language["Display the players buff and debuffs"], UpdateAuraDisplay)

@@ -1,4 +1,4 @@
-local AddOn, Namespace = ... -- HydraUI was created on May 22, 2019
+local AddOn, Namespace = ... -- YxUI was created on May 22, 2019
 
 -- Data storage
 local Assets = {}
@@ -10,34 +10,34 @@ local ModuleQueue = {}
 local PluginQueue = {}
 
 -- Core functions and data
-local HydraUI = CreateFrame("Frame", nil, UIParent)
-HydraUI.Modules = Modules
-HydraUI.Plugins = Plugins
+local YxUI = CreateFrame("Frame", nil, UIParent)
+YxUI.Modules = Modules
+YxUI.Plugins = Plugins
 
-HydraUI.UIParent = CreateFrame("Frame", "HydraUIParent", UIParent, "SecureHandlerStateTemplate")
-HydraUI.UIParent:SetAllPoints(UIParent)
-HydraUI.UIParent:SetFrameLevel(UIParent:GetFrameLevel())
+YxUI.UIParent = CreateFrame("Frame", "YxUIParent", UIParent, "SecureHandlerStateTemplate")
+YxUI.UIParent:SetAllPoints(UIParent)
+YxUI.UIParent:SetFrameLevel(UIParent:GetFrameLevel())
 
 -- Constants
 local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
 local GetAddOnInfo = C_AddOns and C_AddOns.GetAddOnInfo or GetAddOnInfo
 
-HydraUI.UIVersion = GetAddOnMetadata("HydraUI", "Version")
-HydraUI.UserName = UnitName("player")
-HydraUI.UserClass = select(2, UnitClass("player"))
-HydraUI.UserRace = UnitRace("player")
-HydraUI.UserRealm = GetRealmName()
-HydraUI.UserLocale = GetLocale()
-HydraUI.UserProfileKey = format("%s:%s", HydraUI.UserName, HydraUI.UserRealm)
-HydraUI.ClientVersion = select(4, GetBuildInfo())
-HydraUI.IsClassic = HydraUI.ClientVersion > 10000 and HydraUI.ClientVersion < 20000
-HydraUI.IsTBC = HydraUI.ClientVersion > 20000 and HydraUI.ClientVersion < 30000
-HydraUI.IsWrath = HydraUI.ClientVersion > 30000 and HydraUI.ClientVersion < 40000
-HydraUI.IsCata = HydraUI.ClientVersion > 40000 and HydraUI.ClientVersion < 50000
-HydraUI.IsMainline = HydraUI.ClientVersion > 90000
+YxUI.UIVersion = GetAddOnMetadata("YxUI", "Version")
+YxUI.UserName = UnitName("player")
+YxUI.UserClass = select(2, UnitClass("player"))
+YxUI.UserRace = UnitRace("player")
+YxUI.UserRealm = GetRealmName()
+YxUI.UserLocale = GetLocale()
+YxUI.UserProfileKey = format("%s:%s", YxUI.UserName, YxUI.UserRealm)
+YxUI.ClientVersion = select(4, GetBuildInfo())
+YxUI.IsClassic = YxUI.ClientVersion > 10000 and YxUI.ClientVersion < 20000
+YxUI.IsTBC = YxUI.ClientVersion > 20000 and YxUI.ClientVersion < 30000
+YxUI.IsWrath = YxUI.ClientVersion > 30000 and YxUI.ClientVersion < 40000
+YxUI.IsCata = YxUI.ClientVersion > 40000 and YxUI.ClientVersion < 50000
+YxUI.IsMainline = YxUI.ClientVersion > 90000
 
-if (HydraUI.UserLocale == "enGB") then
-	HydraUI.UserLocale = "enUS"
+if (YxUI.UserLocale == "enGB") then
+	YxUI.UserLocale = "enUS"
 end
 
 -- Language
@@ -47,17 +47,23 @@ local Index = function(self, key)
 	return key
 end
 
-setmetatable(Language, {__index = Index})
+Language.Raw = {}
+local NewIndex = function (self, key, value)
+	rawset(self, key, value)
+	Language.Raw[value] = key
+end
+
+setmetatable(Language, {__index = Index, __newindex = NewIndex})
 
 -- Modules and plugins
-function HydraUI:NewModule(name)
+function YxUI:NewModule(name)
 	local Module = self:GetModule(name)
 
 	if Module then
 		return Module
 	end
 
-	Module = CreateFrame("Frame", "HydraUI " .. name, self.UIParent, "BackdropTemplate")
+	Module = CreateFrame("Frame", "YxUI " .. name, self.UIParent, "BackdropTemplate")
 	Module.Name = name
 
 	Modules[name] = Module
@@ -66,13 +72,13 @@ function HydraUI:NewModule(name)
 	return Module
 end
 
-function HydraUI:GetModule(name)
+function YxUI:GetModule(name)
 	if Modules[name] then
 		return Modules[name]
 	end
 end
 
-function HydraUI:LoadModules()
+function YxUI:LoadModules()
 	for i = 1, #ModuleQueue do
 		if (ModuleQueue[i].Load and not ModuleQueue[i].Loaded) then
 			ModuleQueue[i]:Load()
@@ -83,7 +89,7 @@ function HydraUI:LoadModules()
 	-- Wipe the queue
 end
 
-function HydraUI:NewPlugin(name)
+function YxUI:NewPlugin(name)
 	local Plugin = self:GetPlugin(name)
 
 	if Plugin then
@@ -107,13 +113,13 @@ function HydraUI:NewPlugin(name)
 	return Plugin
 end
 
-function HydraUI:GetPlugin(name)
+function YxUI:GetPlugin(name)
 	if Plugins[name] then
 		return Plugins[name]
 	end
 end
 
-function HydraUI:LoadPlugins()
+function YxUI:LoadPlugins()
 	if (#PluginQueue == 0) then
 		return
 	end
@@ -143,7 +149,7 @@ function HydraUI:LoadPlugins()
 end
 
 -- Events
-function HydraUI:OnEvent(event)
+function YxUI:OnEvent(event)
 	-- Import profile data and load a profile
 	self:CreateProfileData()
 	self:UpdateProfileList()
@@ -162,13 +168,13 @@ function HydraUI:OnEvent(event)
 	self:UnregisterEvent(event)
 end
 
-HydraUI:RegisterEvent("PLAYER_ENTERING_WORLD")
-HydraUI:SetScript("OnEvent", HydraUI.OnEvent)
+YxUI:RegisterEvent("PLAYER_ENTERING_WORLD")
+YxUI:SetScript("OnEvent", YxUI.OnEvent)
 
 -- Access data tables
 function Namespace:get()
-	return HydraUI, Language, Assets, Settings, Defaults
+	return YxUI, Language, Assets, Settings, Defaults
 end
 
 -- Global access
-_G.HydraUIGlobal = Namespace
+_G.YxUIGlobal = Namespace

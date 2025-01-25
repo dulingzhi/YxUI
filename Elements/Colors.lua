@@ -1,5 +1,5 @@
 local AddonName, Namespace = ...
-local HydraUI, Language, Assets, Settings, Defaults = Namespace:get()
+local YxUI, Language, Assets, Settings, Defaults = Namespace:get()
 local oUF = Namespace.oUF
 local R, G, B
 
@@ -107,16 +107,16 @@ Defaults["color-totem-air"] = "B3E5FC"
 Defaults["color-tapped"] = "A6A6A6"
 Defaults["color-disconnected"] = "A6A6A6"
 
-HydraUI.ClassColors = {}
-HydraUI.ReactionColors = {}
-HydraUI.ZoneColors = {}
-HydraUI.PowerColors = {}
-HydraUI.DebuffColors = {}
-HydraUI.HappinessColors = {}
-HydraUI.ComboPoints = {}
-HydraUI.TotemColors = {}
+YxUI.ClassColors = {}
+YxUI.ReactionColors = {}
+YxUI.ZoneColors = {}
+YxUI.PowerColors = {}
+YxUI.DebuffColors = {}
+YxUI.HappinessColors = {}
+YxUI.ComboPoints = {}
+YxUI.TotemColors = {}
 
-function HydraUI:SetColorEntry(t, key, hex)
+function YxUI:SetColorEntry(t, key, hex)
 	R, G, B = self:HexToRGB(hex)
 
 	if (not t[key]) then
@@ -129,7 +129,7 @@ function HydraUI:SetColorEntry(t, key, hex)
 	t[key]["Hex"] = hex
 end
 
-function HydraUI:UpdateClassColors()
+function YxUI:UpdateClassColors()
 	self:SetColorEntry(self.ClassColors, "DEATHKNIGHT", Settings["color-death-knight"])
 	self:SetColorEntry(self.ClassColors, "DEMONHUNTER", Settings["color-demon-hunter"])
 	self:SetColorEntry(self.ClassColors, "DRUID", Settings["color-druid"])
@@ -145,7 +145,7 @@ function HydraUI:UpdateClassColors()
 	self:SetColorEntry(self.ClassColors, "WARRIOR", Settings["color-warrior"])
 end
 
-function HydraUI:UpdateReactionColors()
+function YxUI:UpdateReactionColors()
 	self:SetColorEntry(self.ReactionColors, 1, Settings["color-reaction-1"])
 	self:SetColorEntry(self.ReactionColors, 2, Settings["color-reaction-2"])
 	self:SetColorEntry(self.ReactionColors, 3, Settings["color-reaction-3"])
@@ -156,7 +156,7 @@ function HydraUI:UpdateReactionColors()
 	self:SetColorEntry(self.ReactionColors, 8, Settings["color-reaction-8"])
 end
 
-function HydraUI:UpdateZoneColors()
+function YxUI:UpdateZoneColors()
 	self:SetColorEntry(self.ZoneColors, "sanctuary", Settings["color-sanctuary"])
 	self:SetColorEntry(self.ZoneColors, "arena", Settings["color-arena"])
 	self:SetColorEntry(self.ZoneColors, "hostile", Settings["color-hostile"])
@@ -166,7 +166,7 @@ function HydraUI:UpdateZoneColors()
 	self:SetColorEntry(self.ZoneColors, "other", Settings["color-other"])
 end
 
-function HydraUI:UpdatePowerColors()
+function YxUI:UpdatePowerColors()
 	self:SetColorEntry(self.PowerColors, "MANA", Settings["color-mana"])
 	self:SetColorEntry(self.PowerColors, "RAGE", Settings["color-rage"])
 	self:SetColorEntry(self.PowerColors, "ENERGY", Settings["color-energy"])
@@ -188,7 +188,7 @@ function HydraUI:UpdatePowerColors()
 	self:SetColorEntry(self.PowerColors, "ESSENCE", Settings["color-essence"])
 end
 
-function HydraUI:UpdateDebuffColors()
+function YxUI:UpdateDebuffColors()
 	self:SetColorEntry(self.DebuffColors, "Curse", Settings["color-curse"])
 	self:SetColorEntry(self.DebuffColors, "Disease", Settings["color-disease"])
 	self:SetColorEntry(self.DebuffColors, "Magic", Settings["color-magic"])
@@ -196,13 +196,13 @@ function HydraUI:UpdateDebuffColors()
 	self:SetColorEntry(self.DebuffColors, "none", Settings["color-none"])
 end
 
-function HydraUI:UpdateHappinessColors()
+function YxUI:UpdateHappinessColors()
 	self:SetColorEntry(self.HappinessColors, 1, Settings["color-happiness-1"])
 	self:SetColorEntry(self.HappinessColors, 2, Settings["color-happiness-2"])
 	self:SetColorEntry(self.HappinessColors, 3, Settings["color-happiness-3"])
 end
 
-function HydraUI:UpdateComboColors()
+function YxUI:UpdateComboColors()
 	self:SetColorEntry(self.ComboPoints, 1, Settings["color-combo-1"])
 	self:SetColorEntry(self.ComboPoints, 2, Settings["color-combo-2"])
 	self:SetColorEntry(self.ComboPoints, 3, Settings["color-combo-3"])
@@ -212,14 +212,14 @@ function HydraUI:UpdateComboColors()
 	self:SetColorEntry(self.ComboPoints, 7, Settings["color-combo-7"])
 end
 
-function HydraUI:UpdateTotemColors()
+function YxUI:UpdateTotemColors()
 	self:SetColorEntry(self.TotemColors, 1, Settings["color-totem-fire"])
 	self:SetColorEntry(self.TotemColors, 2, Settings["color-totem-earth"])
 	self:SetColorEntry(self.TotemColors, 3, Settings["color-totem-water"])
 	self:SetColorEntry(self.TotemColors, 4, Settings["color-totem-air"])
 end
 
-function HydraUI:UpdateColors()
+function YxUI:UpdateColors()
 	self:UpdateClassColors()
 	self:UpdateReactionColors()
 	self:UpdateZoneColors()
@@ -233,19 +233,19 @@ function HydraUI:UpdateColors()
 	end
 end
 
-function HydraUI:UpdateoUFColors()
+function YxUI:UpdateoUFColors()
 	local Colors = Namespace.oUF.colors
 
-	Colors.class = HydraUI.ClassColors
-	Colors.reaction = HydraUI.ReactionColors
-	Colors.power = HydraUI.PowerColors
-	Colors.debuff = HydraUI.DebuffColors
-	Colors.tapped = {HydraUI:HexToRGB(Settings["color-tapped"])}
-	Colors.disconnected = {HydraUI:HexToRGB(Settings["color-disconnected"])}
-	Colors.health = {HydraUI:HexToRGB(Settings["ui-header-texture-color"])}
+	Colors.class = YxUI.ClassColors
+	Colors.reaction = YxUI.ReactionColors
+	Colors.power = YxUI.PowerColors
+	Colors.debuff = YxUI.DebuffColors
+	Colors.tapped = {YxUI:HexToRGB(Settings["color-tapped"])}
+	Colors.disconnected = {YxUI:HexToRGB(Settings["color-disconnected"])}
+	Colors.health = {YxUI:HexToRGB(Settings["ui-header-texture-color"])}
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Colors"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Colors"], function(left, right)
 	left:CreateHeader(Language["Class Colors"])
 	left:CreateColorSelection("color-death-knight", Settings["color-death-knight"], Language["Death Knight"], "")
 	left:CreateColorSelection("color-demon-hunter", Settings["color-demon-hunter"], Language["Demon Hunter"], "")
@@ -307,7 +307,7 @@ HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Colors"], fun
 	right:CreateColorSelection("color-poison", Settings["color-poison"], Language["Poison"], "")
 	right:CreateColorSelection("color-none", Settings["color-none"], Language["None"], "")
 
-	if (not HydraUI.IsMainline) then
+	if (not YxUI.IsMainline) then
 		right:CreateHeader(Language["Pet Happiness Colors"])
 		right:CreateColorSelection("color-happiness-3", Settings["color-happiness-3"], Language["Happy"], "")
 		right:CreateColorSelection("color-happiness-2", Settings["color-happiness-2"], Language["Content"], "")
@@ -329,7 +329,7 @@ HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Colors"], fun
 	left:CreateColorSelection("color-combo-6", Settings["color-combo-6"], Language["Combo Point 6"], Language["Set the color of combo point 6"], ReloadUI):RequiresReload(true)
 	left:CreateColorSelection("color-combo-7", Settings["color-combo-7"], Language["Combo Point 7"], Language["Set the color of combo point 7"], ReloadUI):RequiresReload(true)
 
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		left:CreateColorSelection("color-combo-charged", Settings["color-combo-charged"], Language["Charged Combo Point"], Language["Set the color of the charged combo point provided from the Kyrian Covenant"], ReloadUI):RequiresReload(true)
 	end
 

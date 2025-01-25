@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local GUI = HydraUI:GetModule("GUI")
+local GUI = YxUI:GetModule("GUI")
 
 local Tiers = {"FF8000", "A335EE", "0070DD", "1EFF00", "FFFFFF"}
 
@@ -42,15 +42,15 @@ GUI:AddWidgets(Language["Info"], Language["Credits"], function(left, right)
 	right:CreateHeader("LibDeflate")
 	right:CreateLine("", "yoursafety")
 
-	left:CreateHeader("HydraUI")
-	left:CreateLine("", "Hydra")
+	left:CreateHeader("YxUI")
+	left:CreateLine("", "Yx")
 end)
 
 GUI:AddWidgets(Language["Info"], Language["Supporters"], function(left, right)
 	left:CreateHeader(Language["Patreon Supporters"])
 
 	local List = {}
-	local R, G, B = HydraUI:HexToRGB(Tiers[1])
+	local R, G, B = YxUI:HexToRGB(Tiers[1])
 
 	for i = 2, #Patrons do
 		for n = 1, #Patrons[i] do

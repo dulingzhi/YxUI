@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetMasteryEffect = GetMasteryEffect
 local GetCombatRatingBonus = GetCombatRatingBonus
@@ -70,7 +70,7 @@ local Update = function(self, event, unit)
 
 	local Mastery = GetMastery()
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.2f%%|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, Mastery)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.2f%%|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Mastery)
 end
 
 local OnEnable = function(self)
@@ -93,4 +93,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Mastery", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Mastery", OnEnable, OnDisable, Update)

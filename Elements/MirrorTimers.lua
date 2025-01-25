@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local MirrorTimers = HydraUI:NewModule("Mirror Timers")
+local MirrorTimers = YxUI:NewModule("Mirror Timers")
 
 local GetMirrorTimerProgress = GetMirrorTimerProgress
 local GetMirrorTimerInfo = GetMirrorTimerInfo
@@ -20,7 +20,7 @@ function MirrorTimers:OnUpdate()
 	self.Value = GetMirrorTimerProgress(self.Timer) / 1000
 
 	if (self.Value > 0) then
-		self.Text:SetText(format("%s (%s)", self.Label, HydraUI:FormatTime(self.Value)))
+		self.Text:SetText(format("%s (%s)", self.Label, YxUI:FormatTime(self.Value)))
 	else
 		self.Text:SetText(format("%s", self.Label))
 	end
@@ -54,19 +54,19 @@ MirrorTimers.MirrorTimer_Show = function(timer, value, maxvalue, scale, paused, 
 
 	MirrorTimers.Bar:SetMinMaxValues(0, maxvalue / 1000)
 	MirrorTimers.Bar:SetValue(value)
-	MirrorTimers.Bar:SetStatusBarColor(HydraUI:HexToRGB(MirrorTimers.Colors[timer]))
-	MirrorTimers.BarBG:SetVertexColor(HydraUI:HexToRGB(MirrorTimers.Colors[timer]))
-	MirrorTimers.Bar.Text:SetText(format("%s (%s)", label, HydraUI:FormatTime(value / 1000)))
+	MirrorTimers.Bar:SetStatusBarColor(YxUI:HexToRGB(MirrorTimers.Colors[timer]))
+	MirrorTimers.BarBG:SetVertexColor(YxUI:HexToRGB(MirrorTimers.Colors[timer]))
+	MirrorTimers.Bar.Text:SetText(format("%s (%s)", label, YxUI:FormatTime(value / 1000)))
 	MirrorTimers.Bar:Show()
 end
 
 function MirrorTimers:Load()
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		return -- Patch 10.1.5; Need a rewrite
 	end
 
-	self.Bar = CreateFrame("StatusBar", "HydraUI Timers Bar", HydraUI.UIParent)
-	self.Bar:SetPoint("TOP", HydraUI.UIParent, 0, -120)
+	self.Bar = CreateFrame("StatusBar", "YxUI Timers Bar", YxUI.UIParent)
+	self.Bar:SetPoint("TOP", YxUI.UIParent, 0, -120)
 	self.Bar:SetSize(210, 20)
 	self.Bar:SetFrameLevel(5)
 	self.Bar:SetStatusBarTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
@@ -81,7 +81,7 @@ function MirrorTimers:Load()
 
 	self.Bar.Text = self.Bar:CreateFontString(nil, "OVERLAY")
 	self.Bar.Text:SetPoint("CENTER", self.Bar, 0, 0)
-	HydraUI:SetFontInfo(self.Bar.Text, Settings["ui-widget-font"], Settings["ui-font-size"])
+	YxUI:SetFontInfo(self.Bar.Text, Settings["ui-widget-font"], Settings["ui-font-size"])
 	self.Bar.Text:SetJustifyH("CENTER")
 
 	self.BarOutline = self.Bar:CreateTexture(nil, "BORDER")
@@ -93,21 +93,21 @@ function MirrorTimers:Load()
 	self.OuterBG = CreateFrame("Frame", nil, self.Bar, "BackdropTemplate")
 	self.OuterBG:SetPoint("TOPLEFT", self.Bar, -4, 4)
 	self.OuterBG:SetPoint("BOTTOMRIGHT", self.Bar, 4, -4)
-	self.OuterBG:SetBackdrop(HydraUI.BackdropAndBorder)
+	self.OuterBG:SetBackdrop(YxUI.BackdropAndBorder)
 	self.OuterBG:SetBackdropBorderColor(0, 0, 0)
 	self.OuterBG:SetFrameLevel(1)
 	self.OuterBG:SetFrameStrata("BACKGROUND")
-	self.OuterBG:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-bg-color"]))
+	self.OuterBG:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-bg-color"]))
 
 	hooksecurefunc("MirrorTimer_Show", self.MirrorTimer_Show)
 
 	self:RegisterEvent("MIRROR_TIMER_PAUSE")
 	self:RegisterEvent("MIRROR_TIMER_STOP")
 
-	self.Hider = CreateFrame("Frame", nil, HydraUI.UIParent)
+	self.Hider = CreateFrame("Frame", nil, YxUI.UIParent)
 	self.Hider:Hide()
 
-	HydraUI:CreateMover(self.Bar, 6)
+	YxUI:CreateMover(self.Bar, 6)
 
 	for i = 1, MIRRORTIMER_NUMTIMERS do
 		_G["MirrorTimer" .. i]:SetParent(self.Hider)

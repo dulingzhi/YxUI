@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local select = select
 local GetItemInfo = GetItemInfo
@@ -43,7 +43,7 @@ local Update = function(self)
 		Count = GetInventoryItemCount("player", 18)
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, Count)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Count)
 
 	if (PreviousCount > 0 and Count < 50) then -- Make sure we had ammo
 		self.Anim:Play()
@@ -95,4 +95,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Ammo", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Ammo", OnEnable, OnDisable, Update)

@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local tonumber = tonumber
 local IsInGuild = IsInGuild
@@ -8,14 +8,14 @@ local GetNumGroupMembers = GetNumGroupMembers
 local LE_PARTY_CATEGORY_HOME = LE_PARTY_CATEGORY_HOME
 local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 
-local AddOnVersion = HydraUI.UIVersion
-local AddOnNum = tonumber(HydraUI.UIVersion)
-local User = HydraUI.UserName .. "-" .. HydraUI.UserRealm
+local AddOnVersion = YxUI.UIVersion
+local AddOnNum = tonumber(YxUI.UIVersion)
+local User = YxUI.UserName .. "-" .. YxUI.UserRealm
 local tinsert = table.insert
 local tremove = table.remove
 local CT = ChatThrottleLib
 
-local Update = HydraUI:NewModule("Update")
+local Update = YxUI:NewModule("Update")
 Update.SentHome = false
 Update.SentInst = false
 Update.Timer = 5
@@ -23,7 +23,7 @@ Update.Timer = 5
 local Tables = {}
 local Queue = {}
 
-local Throttle = HydraUI:GetModule("Throttle")
+local Throttle = YxUI:GetModule("Throttle")
 
 function Update:QueueChannel(channel, target)
 	local Data
@@ -49,7 +49,7 @@ function Update:OnUpdate(elapsed)
 	if (self.Timer < 0) then
 		local Data = tremove(Queue, 1)
 
-		CT:SendAddonMessage("NORMAL", "HydraUI-Version", AddOnVersion, Data[1], Data[2])
+		CT:SendAddonMessage("NORMAL", "YxUI-Version", AddOnVersion, Data[1], Data[2])
 
 		tinsert(Tables, Data)
 
@@ -62,7 +62,7 @@ function Update:OnUpdate(elapsed)
 end
 
 function Update:PLAYER_ENTERING_WORLD()
-	if (not HydraUI.IsMainline and not IsInInstance()) and (not Throttle:IsThrottled("vrsn")) then
+	if (not YxUI.IsMainline and not IsInInstance()) and (not Throttle:IsThrottled("vrsn")) then
 		C_Timer.After(5, function()
 			self:QueueChannel("YELL")
 		end)
@@ -101,7 +101,7 @@ function Update:GROUP_ROSTER_UPDATE()
 end
 
 function Update:CHAT_MSG_ADDON(prefix, message, channel, sender)
-	if (sender == User or prefix ~= "HydraUI-Version") then
+	if (sender == User or prefix ~= "YxUI-Version") then
 		return
 	end
 
@@ -110,10 +110,10 @@ function Update:CHAT_MSG_ADDON(prefix, message, channel, sender)
 	if (AddOnNum > message) then -- We have a higher version, share it
 		self:QueueChannel(channel)
 	elseif (message > AddOnNum) then -- We're behind!
-		HydraUI:print(Language["You can get an updated version of HydraUI at https://www.curseforge.com/wow/addons/hydraui"])
+		YxUI:print(Language["You can get an updated version of YxUI at https://www.curseforge.com/wow/addons/hydraui"])
 		print(Language["Join the Discord community for support and feedback https://discord.gg/XefDFa6nJR"])
 
-		HydraUI:GetModule("GUI"):CreateUpdateAlert()
+		YxUI:GetModule("GUI"):CreateUpdateAlert()
 
 		AddOnNum = message
 		AddOnVersion = tostring(message)
@@ -150,7 +150,7 @@ function Update:OnEvent(event, ...)
 	end
 end
 
-if (not HydraUI.IsMainline) then
+if (not YxUI.IsMainline) then
 	Update:RegisterEvent("ZONE_CHANGED")
 	Update:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 end
@@ -161,4 +161,4 @@ Update:RegisterEvent("GROUP_ROSTER_UPDATE")
 Update:RegisterEvent("CHAT_MSG_ADDON")
 Update:SetScript("OnEvent", Update.OnEvent)
 
-C_ChatInfo.RegisterAddonMessagePrefix("HydraUI-Version")
+C_ChatInfo.RegisterAddonMessagePrefix("YxUI-Version")

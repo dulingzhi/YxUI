@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local unpack = unpack
 local find = string.find
@@ -6,19 +6,19 @@ local gsub = string.gsub
 local match = string.match
 local Round = Round
 
-HydraUI.MovingFrames = {}
-HydraUI.FrameDefaults = {}
-HydraUI.MovingActive = false
+YxUI.MovingFrames = {}
+YxUI.FrameDefaults = {}
+YxUI.MovingActive = false
 
-local GUI = HydraUI:GetModule("GUI")
+local GUI = YxUI:GetModule("GUI")
 
-function HydraUI:PositionToString(frame)
+function YxUI:PositionToString(frame)
 	local A1, Parent, A2, X, Y = frame:GetPoint()
 
-	return format("%s:%s:%s:%s:%s", A1, Parent and Parent:GetName() or "HydraUIParent", A2, Round(X or 0), Round(Y or 0))
+	return format("%s:%s:%s:%s:%s", A1, Parent and Parent:GetName() or "YxUIParent", A2, Round(X or 0), Round(Y or 0))
 end
 
-function HydraUI:StringToPosition(str)
+function YxUI:StringToPosition(str)
 	if (type(str) == "table") then -- Remove this after a month or two. (June 2nd 2020)
 		return unpack(str) -- Migrated data will provide a table here. This leftover will be flushed after one login
 	end
@@ -43,27 +43,27 @@ local OnDragStop = function(self)
 		self:PostMove()
 	end
 
-	local Profile = HydraUI:GetActiveProfile()
+	local Profile = YxUI:GetActiveProfile()
 
 	if (not Profile.Move) then
 		Profile.Move = {}
 	end
 
-	Profile.Move[self.Name] = HydraUI:PositionToString(self)
+	Profile.Move[self.Name] = YxUI:PositionToString(self)
 end
 
 local OnAccept = function()
-	HydraUI:ToggleMovers()
+	YxUI:ToggleMovers()
 	GUI:Toggle()
 end
 
 local OnCancel = function()
-	HydraUI:ToggleMovers()
+	YxUI:ToggleMovers()
 end
 
-function HydraUI:ToggleMovers()
+function YxUI:ToggleMovers()
 	if InCombatLockdown() then
-		HydraUI:print(ERR_NOT_IN_COMBAT)
+		YxUI:print(ERR_NOT_IN_COMBAT)
 
 		return
 	end
@@ -77,7 +77,7 @@ function HydraUI:ToggleMovers()
 			self.MovingFrames[i]:Hide()
 		end
 
-		local F = HydraUI:GetModule("m")
+		local F = YxUI:GetModule("m")
 
 		if F:IsShown() then
 			F:Hide()
@@ -94,7 +94,7 @@ function HydraUI:ToggleMovers()
 		end
 
 		if (GUI.Loaded and GUI:IsShown()) then
-			HydraUI:DisplayPopup(Language["Attention"], Language["Would you like to reopen the settings window?"], ACCEPT, OnAccept, CANCEL, OnCancel) -- PopupOnCancel
+			YxUI:DisplayPopup(Language["Attention"], Language["Would you like to reopen the settings window?"], ACCEPT, OnAccept, CANCEL, OnCancel) -- PopupOnCancel
 			GUI:Toggle()
 		end
 
@@ -102,41 +102,41 @@ function HydraUI:ToggleMovers()
 	end
 end
 
-function HydraUI:ResetMovers()
-	local Profile = HydraUI:GetActiveProfile()
+function YxUI:ResetMovers()
+	local Profile = YxUI:GetActiveProfile()
 
 	if Profile.Move then
 		Profile.Move = nil
 
-		for i = 1, #HydraUI.MovingFrames do
-			if HydraUI.FrameDefaults[HydraUI.MovingFrames[i].Name] then
-				local A1, Parent, A2, X, Y = unpack(HydraUI.FrameDefaults[HydraUI.MovingFrames[i].Name])
+		for i = 1, #YxUI.MovingFrames do
+			if YxUI.FrameDefaults[YxUI.MovingFrames[i].Name] then
+				local A1, Parent, A2, X, Y = unpack(YxUI.FrameDefaults[YxUI.MovingFrames[i].Name])
 
-				HydraUI.MovingFrames[i]:ClearAllPoints()
-				HydraUI.MovingFrames[i]:SetPoint(A1, _G[Parent], A2, X, Y)
+				YxUI.MovingFrames[i]:ClearAllPoints()
+				YxUI.MovingFrames[i]:SetPoint(A1, _G[Parent], A2, X, Y)
 			end
 		end
 	end
 end
 
-function HydraUI:ResetMover(name)
-	for i = 1, #HydraUI.MovingFrames do
-		if (HydraUI.MovingFrames[i].Name == name) then
-			local A1, Parent, A2, X, Y = unpack(HydraUI.FrameDefaults[HydraUI.MovingFrames[i].Name])
+function YxUI:ResetMover(name)
+	for i = 1, #YxUI.MovingFrames do
+		if (YxUI.MovingFrames[i].Name == name) then
+			local A1, Parent, A2, X, Y = unpack(YxUI.FrameDefaults[YxUI.MovingFrames[i].Name])
 
-			HydraUI.MovingFrames[i]:ClearAllPoints()
-			HydraUI.MovingFrames[i]:SetPoint(A1, _G[Parent], A2, X, Y)
+			YxUI.MovingFrames[i]:ClearAllPoints()
+			YxUI.MovingFrames[i]:SetPoint(A1, _G[Parent], A2, X, Y)
 
 			break
 		end
 	end
 end
 
-function HydraUI:ResetAllMovers()
+function YxUI:ResetAllMovers()
 	self:DisplayPopup(Language["Attention"], Language["Are you sure you want to reset the position of all moved frames?"], ACCEPT, self.ResetMovers, CANCEL)
 end
 
-function HydraUI:IsMoved(frame)
+function YxUI:IsMoved(frame)
 	local Profile = self:GetActiveProfile()
 
 	if (not Profile.Move) then
@@ -156,14 +156,14 @@ end
 
 local MoverOnMouseUp = function(self, button)
 	if (button == "RightButton") then
-		if HydraUI.FrameDefaults[self.Name] then
-			local A1, Parent, A2, X, Y = unpack(HydraUI.FrameDefaults[self.Name])
+		if YxUI.FrameDefaults[self.Name] then
+			local A1, Parent, A2, X, Y = unpack(YxUI.FrameDefaults[self.Name])
 			local ParentObject = _G[Parent]
 
 			self:ClearAllPoints()
 			self:SetPoint(A1, ParentObject, A2, X, Y)
 
-			local Profile = HydraUI:GetActiveProfile()
+			local Profile = YxUI:GetActiveProfile()
 
 			if (not Profile.Move) then
 				return
@@ -172,7 +172,7 @@ local MoverOnMouseUp = function(self, button)
 			Profile.Move[self.Name] = nil -- We're back to default, so don't save the value
 		end
 	else
-		local F = HydraUI:GetModule("m")
+		local F = YxUI:GetModule("m")
 
 		if (not F.Loaded) then
 			F:LoadFrame()
@@ -183,7 +183,7 @@ local MoverOnMouseUp = function(self, button)
 		local A1, P, A2, X, Y = self:GetPoint()
 
 		if not P then
-			P = HydraUI.UIParent
+			P = YxUI.UIParent
 		end
 
 		F.Lines[1].Text:SetText(self.Name)
@@ -200,7 +200,7 @@ local MoverOnMouseUp = function(self, button)
 end
 
 local MoverOnEnter = function(self)
-	self:SetBackdropColor(HydraUI:HexToRGB("FF4444"))
+	self:SetBackdropColor(YxUI:HexToRGB("FF4444"))
 
 	local A1, Parent, A2, X, Y = self:GetPoint()
 
@@ -209,30 +209,30 @@ local MoverOnEnter = function(self)
 	GameTooltip:AddLine(self.Name)
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddDoubleLine(Language["Anchor 1:"], A1, 1, 1, 1, 1, 1, 1)
-	GameTooltip:AddDoubleLine(Language["Parent:"], Parent and Parent:GetName() or "HydraUIParent", 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(Language["Parent:"], Parent and Parent:GetName() or "YxUIParent", 1, 1, 1, 1, 1, 1)
 	GameTooltip:AddDoubleLine(Language["Anchor 2:"], A2, 1, 1, 1, 1, 1, 1)
 	GameTooltip:AddDoubleLine(Language["X offset:"], Round(X), 1, 1, 1, 1, 1, 1)
 	GameTooltip:AddDoubleLine(Language["Y offset:"], Round(Y), 1, 1, 1, 1, 1, 1)
 	GameTooltip:Show()
 
-	for i = 1, #HydraUI.MovingFrames do
-		if (HydraUI.MovingFrames[i].Name ~= self.Name) then
-			HydraUI.MovingFrames[i]:SetAlpha(0.5)
+	for i = 1, #YxUI.MovingFrames do
+		if (YxUI.MovingFrames[i].Name ~= self.Name) then
+			YxUI.MovingFrames[i]:SetAlpha(0.5)
 		end
 	end
 end
 
 local MoverOnLeave = function(self)
-	self:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-bg-color"]))
+	self:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-bg-color"]))
 
 	GameTooltip:Hide()
 
-	for i = 1, #HydraUI.MovingFrames do
-		HydraUI.MovingFrames[i]:SetAlpha(1)
+	for i = 1, #YxUI.MovingFrames do
+		YxUI.MovingFrames[i]:SetAlpha(1)
 	end
 end
 
-function HydraUI:CreateMover(frame, padding)
+function YxUI:CreateMover(frame, padding)
 	local A1, Parent, A2, X, Y = frame:GetPoint()
 	local Name = frame:GetName()
 
@@ -242,12 +242,12 @@ function HydraUI:CreateMover(frame, padding)
 
 	local Label = Name
 
-	if find(Label, "HydraUI") then
-		Label = gsub(Label, "HydraUI ", "")
+	if find(Label, "YxUI") then
+		Label = gsub(Label, "YxUI ", "")
 	end
 
 	if (not Parent) then
-		Parent = HydraUIParent
+		Parent = YxUIParent
 	end
 
 	local ParentName = Parent:GetName()
@@ -255,10 +255,10 @@ function HydraUI:CreateMover(frame, padding)
 	local Padding = padding or 0
 	local Width, Height = frame:GetSize()
 
-	local Mover = CreateFrame("Frame", nil, HydraUI.UIParent, "SecureHandlerStateTemplate, BackdropTemplate")
+	local Mover = CreateFrame("Frame", nil, YxUI.UIParent, "SecureHandlerStateTemplate, BackdropTemplate")
 	Mover:SetSize(Width + Padding, Height + Padding)
-	Mover:SetBackdrop(HydraUI.BackdropAndBorder)
-	Mover:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-bg-color"]))
+	Mover:SetBackdrop(YxUI.BackdropAndBorder)
+	Mover:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-bg-color"]))
 	Mover:SetBackdropBorderColor(0, 0, 0)
 	Mover:SetFrameLevel(20)
 	Mover:SetFrameStrata("HIGH")
@@ -274,12 +274,12 @@ function HydraUI:CreateMover(frame, padding)
 	Mover.BG = CreateFrame("Frame", nil, Mover, "BackdropTemplate")
 	Mover.BG:SetPoint("TOPLEFT", Mover, 3, -3)
 	Mover.BG:SetPoint("BOTTOMRIGHT", Mover, -3, 3)
-	Mover.BG:SetBackdrop(HydraUI.BackdropAndBorder)
-	Mover.BG:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-main-color"]))
+	Mover.BG:SetBackdrop(YxUI.BackdropAndBorder)
+	Mover.BG:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
 	Mover.BG:SetBackdropBorderColor(0, 0, 0)
 
 	Mover.Label = Mover.BG:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(Mover.Label, Settings["ui-widget-font"], 12)
+	YxUI:SetFontInfo(Mover.Label, Settings["ui-widget-font"], 12)
 	Mover.Label:SetPoint("CENTER", Mover, 0, 0)
 	Mover.Label:SetText(Label)
 
@@ -308,7 +308,7 @@ end
 -- Create mover frame
 --if 1 == 1 then return end
 
-local m = HydraUI:NewModule("m")
+local m = YxUI:NewModule("m")
 
 local InputOnEnterPressed = function(self)
 	local Text = self:GetText() or ""
@@ -333,7 +333,7 @@ end
 
 function m:CreateLine(parent, label)
 	parent.Text = parent:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(parent.Text, Settings["ui-widget-font"], Settings["ui-font-size"])
+	YxUI:SetFontInfo(parent.Text, Settings["ui-widget-font"], Settings["ui-font-size"])
 	parent.Text:SetSize(parent:GetWidth(), parent:GetHeight())
 	parent.Text:SetPoint("LEFT", parent, 3, 0)
 	parent.Text:SetJustifyH("LEFT")
@@ -344,7 +344,7 @@ function m:CreateInput(parent, label, hook)
 	parent.EditBox = CreateFrame("EditBox", nil, parent, "BackdropTemplate")
 	parent.EditBox:SetSize(100, 20)
 	parent.EditBox:SetPoint("RIGHT", parent, -2, 0)
-	HydraUI:SetFontInfo(parent.EditBox, Settings["ui-widget-font"], Settings["ui-font-size"])
+	YxUI:SetFontInfo(parent.EditBox, Settings["ui-widget-font"], Settings["ui-font-size"])
 	parent.EditBox:SetJustifyH("LEFT")
 	parent.EditBox:SetAutoFocus(false)
 	parent.EditBox:EnableKeyboard(true)
@@ -352,7 +352,7 @@ function m:CreateInput(parent, label, hook)
 	parent.EditBox:SetMaxLetters(255)
 	parent.EditBox:SetTextInsets(5, 0, 0, 0)
 	parent.EditBox:SetText("") -- change me
-	parent.EditBox:SetBackdrop(HydraUI.BackdropAndBorder)
+	parent.EditBox:SetBackdrop(YxUI.BackdropAndBorder)
 	parent.EditBox:SetBackdropBorderColor(0, 0, 0)
 	parent.EditBox:SetScript("OnEnterPressed", InputOnEnterPressed)
 	parent.EditBox:SetScript("OnEscapePressed", InputOnEscapePressed)
@@ -369,14 +369,14 @@ function m:CreateInput(parent, label, hook)
 	parent.EditBox.Tex:SetTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
 	parent.EditBox.Tex:SetPoint("TOPLEFT", parent.EditBox, 1, -1)
 	parent.EditBox.Tex:SetPoint("BOTTOMRIGHT", parent.EditBox, -1, 1)
-	parent.EditBox.Tex:SetVertexColor(HydraUI:HexToRGB(Settings["ui-widget-bright-color"]))
+	parent.EditBox.Tex:SetVertexColor(YxUI:HexToRGB(Settings["ui-widget-bright-color"]))
 
 	if hook then
 		parent.EditBox.Hook = hook
 	end
 
 	parent.Text = parent:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(parent.Text, Settings["ui-widget-font"], Settings["ui-font-size"])
+	YxUI:SetFontInfo(parent.Text, Settings["ui-widget-font"], Settings["ui-font-size"])
 	parent.Text:SetSize(parent:GetWidth(), parent:GetHeight())
 	parent.Text:SetPoint("LEFT", parent, 3, 0)
 	parent.Text:SetJustifyH("LEFT")
@@ -408,7 +408,7 @@ end
 function m:UpdateFrameInfo()
 	local A1, P, A2, X, Y = self.CurrentFrame:GetPoint()
 
-	P = P or HydraUI.UIParent
+	P = P or YxUI.UIParent
 
 	self.Lines[1].Text:SetText(self.CurrentFrame.Name)
 	self.Lines[2].EditBox:SetText(P:GetName())
@@ -417,13 +417,13 @@ function m:UpdateFrameInfo()
 	self.Lines[5].EditBox:SetText(Round(X))
 	self.Lines[6].EditBox:SetText(Round(Y))
 
-	local Profile = HydraUI:GetActiveProfile()
+	local Profile = YxUI:GetActiveProfile()
 
 	if (not Profile.Move) then
 		Profile.Move = {}
 	end
 
-	Profile.Move[self.CurrentFrame.Name] = HydraUI:PositionToString(self.CurrentFrame)
+	Profile.Move[self.CurrentFrame.Name] = YxUI:PositionToString(self.CurrentFrame)
 end
 
 function m:UpdateParent()
@@ -433,7 +433,7 @@ function m:UpdateParent()
 		return
 	end
 
-	local Frame = HydraUI:GetModule("m").CurrentFrame
+	local Frame = YxUI:GetModule("m").CurrentFrame
 	local A1, P, A2, X, Y = Frame:GetPoint()
 
 	Frame:ClearAllPoints()
@@ -450,7 +450,7 @@ function m:UpdateFromPoint()
 		self:SetText(Point)
 	end
 
-	local Frame = HydraUI:GetModule("m").CurrentFrame
+	local Frame = YxUI:GetModule("m").CurrentFrame
 
 	local A1, P, A2, X, Y = Frame:GetPoint()
 
@@ -468,7 +468,7 @@ function m:UpdateToPoint()
 		self:SetText(Point)
 	end
 
-	local Frame = HydraUI:GetModule("m").CurrentFrame
+	local Frame = YxUI:GetModule("m").CurrentFrame
 
 	local A1, P, A2, X, Y = Frame:GetPoint()
 
@@ -485,7 +485,7 @@ function m:UpdateXOffset()
 		return
 	end
 
-	local Frame = HydraUI:GetModule("m").CurrentFrame
+	local Frame = YxUI:GetModule("m").CurrentFrame
 
 	local A1, P, A2, X, Y = Frame:GetPoint()
 
@@ -502,7 +502,7 @@ function m:UpdateYOffset()
 		return
 	end
 
-	local Frame = HydraUI:GetModule("m").CurrentFrame
+	local Frame = YxUI:GetModule("m").CurrentFrame
 
 	local A1, P, A2, X, Y = Frame:GetPoint()
 
@@ -588,8 +588,8 @@ function m:LoadFrame()
 	self:SetPoint("CENTER", UIParent, 0, -20)
 	self:SetFrameStrata("DIALOG")
 	self:SetFrameLevel(20)
-	self:SetBackdrop(HydraUI.BackdropAndBorder)
-	self:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-bg-color"]))
+	self:SetBackdrop(YxUI.BackdropAndBorder)
+	self:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-bg-color"]))
 	self:SetBackdropBorderColor(0, 0, 0)
 	self:SetBackdropBorderColor(0, 0, 0)
 	self:SetMovable(true)
@@ -603,7 +603,7 @@ function m:LoadFrame()
 	self.Header:SetHeight(22)
 	self.Header:SetPoint("TOPLEFT", self, 3, -3)
 	self.Header:SetPoint("TOPRIGHT", self, -((3 + 2) + 22), -3)
-	self.Header:SetBackdrop(HydraUI.BackdropAndBorder)
+	self.Header:SetBackdrop(YxUI.BackdropAndBorder)
 	self.Header:SetBackdropColor(0, 0, 0)
 	self.Header:SetBackdropBorderColor(0, 0, 0)
 
@@ -611,11 +611,11 @@ function m:LoadFrame()
 	self.HeaderTexture:SetPoint("TOPLEFT", self.Header, 1, -1)
 	self.HeaderTexture:SetPoint("BOTTOMRIGHT", self.Header, -1, 1)
 	self.HeaderTexture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-	self.HeaderTexture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-header-texture-color"]))
+	self.HeaderTexture:SetVertexColor(YxUI:HexToRGB(Settings["ui-header-texture-color"]))
 
 	self.Header.Text = self.Header:CreateFontString(nil, "OVERLAY")
 	self.Header.Text:SetPoint("LEFT", self.Header, 5, -1)
-	HydraUI:SetFontInfo(self.Header.Text, Settings["ui-header-font"], Settings["ui-header-font-size"])
+	YxUI:SetFontInfo(self.Header.Text, Settings["ui-header-font"], Settings["ui-header-font-size"])
 	self.Header.Text:SetJustifyH("LEFT")
 	self.Header.Text:SetText("|cFF" .. Settings["ui-header-font-color"] .. Language["Frame Position"] .. "|r")
 
@@ -623,19 +623,19 @@ function m:LoadFrame()
 	self.CloseButton = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.CloseButton:SetSize(22, 22)
 	self.CloseButton:SetPoint("TOPRIGHT", self, -3, -3)
-	self.CloseButton:SetBackdrop(HydraUI.BackdropAndBorder)
+	self.CloseButton:SetBackdrop(YxUI.BackdropAndBorder)
 	self.CloseButton:SetBackdropColor(0, 0, 0, 0)
 	self.CloseButton:SetBackdropBorderColor(0, 0, 0)
-	self.CloseButton:SetScript("OnEnter", function(self) self.Cross:SetVertexColor(HydraUI:HexToRGB("C0392B")) end)
-	self.CloseButton:SetScript("OnLeave", function(self) self.Cross:SetVertexColor(HydraUI:HexToRGB("EEEEEE")) end)
+	self.CloseButton:SetScript("OnEnter", function(self) self.Cross:SetVertexColor(YxUI:HexToRGB("C0392B")) end)
+	self.CloseButton:SetScript("OnLeave", function(self) self.Cross:SetVertexColor(YxUI:HexToRGB("EEEEEE")) end)
 	self.CloseButton:SetScript("OnMouseUp", function(self)
-		self.Texture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-header-texture-color"]))
+		self.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-header-texture-color"]))
 
 		self:GetParent():Hide()
 	end)
 
 	self.CloseButton:SetScript("OnMouseDown", function(self)
-		local R, G, B = HydraUI:HexToRGB(Settings["ui-header-texture-color"])
+		local R, G, B = YxUI:HexToRGB(Settings["ui-header-texture-color"])
 
 		self.Texture:SetVertexColor(R * 0.85, G * 0.85, B * 0.85)
 	end)
@@ -644,19 +644,19 @@ function m:LoadFrame()
 	self.CloseButton.Texture:SetPoint("TOPLEFT", self.CloseButton, 1, -1)
 	self.CloseButton.Texture:SetPoint("BOTTOMRIGHT", self.CloseButton, -1, 1)
 	self.CloseButton.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-	self.CloseButton.Texture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-header-texture-color"]))
+	self.CloseButton.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-header-texture-color"]))
 
 	self.CloseButton.Cross = self.CloseButton:CreateTexture(nil, "OVERLAY")
 	self.CloseButton.Cross:SetPoint("CENTER", self.CloseButton, 0, 0)
 	self.CloseButton.Cross:SetSize(16, 16)
 	self.CloseButton.Cross:SetTexture(Assets:GetTexture("Close"))
-	self.CloseButton.Cross:SetVertexColor(HydraUI:HexToRGB("EEEEEE"))
+	self.CloseButton.Cross:SetVertexColor(YxUI:HexToRGB("EEEEEE"))
 
 	self.Inner = CreateFrame("Frame", nil, self, "BackdropTemplate")
 	self.Inner:SetPoint("TOPLEFT", self.Header, "BOTTOMLEFT", 0, -2)
 	self.Inner:SetPoint("BOTTOMRIGHT", self, -3, 3)
-	self.Inner:SetBackdrop(HydraUI.BackdropAndBorder)
-	self.Inner:SetBackdropColor(HydraUI:HexToRGB(Settings["ui-window-main-color"]))
+	self.Inner:SetBackdrop(YxUI.BackdropAndBorder)
+	self.Inner:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
 	self.Inner:SetBackdropBorderColor(0, 0, 0)
 
 	self.Lines = {}
@@ -687,7 +687,7 @@ function m:LoadFrame()
 	for i = 4, 1, -1 do
 		local Button = CreateFrame("Frame", nil, self, "BackdropTemplate")
 		Button:SetSize(20, 20)
-		Button:SetBackdrop(HydraUI.BackdropAndBorder)
+		Button:SetBackdrop(YxUI.BackdropAndBorder)
 		Button:SetBackdropColor(0, 0, 0)
 		Button:SetBackdropBorderColor(0, 0, 0)
 
@@ -695,12 +695,12 @@ function m:LoadFrame()
 		Button.Texture:SetPoint("TOPLEFT", Button, 1, -1)
 		Button.Texture:SetPoint("BOTTOMRIGHT", Button, -1, 1)
 		Button.Texture:SetTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
-		Button.Texture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-widget-bright-color"]))
+		Button.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-widget-bright-color"]))
 
 		Button.Arrow = Button:CreateTexture(nil, "OVERLAY")
 		Button.Arrow:SetSize(16, 16)
 		Button.Arrow:SetPoint("CENTER", Button, 0, 0)
-		Button.Arrow:SetVertexColor(HydraUI:HexToRGB(Settings["ui-widget-color"]))
+		Button.Arrow:SetVertexColor(YxUI:HexToRGB(Settings["ui-widget-color"]))
 
 		if (i == 4) then
 			Button:SetPoint("RIGHT", self.Lines[7], -2, 0)
@@ -712,7 +712,7 @@ function m:LoadFrame()
 	end
 
 	self.NudgeText = self.Lines[7]:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(self.NudgeText, Settings["ui-widget-font"], Settings["ui-font-size"])
+	YxUI:SetFontInfo(self.NudgeText, Settings["ui-widget-font"], Settings["ui-font-size"])
 	self.NudgeText:SetSize(self.Lines[7]:GetWidth() / 2, self.Lines[7]:GetHeight())
 	self.NudgeText:SetPoint("LEFT", self.Lines[7], 3, 0)
 	self.NudgeText:SetJustifyH("LEFT")

@@ -1,5 +1,5 @@
 local addon, ns = ...
-local HydraUI, Language, Assets, Settings = ns:get()
+local YxUI, Language, Assets, Settings = ns:get()
 
 local oUF = ns.oUF or oUF
 local Events = oUF.Tags.Events
@@ -34,8 +34,8 @@ local GetPetHappiness = GetPetHappiness
 
 local DEAD = DEAD
 local PLAYER_OFFLINE = PLAYER_OFFLINE
-local AFK = HydraUI.IsMainline and DEFAULT_AFK_MESSAGE or CHAT_MSG_AFK
-local HealthEvent = HydraUI.IsMainline and "UNIT_HEALTH " or "UNIT_HEALTH_FREQUENT "
+local AFK = YxUI.IsMainline and DEFAULT_AFK_MESSAGE or CHAT_MSG_AFK
+local HealthEvent = YxUI.IsMainline and "UNIT_HEALTH " or "UNIT_HEALTH_FREQUENT "
 
 local TestPartyIndex = 0
 local TestRaidIndex = 0
@@ -191,7 +191,7 @@ Methods["Health"] = UnitHealth
 
 Events["Health:Short"] = HealthEvent .. "UNIT_MAXHEALTH"
 Methods["Health:Short"] = function(unit)
-	return HydraUI:ShortValue(UnitHealth(unit))
+	return YxUI:ShortValue(UnitHealth(unit))
 end
 
 Events["HealthPercent"] = HealthEvent .. "UNIT_MAXHEALTH"
@@ -219,7 +219,7 @@ Methods["HealthValues:Short"] = function(unit)
 	local Current = UnitHealth(unit)
 	local Max = UnitHealthMax(unit)
 
-	return HydraUI:ShortValue(Current) .. " / " .. HydraUI:ShortValue(Max)
+	return YxUI:ShortValue(Current) .. " / " .. YxUI:ShortValue(Max)
 end
 
 Events["HealthDeficit"] = HealthEvent .. "UNIT_MAXHEALTH PLAYER_FLAGS_CHANGED UNIT_CONNECTION PARTY_MEMBER_ENABLE PARTY_MEMBER_DISABLE"
@@ -260,7 +260,7 @@ Methods["HealthDeficit:Short"] = function(unit)
 	local Deficit = Max - Current
 
 	if ((Deficit ~= 0) or (Current ~= Max)) then
-		return "-" .. HydraUI:ShortValue(Deficit)
+		return "-" .. YxUI:ShortValue(Deficit)
 	end
 end
 
@@ -293,9 +293,9 @@ Methods["HealthColor"] = function(unit)
 	local Max = UnitHealthMax(unit)
 
 	if (Current and Max > 0) then
-		return "|cFF" .. HydraUI:RGBToHex(GetColor(Current / Max, 0.905, 0.298, 0.235, 0.17, 0.77, 0.4))
+		return "|cFF" .. YxUI:RGBToHex(GetColor(Current / Max, 0.905, 0.298, 0.235, 0.17, 0.77, 0.4))
 	else
-		return "|cFF" .. HydraUI:RGBToHex(0.18, 0.8, 0.443)
+		return "|cFF" .. YxUI:RGBToHex(0.18, 0.8, 0.443)
 	end
 end
 
@@ -309,7 +309,7 @@ end
 Events["Power:Short"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_POWER_UPDATE"
 Methods["Power:Short"] = function(unit)
 	if (UnitPower(unit) ~= 0) then
-		return HydraUI:ShortValue(UnitPower(unit))
+		return YxUI:ShortValue(UnitPower(unit))
 	end
 end
 
@@ -329,7 +329,7 @@ Methods["PowerValues:Short"] = function(unit)
 	local Max = UnitPowerMax(unit)
 
 	if (Max ~= 0) then
-		return HydraUI:ShortValue(Current) .. " / " .. HydraUI:ShortValue(Max)
+		return YxUI:ShortValue(Current) .. " / " .. YxUI:ShortValue(Max)
 	end
 end
 
@@ -344,8 +344,8 @@ Events["PowerColor"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_POWER_UPDATE UNIT
 Methods["PowerColor"] = function(unit)
 	local PowerType, PowerToken = UnitPowerType(unit)
 
-	if HydraUI.PowerColors[PowerToken] then
-		return format("|cFF%s", HydraUI.PowerColors[PowerToken].Hex)
+	if YxUI.PowerColors[PowerToken] then
+		return format("|cFF%s", YxUI.PowerColors[PowerToken].Hex)
 	else
 		return "|cFFFFFFFF"
 	end
@@ -439,20 +439,20 @@ Methods["NameColor"] = function(unit)
 		local _, Class = UnitClass(unit)
 
 		if Class then
-			local Color = HydraUI.ClassColors[Class]
+			local Color = YxUI.ClassColors[Class]
 
 			if Color then
-				return "|cFF"..HydraUI:RGBToHex(Color[1], Color[2], Color[3])
+				return "|cFF"..YxUI:RGBToHex(Color[1], Color[2], Color[3])
 			end
 		end
 	else
 		local Reaction = UnitReaction(unit, "player")
 
 		if Reaction then
-			local Color = HydraUI.ReactionColors[Reaction]
+			local Color = YxUI.ReactionColors[Reaction]
 
 			if Color then
-				return "|cFF"..HydraUI:RGBToHex(Color[1], Color[2], Color[3])
+				return "|cFF"..YxUI:RGBToHex(Color[1], Color[2], Color[3])
 			end
 		end
 	end
@@ -463,10 +463,10 @@ Methods["Reaction"] = function(unit)
 	local Reaction = UnitReaction(unit, "player")
 
 	if Reaction then
-		local Color = HydraUI.ReactionColors[Reaction]
+		local Color = YxUI.ReactionColors[Reaction]
 
 		if Color then
-			return "|cFF"..HydraUI:RGBToHex(Color[1], Color[2], Color[3])
+			return "|cFF"..YxUI:RGBToHex(Color[1], Color[2], Color[3])
 		end
 	end
 end
@@ -476,12 +476,12 @@ Methods["LevelColor"] = function(unit)
 	local Level = UnitLevel(unit)
 	local Color = GetQuestDifficultyColor(Level)
 
-	return "|cFF" .. HydraUI:RGBToHex(Color.r, Color.g, Color.b)
+	return "|cFF" .. YxUI:RGBToHex(Color.r, Color.g, Color.b)
 end
 
 Events["PetColor"] = "UNIT_HAPPINESS UNIT_LEVEL PLAYER_LEVEL_UP UNIT_PET UNIT_FACTION"
 Methods["PetColor"] = function(unit)
-	if (HydraUI.UserClass == "HUNTER") then
+	if (YxUI.UserClass == "HUNTER") then
 		return Methods["HappinessColor"](unit)
 	else
 		return Methods["Reaction"](unit)
@@ -494,10 +494,10 @@ Methods["HappinessColor"] = function(unit)
 		local Happiness = GetPetHappiness()
 
 		if Happiness then
-			local Color = HydraUI.HappinessColors[Happiness]
+			local Color = YxUI.HappinessColors[Happiness]
 
 			if Color then
-				return "|cFF"..HydraUI:RGBToHex(Color[1], Color[2], Color[3])
+				return "|cFF"..YxUI:RGBToHex(Color[1], Color[2], Color[3])
 			end
 		end
 	end
@@ -505,7 +505,7 @@ end
 
 Events["PartyIndex"] = "GROUP_ROSTER_UPDATE"
 Methods["PartyIndex"] = function(unit)
-	local Header = _G["HydraUI Party"]
+	local Header = _G["YxUI Party"]
 
 	if Header and Header:GetAttribute("isTesting") then
 		if TestPartyIndex >= 5 then
@@ -525,7 +525,7 @@ end
 
 Events["RaidIndex"] = "GROUP_ROSTER_UPDATE"
 Methods["RaidIndex"] = function(unit)
-	local Header = _G["HydraUI Raid"]
+	local Header = _G["YxUI Raid"]
 
 	if Header and Header:GetAttribute("isTesting") then
 		if TestRaidIndex >= 25 then

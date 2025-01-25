@@ -1,9 +1,9 @@
 ## Interface: 11505
-## Author: Hydra
-## Version: 2.49
-## Title: |cFFFFC44DHydra|r|cFFFFFFFFUI|r
+## Author: Jai
+## Version: 1.0.0
+## Title: |cFFFFC44DYx|r|cFFFFFFFFUI|r
 ## Notes: Interface replacement for Classic and Season of Mastery
-## SavedVariables: HydraUIProfileData, HydraUIProfiles, HydraUIData, HydraUIGold
+## SavedVariables: YxUIProfileData, YxUIProfiles, YxUIData, YxUIGold
 
 Elements\Initialize.lua
 Elements\Libraries\LibStub.lua

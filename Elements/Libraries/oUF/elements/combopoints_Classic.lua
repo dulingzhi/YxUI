@@ -1,6 +1,6 @@
 local _, ns = ...
 local oUF = ns.oUF
-local HydraUI = ns:get()
+local YxUI = ns:get()
 
 local GetShapeshiftFormID = GetShapeshiftFormID
 local GetComboPoints = GetComboPoints
@@ -70,7 +70,7 @@ local Enable = function(self)
 		self:RegisterEvent("UNIT_POWER_UPDATE", Path, true)
 		self:RegisterEvent("UNIT_TARGET", Path)
 
-		if (HydraUI.UserClass == "DRUID") then
+		if (YxUI.UserClass == "DRUID") then
 			self:RegisterEvent("UPDATE_SHAPESHIFT_FORM", UpdateForm, true)
 			self:RegisterEvent("PLAYER_ENTERING_WORLD", UpdateForm, true)
 		end

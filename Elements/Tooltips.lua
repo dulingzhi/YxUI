@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-local Tooltips = HydraUI:NewModule("Tooltips")
+local Tooltips = YxUI:NewModule("Tooltips")
 
 -- Default settings values
 Defaults["tooltips-enable"] = true
@@ -56,7 +56,7 @@ local GetHappiness
 local GameTooltipStatusBar = GameTooltipStatusBar
 local MyGuild
 
-if (not HydraUI.IsMainline) then
+if (not YxUI.IsMainline) then
 	GetHappiness = GetPetHappiness
 end
 
@@ -90,7 +90,7 @@ function Tooltips:UpdateFonts(tooltip)
 		local Region = select(i, tooltip:GetRegions())
 
 		if (Region:GetObjectType() == "FontString") then
-			HydraUI:SetFontInfo(Region, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
+			YxUI:SetFontInfo(Region, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
 		end
 	end
 
@@ -102,11 +102,11 @@ function Tooltips:UpdateFonts(tooltip)
 			local Suffix = _G[Child:GetName() .. "SuffixText"]
 
 			if Prefix then
-				HydraUI:SetFontInfo(Prefix, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
+				YxUI:SetFontInfo(Prefix, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
 			end
 
 			if Suffix then
-				HydraUI:SetFontInfo(Suffix, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
+				YxUI:SetFontInfo(Suffix, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
 			end
 		end
 	end
@@ -125,7 +125,7 @@ function Tooltips:UpdateFonts(tooltip)
 						local Text = _G[Region:GetName() .. "Text"]
 
 						if Text then
-							HydraUI:SetFontInfo(Text, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
+							YxUI:SetFontInfo(Text, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
 						end
 					end
 				end
@@ -144,7 +144,7 @@ local SetTooltipStyle = function(self)
 	if self.Styled then
 		Tooltips:UpdateFonts(self)
 	else
-		local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+		local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 		local Level = self:GetFrameLevel()
 
 		self.Backdrop = CreateFrame("Frame", nil, self, "BackdropTemplate")
@@ -152,15 +152,15 @@ local SetTooltipStyle = function(self)
 		self.Backdrop:SetPoint("BOTTOMRIGHT", self, 0, 0)
 		self.Backdrop:SetFrameLevel(Level > 1 and Level - 1 or 0)
 		self.Backdrop:SetFrameStrata(self:GetFrameStrata())
-		HydraUI:AddBackdrop(self.Backdrop)
+		YxUI:AddBackdrop(self.Backdrop)
 		self.Backdrop.Outside:SetBackdropColor(R, G, B, (Settings["tooltips-opacity"] / 100))
 
 		if (self == AutoCompleteBox) then
 			for i = 1, AUTOCOMPLETE_MAX_BUTTONS do
-				HydraUI:SetFontInfo(_G["AutoCompleteButton" .. i .. "Text"], Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
+				YxUI:SetFontInfo(_G["AutoCompleteButton" .. i .. "Text"], Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
 			end
 
-			HydraUI:SetFontInfo(AutoCompleteInstructions, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
+			YxUI:SetFontInfo(AutoCompleteInstructions, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
 		end
 
 		Tooltips:UpdateFonts(self)
@@ -178,18 +178,18 @@ local GetUnitColor = function(unit)
 		local Class = select(2, UnitClass(unit))
 
 		if Class then
-			Color = HydraUI.ClassColors[Class]
+			Color = YxUI.ClassColors[Class]
 		end
 	else
 		local Reaction = UnitReaction(unit, "player")
 
 		if Reaction then
-			Color = HydraUI.ReactionColors[Reaction]
+			Color = YxUI.ReactionColors[Reaction]
 		end
 	end
 
 	if Color then
-		return HydraUI:RGBToHex(Color[1], Color[2], Color[3])
+		return YxUI:RGBToHex(Color[1], Color[2], Color[3])
 	else
 		return "FFFFFF"
 	end
@@ -269,18 +269,18 @@ local OnTooltipSetUnit = function(self)
 			Class = ""
 		end
 
-		GameTooltipStatusBar:SetStatusBarColor(HydraUI:HexToRGB(Color))
-		GameTooltipStatusBar.BG:SetVertexColor(HydraUI:HexToRGB(Color))
+		GameTooltipStatusBar:SetStatusBarColor(YxUI:HexToRGB(Color))
+		GameTooltipStatusBar.BG:SetVertexColor(YxUI:HexToRGB(Color))
 
-		if HydraUI.IsMainline then
+		if YxUI.IsMainline then
 			local EffectiveLevel = UnitEffectiveLevel(UnitID)
 
 			if (EffectiveLevel > 0 and EffectiveLevel ~= Level) then
 				local EffectiveColor = GetQuestDifficultyColor(EffectiveLevel)
-				local EffectiveHex = HydraUI:RGBToHex(EffectiveColor.r, EffectiveColor.g, EffectiveColor.b)
+				local EffectiveHex = YxUI:RGBToHex(EffectiveColor.r, EffectiveColor.g, EffectiveColor.b)
 
 				local LevelColor = GetQuestDifficultyColor(Level)
-				local ColorHex = HydraUI:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
+				local ColorHex = YxUI:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
 
 				if (Level == -1) then
 					Level = "??"
@@ -290,7 +290,7 @@ local OnTooltipSetUnit = function(self)
 			end
 		else
 			local LevelColor = GetQuestDifficultyColor(Level)
-			local Hex = HydraUI:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
+			local Hex = YxUI:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
 
 			if (Level == -1) then
 				Level = "??"
@@ -364,15 +364,15 @@ local OnTooltipSetUnit = function(self)
 			self:AddLine(Language["Targeting: |cFF"] .. TargetColor .. UnitName(UnitID .. "target") .. "|r", 1, 1, 1)
 		end
 
-		if ((not HydraUI.IsMainline) and HydraUI.UserClass == "HUNTER" and UnitID == "pet") then
+		if ((not YxUI.IsMainline) and YxUI.UserClass == "HUNTER" and UnitID == "pet") then
 			local Level = GetHappiness()
 
 			if Level then
-				local Color = HydraUI.HappinessColors[Level]
+				local Color = YxUI.HappinessColors[Level]
 
 				if Color then
 					self:AddLine(" ")
-					self:AddDoubleLine(Language["Happiness:"], format("|cFF%s%s|r", HydraUI:RGBToHex(Color[1], Color[2], Color[3]), Tooltips.HappinessLevels[Level]))
+					self:AddDoubleLine(Language["Happiness:"], format("|cFF%s%s|r", YxUI:RGBToHex(Color[1], Color[2], Color[3]), Tooltips.HappinessLevels[Level]))
 				end
 			end
 		end
@@ -396,7 +396,7 @@ local OnTooltipSetItem = function(self)
 		return
 	end
 
-	if (not HydraUI.IsMainline) and Settings["tooltips-show-price"] then
+	if (not YxUI.IsMainline) and Settings["tooltips-show-price"] then
 		local Price = select(11, GetItemInfo(Link))
 
 		if Price then
@@ -535,7 +535,7 @@ function Tooltips:AddHooks()
 		self.Handled[i]:HookScript("OnShow", SetTooltipStyle)
 	end
 
-	if (TooltipDataProcessor and not HydraUI.IsCata) then
+	if (TooltipDataProcessor and not YxUI.IsCata) then
 		TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit)
 		TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetItem)
 		TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, OnTooltipSetSpell)
@@ -564,8 +564,8 @@ local OnValueChanged = function(self)
 
 	local Color = GetUnitColor(Unit)
 
-	self:SetStatusBarColor(HydraUI:HexToRGB(Color))
-	self.BG:SetVertexColor(HydraUI:HexToRGB(Color))
+	self:SetStatusBarColor(YxUI:HexToRGB(Color))
+	self.BG:SetVertexColor(YxUI:HexToRGB(Color))
 
 	if (not Settings["tooltips-show-health-text"]) then
 		return
@@ -589,7 +589,7 @@ local OnValueChanged = function(self)
 		elseif UnitIsGhost(Unit) then
 			self.HealthValue:SetText("|cFFEEEEEE" .. Language["Ghost"] .. "|r")
 		else
-			self.HealthValue:SetText(format("%s / %s", HydraUI:ShortValue(Current), HydraUI:ShortValue(Max)))
+			self.HealthValue:SetText(format("%s / %s", YxUI:ShortValue(Current), YxUI:ShortValue(Max)))
 		end
 
 		self.HealthPercent:SetText(format("%s%%", floor((Current / Max * 100 + 0.05) * 10) / 10))
@@ -607,8 +607,8 @@ local OnShow = function(self)
 end
 
 function Tooltips:UpdateStatusBarFonts()
-	HydraUI:SetFontInfo(GameTooltipStatusBar.HealthValue, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
-	HydraUI:SetFontInfo(GameTooltipStatusBar.HealthPercent, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
+	YxUI:SetFontInfo(GameTooltipStatusBar.HealthValue, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
+	YxUI:SetFontInfo(GameTooltipStatusBar.HealthPercent, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
 end
 
 function Tooltips:StyleStatusBar()
@@ -631,7 +631,7 @@ function Tooltips:StyleStatusBar()
 	GameTooltipStatusBar.Backdrop:SetPoint("TOPLEFT", GameTooltipStatusBar, -Adjust, Adjust)
 	GameTooltipStatusBar.Backdrop:SetPoint("BOTTOMRIGHT", GameTooltipStatusBar, Adjust, -Adjust)
 
-	HydraUI:AddBackdrop(GameTooltipStatusBar.Backdrop)
+	YxUI:AddBackdrop(GameTooltipStatusBar.Backdrop)
 	GameTooltipStatusBar.Backdrop.Outside:SetFrameLevel(GameTooltip:GetFrameLevel() - 1)
 
 	GameTooltipStatusBar.BG2 = GameTooltipStatusBar:CreateTexture(nil, "BACKGROUND")
@@ -640,12 +640,12 @@ function Tooltips:StyleStatusBar()
 	GameTooltipStatusBar.BG2:SetVertexColor(0, 0, 0)
 
 	GameTooltipStatusBar.HealthValue = GameTooltipStatusBar:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(GameTooltipStatusBar.HealthValue, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
+	YxUI:SetFontInfo(GameTooltipStatusBar.HealthValue, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
 	GameTooltipStatusBar.HealthValue:SetPoint("LEFT", GameTooltipStatusBar, 3, 0)
 	GameTooltipStatusBar.HealthValue:SetJustifyH("LEFT")
 
 	GameTooltipStatusBar.HealthPercent = GameTooltipStatusBar:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(GameTooltipStatusBar.HealthPercent, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
+	YxUI:SetFontInfo(GameTooltipStatusBar.HealthPercent, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
 	GameTooltipStatusBar.HealthPercent:SetPoint("RIGHT", GameTooltipStatusBar, -3, 0)
 	GameTooltipStatusBar.HealthPercent:SetJustifyH("RIGHT")
 
@@ -654,27 +654,27 @@ function Tooltips:StyleStatusBar()
 end
 
 local ItemRefCloseOnEnter = function(self)
-	self.Cross:SetVertexColor(HydraUI:HexToRGB("C0392B"))
+	self.Cross:SetVertexColor(YxUI:HexToRGB("C0392B"))
 end
 
 local ItemRefCloseOnLeave = function(self)
-	self.Cross:SetVertexColor(HydraUI:HexToRGB("EEEEEE"))
+	self.Cross:SetVertexColor(YxUI:HexToRGB("EEEEEE"))
 end
 
 local ItemRefCloseOnMouseUp = function(self)
-	self.Texture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-widget-bright-color"]))
+	self.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-widget-bright-color"]))
 
 	ItemRefTooltip:Hide()
 end
 
 local ItemRefCloseOnMouseDown = function(self)
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-widget-bright-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-widget-bright-color"])
 
 	self.Texture:SetVertexColor(R * 0.5, G * 0.5, B * 0.5)
 end
 
 function Tooltips:SkinItemRef()
-	if HydraUI.IsMainline then
+	if YxUI.IsMainline then
 		ItemRefTooltip.CloseButton:Hide()
 	else
 		ItemRefCloseButton:Hide()
@@ -684,7 +684,7 @@ function Tooltips:SkinItemRef()
 	local CloseButton = CreateFrame("Frame", nil, ItemRefTooltip, "BackdropTemplate")
 	CloseButton:SetSize(20, 20)
 	CloseButton:SetPoint("TOPRIGHT", ItemRefTooltip, -3, -4)
-	CloseButton:SetBackdrop(HydraUI.BackdropAndBorder)
+	CloseButton:SetBackdrop(YxUI.BackdropAndBorder)
 	CloseButton:SetBackdropColor(0, 0, 0, 0)
 	CloseButton:SetBackdropBorderColor(0, 0, 0)
 	CloseButton:SetScript("OnEnter", ItemRefCloseOnEnter)
@@ -696,13 +696,13 @@ function Tooltips:SkinItemRef()
 	CloseButton.Texture:SetPoint("TOPLEFT", CloseButton, 1, -1)
 	CloseButton.Texture:SetPoint("BOTTOMRIGHT", CloseButton, -1, 1)
 	CloseButton.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-	CloseButton.Texture:SetVertexColor(HydraUI:HexToRGB(Settings["ui-widget-bright-color"]))
+	CloseButton.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-widget-bright-color"]))
 
 	CloseButton.Cross = CloseButton:CreateTexture(nil, "OVERLAY")
 	CloseButton.Cross:SetPoint("CENTER", CloseButton, 0, 0)
 	CloseButton.Cross:SetSize(16, 16)
 	CloseButton.Cross:SetTexture(Assets:GetTexture("Close"))
-	CloseButton.Cross:SetVertexColor(HydraUI:HexToRGB("EEEEEE"))
+	CloseButton.Cross:SetVertexColor(YxUI:HexToRGB("EEEEEE"))
 
 	ItemRefTooltip.NewCloseButton = CloseButton
 end
@@ -729,12 +729,12 @@ function Tooltips:Load()
 	self:SetSize(200, 26)
 
 	if Settings["right-window-enable"] then
-		local Mod = HydraUI:GetModule("Right Window")
+		local Mod = YxUI:GetModule("Right Window")
 		local Offset = Settings["ui-border-thickness"]
 
 		self:SetPoint("BOTTOMLEFT", Mod.TopLeft or Mod.Top, "TOPLEFT", 0, 1 > Offset and -1 or -(Offset + 2))
 	else
-		self:SetPoint("BOTTOMRIGHT", HydraUI.UIParent, -13, 101)
+		self:SetPoint("BOTTOMRIGHT", YxUI.UIParent, -13, 101)
 	end
 
 	self:AddHooks()
@@ -743,7 +743,7 @@ function Tooltips:Load()
 	--self:RegisterEvent("INSPECT_READY")
 	--self:SetScript("OnEvent", self.OnEvent)
 
-	self.Mover = HydraUI:CreateMover(self)
+	self.Mover = YxUI:CreateMover(self)
 
 	--self.Mover.PreMove = function() GameTooltip_SetDefaultAnchor(GameTooltip, self) GameTooltip:AddLine("Example tooltip") GameTooltip:Show() end
 	--self.Mover.PostMove = function() GameTooltip:Hide() end
@@ -765,7 +765,7 @@ local UpdateShowHealthText = function(value)
 end
 
 local UpdateTooltipBackdrop = function(value)
-	local R, G, B = HydraUI:HexToRGB(Settings["ui-window-main-color"])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
 
 	for i = 1, #Tooltips.Handled do
 		if Tooltips.Handled[i].Backdrop then
@@ -774,9 +774,9 @@ local UpdateTooltipBackdrop = function(value)
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Tooltips"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Tooltips"], function(left, right)
 	left:CreateHeader(Language["Enable"])
-	left:CreateSwitch("tooltips-enable", Settings["tooltips-enable"], Language["Enable Tooltips Module"], Language["Enable the HydraUI tooltips module"], ReloadUI):RequiresReload(true)
+	left:CreateSwitch("tooltips-enable", Settings["tooltips-enable"], Language["Enable Tooltips Module"], Language["Enable the YxUI tooltips module"], ReloadUI):RequiresReload(true)
 
 	left:CreateHeader(Language["Health Bar"])
 	left:CreateSwitch("tooltips-show-health", Settings["tooltips-show-health"], Language["Display Health Bar"], Language["Display the tooltip health bar"])

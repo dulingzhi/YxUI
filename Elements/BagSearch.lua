@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local BagSearch = HydraUI:NewModule("Bag Search")
+local BagSearch = YxUI:NewModule("Bag Search")
 
 if (not SetItemSearch) then -- Blizz is adding their bags to all game versions it looks like, this file will be removed soon
 	return

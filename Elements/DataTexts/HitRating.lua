@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetCombatRatingBonus = GetCombatRatingBonus
 local Label = HIT
@@ -14,7 +14,7 @@ end
 local OnEnter = function(self)
 	self:SetTooltip()
 
-	if (HydraUI.UserClass == "HUNTER") then
+	if (YxUI.UserClass == "HUNTER") then
 		GameTooltip:AddLine(format("%s %s", COMBAT_RATING_NAME6, GetCombatRating(CR_HIT_RANGED)))
 		GameTooltip:AddLine(format(CR_HIT_MELEE_TOOLTIP, UnitLevel("player"), GetCombatRatingBonus(CR_HIT_RANGED), GetArmorPenetration(), GetCombatRatingBonus(CR_ARMOR_PENETRATION)), 1, 1, 1)
 	elseif (GetCombatRatingBonus(CR_HIT_SPELL) > GetCombatRatingBonus(CR_HIT_MELEE)) then
@@ -39,7 +39,7 @@ local Update = function(self, event, unit)
 
 	local Rating
 
-	if (HydraUI.UserClass == "HUNTER") then
+	if (YxUI.UserClass == "HUNTER") then
 		Rating = GetCombatRatingBonus(CR_HIT_RANGED)
 	elseif (GetCombatRatingBonus(CR_HIT_SPELL) > GetCombatRatingBonus(CR_HIT_MELEE)) then
 		Rating = GetCombatRatingBonus(CR_HIT_SPELL)
@@ -47,7 +47,7 @@ local Update = function(self, event, unit)
 		Rating = GetCombatRatingBonus(CR_HIT_MELEE)
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.2f%%|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, Rating)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.2f%%|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Rating)
 end
 
 local OnEnable = function(self)
@@ -70,4 +70,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText(Label, OnEnable, OnDisable, Update)
+YxUI:AddDataText(Label, OnEnable, OnDisable, Update)

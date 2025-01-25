@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local Gold = HydraUI:NewModule("Gold")
+local Gold = YxUI:NewModule("Gold")
 
 local GetMoney = GetMoney
 local tinsert = table.insert
@@ -41,7 +41,7 @@ function Gold:GetServerInfo()
 	local Table
 	local Total = 0
 
-	for Name, Value in next, HydraUI.GoldData[HydraUI.UserRealm] do
+	for Name, Value in next, YxUI.GoldData[YxUI.UserRealm] do
 		Table = self:GetTable()
 
 		Table[1] = Name
@@ -60,28 +60,28 @@ end
 function Gold:OnEvent()
 	local CurrentValue = GetMoney()
 
-	SessionChange = SessionChange + (CurrentValue - HydraUI.GoldData[HydraUI.UserRealm][CurrentUser])
+	SessionChange = SessionChange + (CurrentValue - YxUI.GoldData[YxUI.UserRealm][CurrentUser])
 
-	HydraUI.GoldData[HydraUI.UserRealm][CurrentUser] = CurrentValue
+	YxUI.GoldData[YxUI.UserRealm][CurrentUser] = CurrentValue
 end
 
 function Gold:Reset()
-	HydraUIGold = nil
-	HydraUI.GoldData = nil
+	YxUIGold = nil
+	YxUI.GoldData = nil
 
 	self:Load()
 end
 
 function Gold:Load()
-	HydraUI:BindSavedVariable("HydraUIGold", "GoldData")
+	YxUI:BindSavedVariable("YxUIGold", "GoldData")
 
-	if (not HydraUI.GoldData[HydraUI.UserRealm]) then
-		HydraUI.GoldData[HydraUI.UserRealm] = {}
+	if (not YxUI.GoldData[YxUI.UserRealm]) then
+		YxUI.GoldData[YxUI.UserRealm] = {}
 	end
 
-	CurrentUser = string.format("|c%s%s|r", RAID_CLASS_COLORS[HydraUI.UserClass].colorStr, HydraUI.UserName)
+	CurrentUser = string.format("|c%s%s|r", RAID_CLASS_COLORS[YxUI.UserClass].colorStr, YxUI.UserName)
 
-	HydraUI.GoldData[HydraUI.UserRealm][CurrentUser] = GetMoney()
+	YxUI.GoldData[YxUI.UserRealm][CurrentUser] = GetMoney()
 
 	self:RegisterEvent("PLAYER_MONEY")
 	self:SetScript("OnEvent", self.OnEvent)

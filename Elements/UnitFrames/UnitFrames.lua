@@ -1,5 +1,5 @@
 local addon, ns = ...
-local HydraUI, Language, Assets, Settings, Defaults = ns:get()
+local YxUI, Language, Assets, Settings, Defaults = ns:get()
 
 local oUF = ns.oUF or oUF
 
@@ -21,12 +21,12 @@ Defaults["unitframes-font-size"] = 12
 Defaults["unitframes-font-flags"] = ""
 Defaults["unitframes-display-aura-timers"] = true
 
-local UF = HydraUI:NewModule("Unit Frames")
+local UF = YxUI:NewModule("Unit Frames")
 
-HydraUI.UnitFrames = {}
-HydraUI.StyleFuncs = {}
+YxUI.UnitFrames = {}
+YxUI.StyleFuncs = {}
 
-local Hider = CreateFrame("Frame", nil, HydraUI.UIParent, "SecureHandlerStateTemplate")
+local Hider = CreateFrame("Frame", nil, YxUI.UIParent, "SecureHandlerStateTemplate")
 Hider:Hide()
 
 function UF:GetRoleTexCoords(role)
@@ -91,7 +91,7 @@ local AuraOnUpdate = function(self, ela)
 		local Now = (self.Expiration - GetTime())
 
 		if (Now > 0) then
-			self.Time:SetText(HydraUI:AuraFormatTime(Now))
+			self.Time:SetText(YxUI:AuraFormatTime(Now))
 		else
 			self:SetScript("OnUpdate", nil)
 			self.Time:Hide()
@@ -119,11 +119,11 @@ UF.NPThreatPostUpdate = function(self, unit, status, r, g, b)
 	end
 end
 
-if HydraUI.IsClassic then
+if YxUI.IsClassic then
 	local LCD = LibStub("LibClassicDurations")
 	local UnitAura = UnitAura
 
-	LCD:Register("HydraUI")
+	LCD:Register("YxUI")
 
 	UF.PostUpdateIcon = function(self, unit, button, index, position, duration, expiration, debuffType, isStealable)
 		local Name, _, _, _, Duration, Expiration, Caster, _, _, SpellID = UnitAura(unit, index, button.filter)
@@ -239,17 +239,17 @@ UF.PostCreateIcon = function(unit, button)
 
 	button.count:SetPoint("BOTTOMRIGHT", 1, 2)
 	button.count:SetJustifyH("RIGHT")
-	HydraUI:SetFontInfo(button.count, Settings["unitframes-font"], Settings["unitframes-font-size"], "OUTLINE")
+	YxUI:SetFontInfo(button.count, Settings["unitframes-font"], Settings["unitframes-font-size"], "OUTLINE")
 
 	button.Time = button.cd:CreateFontString(nil, "OVERLAY")
-	HydraUI:SetFontInfo(button.Time, Settings["unitframes-font"], Settings["unitframes-font-size"], "OUTLINE")
+	YxUI:SetFontInfo(button.Time, Settings["unitframes-font"], Settings["unitframes-font-size"], "OUTLINE")
 	button.Time:SetPoint("TOPLEFT", -1, -1)
 	button.Time:SetJustifyH("LEFT")
 
 	button.DebuffType = CreateFrame("Frame", nil, button, "BackdropTemplate")
 	button.DebuffType:SetPoint("TOPLEFT", 1, -1)
 	button.DebuffType:SetPoint("BOTTOMRIGHT", -1, 1)
-	button.DebuffType:SetBackdrop(HydraUI.Outline)
+	button.DebuffType:SetBackdrop(YxUI.Outline)
 	button.DebuffType:SetFrameLevel(button:GetFrameLevel() + 3)
 
 	if (not Settings["unitframes-display-aura-timers"]) then
@@ -261,56 +261,56 @@ end
 
 UF.PostCastStart = function(self, unit)
 	if self.notInterruptible then
-		self:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-casting-uninterruptible"]))
-		self.bg:SetVertexColor(HydraUI:HexToRGB(Settings["color-casting-uninterruptible"]))
+		self:SetStatusBarColor(YxUI:HexToRGB(Settings["color-casting-uninterruptible"]))
+		self.bg:SetVertexColor(YxUI:HexToRGB(Settings["color-casting-uninterruptible"]))
 	elseif (self.ClassColor and UnitIsPlayer(unit)) then
 		_, Class = UnitClass(unit)
 
 		if Class then
-			Colors = HydraUI.ClassColors[Class]
+			Colors = YxUI.ClassColors[Class]
 
 			self:SetStatusBarColor(Colors[1], Colors[2], Colors[3])
 			self.bg:SetVertexColor(Colors[1], Colors[2], Colors[3])
 		else
-			self:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-casting-start"]))
-			self.bg:SetVertexColor(HydraUI:HexToRGB(Settings["color-casting-start"]))
+			self:SetStatusBarColor(YxUI:HexToRGB(Settings["color-casting-start"]))
+			self.bg:SetVertexColor(YxUI:HexToRGB(Settings["color-casting-start"]))
 		end
 	else
-		self:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-casting-start"]))
-		self.bg:SetVertexColor(HydraUI:HexToRGB(Settings["color-casting-start"]))
+		self:SetStatusBarColor(YxUI:HexToRGB(Settings["color-casting-start"]))
+		self.bg:SetVertexColor(YxUI:HexToRGB(Settings["color-casting-start"]))
 	end
 end
 
 UF.PostCastInterruptible = function(self)
 	if self.notInterruptible then
-		self:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-casting-uninterruptible"]))
-		self.bg:SetVertexColor(HydraUI:HexToRGB(Settings["color-casting-uninterruptible"]))
+		self:SetStatusBarColor(YxUI:HexToRGB(Settings["color-casting-uninterruptible"]))
+		self.bg:SetVertexColor(YxUI:HexToRGB(Settings["color-casting-uninterruptible"]))
 	elseif (self.ClassColor and UnitIsPlayer(unit)) then
 		_, Class = UnitClass(unit)
 
 		if Class then
-			Colors = HydraUI.ClassColors[Class]
+			Colors = YxUI.ClassColors[Class]
 
 			self:SetStatusBarColor(Colors[1], Colors[2], Colors[3])
 			self.bg:SetVertexColor(Colors[1], Colors[2], Colors[3])
 		else
-			self:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-casting-start"]))
-			self.bg:SetVertexColor(HydraUI:HexToRGB(Settings["color-casting-start"]))
+			self:SetStatusBarColor(YxUI:HexToRGB(Settings["color-casting-start"]))
+			self.bg:SetVertexColor(YxUI:HexToRGB(Settings["color-casting-start"]))
 		end
 	else
-		self:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-casting-start"]))
-		self.bg:SetVertexColor(HydraUI:HexToRGB(Settings["color-casting-start"]))
+		self:SetStatusBarColor(YxUI:HexToRGB(Settings["color-casting-start"]))
+		self.bg:SetVertexColor(YxUI:HexToRGB(Settings["color-casting-start"]))
 	end
 end
 
 UF.PostCastStop = function(self)
-	self:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-casting-stopped"]))
-	self.bg:SetVertexColor(HydraUI:HexToRGB(Settings["color-casting-stopped"]))
+	self:SetStatusBarColor(YxUI:HexToRGB(Settings["color-casting-stopped"]))
+	self.bg:SetVertexColor(YxUI:HexToRGB(Settings["color-casting-stopped"]))
 end
 
 UF.PostCastFail = function(self)
-	self:SetStatusBarColor(HydraUI:HexToRGB(Settings["color-casting-interrupted"]))
-	self.bg:SetVertexColor(HydraUI:HexToRGB(Settings["color-casting-interrupted"]))
+	self:SetStatusBarColor(YxUI:HexToRGB(Settings["color-casting-interrupted"]))
+	self.bg:SetVertexColor(YxUI:HexToRGB(Settings["color-casting-interrupted"]))
 end
 
 local TotemOnUpdate = function(self, elapsed)
@@ -367,7 +367,7 @@ UF.AuraOffsets = {
 	BOTTOM = {0, 0},
 }
 
-if HydraUI.IsMainline then
+if YxUI.IsMainline then
 	UF.BuffIDs = {
 		["DRUID"] = {
 			{774, "TOPLEFT", {0.8, 0.4, 0.8}},      -- Rejuvenation
@@ -419,7 +419,7 @@ if HydraUI.IsMainline then
 
 		}
 	}
-elseif HydraUI.IsCata then
+elseif YxUI.IsCata then
 	UF.BuffIDs = {
 		["DRUID"] = {
 			-- Regrowth
@@ -632,11 +632,11 @@ UF.PostCreateAuraWatchIcon = function(auras, icon)
 end
 
 local UpdatePartyShowRole = function(value)
-	if HydraUI.UnitFrames["party"] then
+	if YxUI.UnitFrames["party"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["party"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["party"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["party"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["party"]:GetChildren())
 
 			if Unit then
 				if value then
@@ -652,64 +652,64 @@ local UpdatePartyShowRole = function(value)
 end
 
 local Style = function(self, unit)
-	if HydraUI.StyleFuncs[unit] then
-		HydraUI.StyleFuncs[unit](self, unit)
+	if YxUI.StyleFuncs[unit] then
+		YxUI.StyleFuncs[unit](self, unit)
 	elseif (find(unit, "raid") and Settings["raid-enable"]) then
-		HydraUI.StyleFuncs["raid"](self, unit)
+		YxUI.StyleFuncs["raid"](self, unit)
 	elseif (find(unit, "raidpet") and Settings["raid-pets-enable"]) then
-		HydraUI.StyleFuncs["raidpet"](self, unit)
+		YxUI.StyleFuncs["raidpet"](self, unit)
 	elseif (find(unit, "partypet") and Settings["party-enable"] and Settings["party-pets-enable"]) then
-		HydraUI.StyleFuncs["partypet"](self, unit)
+		YxUI.StyleFuncs["partypet"](self, unit)
 	elseif (find(unit, "party") and not find(unit, "pet") and Settings["party-enable"]) then
-		HydraUI.StyleFuncs["party"](self, unit)
+		YxUI.StyleFuncs["party"](self, unit)
 	elseif (find(unit, "nameplate") and Settings["nameplates-enable"]) then
-		HydraUI.StyleFuncs["nameplate"](self, unit)
+		YxUI.StyleFuncs["nameplate"](self, unit)
 	elseif find(unit, "boss%d") then
-		HydraUI.StyleFuncs["boss"](self, unit)
+		YxUI.StyleFuncs["boss"](self, unit)
 	end
 end
 
 local UpdateShowPlayerBuffs = function(value)
-	if HydraUI.UnitFrames["player"] then
+	if YxUI.UnitFrames["player"] then
 		if value then
-			HydraUI.UnitFrames["player"]:EnableElement("Auras")
-			HydraUI.UnitFrames["player"]:UpdateAllElements("ForceUpdate")
+			YxUI.UnitFrames["player"]:EnableElement("Auras")
+			YxUI.UnitFrames["player"]:UpdateAllElements("ForceUpdate")
 		else
-			HydraUI.UnitFrames["player"]:DisableElement("Auras")
+			YxUI.UnitFrames["player"]:DisableElement("Auras")
 		end
 	end
 end
 
 local UpdateRaidSortingMethod = function(value)
 	if (value == "CLASS") then
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "DEATHKNIGHT,DEMONHUNTER,DRUID,HUNTER,MAGE,MONK,PALADIN,PRIEST,SHAMAN,WARLOCK,WARRIOR")
-		HydraUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupBy", "CLASS")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "DEATHKNIGHT,DEMONHUNTER,DRUID,HUNTER,MAGE,MONK,PALADIN,PRIEST,SHAMAN,WARLOCK,WARRIOR")
+		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "CLASS")
 	elseif (value == "ROLE") then
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "TANK,HEALER,DAMAGER,NONE")
-		HydraUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupBy", "ASSIGNEDROLE")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "TANK,HEALER,DAMAGER,NONE")
+		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "ASSIGNEDROLE")
 	elseif (value == "NAME") then
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
-		HydraUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupBy", nil)
+		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
+		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", nil)
 	elseif (value == "MTMA") then
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "MAINTANK,MAINASSIST,NONE")
-		HydraUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupBy", "ROLE")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "MAINTANK,MAINASSIST,NONE")
+		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "ROLE")
 	else -- GROUP
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
-		HydraUI.UnitFrames["raid"]:SetAttribute("sortMethod", "INDEX")
-		HydraUI.UnitFrames["raid"]:SetAttribute("groupBy", "GROUP")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
+		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "INDEX")
+		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "GROUP")
 	end
 end
 
 local UpdateRaidShowPower = function(value)
-	if HydraUI.UnitFrames["raid"] then
+	if YxUI.UnitFrames["raid"] then
 		local Unit
 
-		for i = 1, HydraUI.UnitFrames["raid"]:GetNumChildren() do
-			Unit = select(i, HydraUI.UnitFrames["raid"]:GetChildren())
+		for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
+			Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
 
 			if Unit then
 				if value then
@@ -726,11 +726,11 @@ local UpdateRaidShowPower = function(value)
 	end
 end
 
-oUF:RegisterStyle("HydraUI", Style)
+oUF:RegisterStyle("YxUI", Style)
 
 function UF:Load()
 	if Settings["player-enable"] then
-		local Player = oUF:Spawn("player", "HydraUI Player")
+		local Player = oUF:Spawn("player", "YxUI Player")
 
 		if Settings["unitframes-player-enable-power"] and (not Settings["player-move-power"]) then
 			Player:SetSize(Settings["unitframes-player-width"], Settings["unitframes-player-health-height"] + Settings["unitframes-player-power-height"] + 3)
@@ -738,8 +738,8 @@ function UF:Load()
 			Player:SetSize(Settings["unitframes-player-width"], Settings["unitframes-player-health-height"] + 2)
 		end
 
-		Player:SetPoint("TOPRIGHT", HydraUI.UIParent, "CENTER", -68, -281)
-		Player:SetParent(HydraUI.UIParent)
+		Player:SetPoint("TOPRIGHT", YxUI.UIParent, "CENTER", -68, -281)
+		Player:SetParent(YxUI.UIParent)
 
 		if Settings["player-enable-portrait"] then
 			Player:EnableElement("Portrait")
@@ -765,21 +765,21 @@ function UF:Load()
 		end
 
 		if Settings["unitframes-player-enable-castbar"] then
-			Player.CastAnchor:SetPoint("BOTTOM", HydraUI.UIParent, 0, 118)
-			HydraUI:CreateMover(Player.CastAnchor, 2)
+			Player.CastAnchor:SetPoint("BOTTOM", YxUI.UIParent, 0, 118)
+			YxUI:CreateMover(Player.CastAnchor, 2)
 		end
 
-		HydraUI.UnitFrames["player"] = Player
-		HydraUI:CreateMover(Player)
+		YxUI.UnitFrames["player"] = Player
+		YxUI:CreateMover(Player)
 
 		Player:UpdateAllElements("ForceUpdate")
 	end
 
 	if Settings["target-enable"] then
-		local Target = oUF:Spawn("target", "HydraUI Target")
+		local Target = oUF:Spawn("target", "YxUI Target")
 		Target:SetSize(Settings["unitframes-target-width"], Settings["unitframes-target-health-height"] + Settings["unitframes-target-power-height"] + 3)
-		Target:SetPoint("TOPLEFT", HydraUI.UIParent, "CENTER", 68, -281)
-		Target:SetParent(HydraUI.UIParent)
+		Target:SetPoint("TOPLEFT", YxUI.UIParent, "CENTER", 68, -281)
+		Target:SetParent(YxUI.UIParent)
 
 		if Settings["target-enable-portrait"] then
 			Target:EnableElement("Portrait")
@@ -800,51 +800,51 @@ function UF:Load()
 		end
 
 		if Settings["unitframes-target-enable-castbar"] then
-			Target.CastAnchor:SetPoint("BOTTOM", HydraUI.UIParent, 0, 146)
-			HydraUI:CreateMover(Target.CastAnchor, 2)
+			Target.CastAnchor:SetPoint("BOTTOM", YxUI.UIParent, 0, 146)
+			YxUI:CreateMover(Target.CastAnchor, 2)
 		end
 
-		HydraUI.UnitFrames["target"] = Target
-		HydraUI:CreateMover(Target)
+		YxUI.UnitFrames["target"] = Target
+		YxUI:CreateMover(Target)
 
 		Target:UpdateAllElements("ForceUpdate")
 	end
 
 	if Settings["tot-enable"] then
-		local TargetTarget = oUF:Spawn("targettarget", "HydraUI Target Target")
+		local TargetTarget = oUF:Spawn("targettarget", "YxUI Target Target")
 		TargetTarget:SetSize(Settings["unitframes-targettarget-width"], Settings["unitframes-targettarget-health-height"] + Settings["unitframes-targettarget-power-height"] + 3)
-		TargetTarget:SetParent(HydraUI.UIParent)
+		TargetTarget:SetParent(YxUI.UIParent)
 
 		if Settings["target-enable"] then
-			TargetTarget:SetPoint("TOPRIGHT", HydraUI.UnitFrames["target"], "BOTTOMRIGHT", 0, -2)
+			TargetTarget:SetPoint("TOPRIGHT", YxUI.UnitFrames["target"], "BOTTOMRIGHT", 0, -2)
 		else
-			TargetTarget:SetPoint("TOPRIGHT", HydraUI.UIParent, "CENTER", 68, -341)
+			TargetTarget:SetPoint("TOPRIGHT", YxUI.UIParent, "CENTER", 68, -341)
 		end
 
-		HydraUI.UnitFrames["targettarget"] = TargetTarget
-		HydraUI:CreateMover(TargetTarget)
+		YxUI.UnitFrames["targettarget"] = TargetTarget
+		YxUI:CreateMover(TargetTarget)
 	end
 
 	if Settings["pet-enable"] then
-		local Pet = oUF:Spawn("pet", "HydraUI Pet")
+		local Pet = oUF:Spawn("pet", "YxUI Pet")
 		Pet:SetSize(Settings["unitframes-pet-width"], Settings["unitframes-pet-health-height"] + Settings["unitframes-pet-power-height"] + 3)
-		Pet:SetParent(HydraUI.UIParent)
+		Pet:SetParent(YxUI.UIParent)
 
 		if Settings["player-enable"] then
-			Pet:SetPoint("TOPLEFT", HydraUI.UnitFrames["player"], "BOTTOMLEFT", 0, -2)
+			Pet:SetPoint("TOPLEFT", YxUI.UnitFrames["player"], "BOTTOMLEFT", 0, -2)
 		else
-			Pet:SetPoint("TOPLEFT", HydraUI.UIParent, "CENTER", -68, -341)
+			Pet:SetPoint("TOPLEFT", YxUI.UIParent, "CENTER", -68, -341)
 		end
 
-		HydraUI.UnitFrames["pet"] = Pet
-		HydraUI:CreateMover(Pet)
+		YxUI.UnitFrames["pet"] = Pet
+		YxUI:CreateMover(Pet)
 	end
 
 	if Settings["focus-enable"] then
-		local Focus = oUF:Spawn("focus", "HydraUI Focus")
+		local Focus = oUF:Spawn("focus", "YxUI Focus")
 		Focus:SetSize(Settings["unitframes-focus-width"], Settings["unitframes-focus-health-height"] + Settings["unitframes-focus-power-height"] + 3)
-		Focus:SetPoint("RIGHT", HydraUI.UIParent, "CENTER", -68, 304)
-		Focus:SetParent(HydraUI.UIParent)
+		Focus:SetPoint("RIGHT", YxUI.UIParent, "CENTER", -68, 304)
+		Focus:SetParent(YxUI.UIParent)
 
 		if Settings["focus-enable-buffs"] then
 			Focus:EnableElement("Auras")
@@ -852,25 +852,25 @@ function UF:Load()
 			Focus:DisableElement("Auras")
 		end
 
-		HydraUI.UnitFrames["focus"] = Focus
-		HydraUI:CreateMover(Focus)
+		YxUI.UnitFrames["focus"] = Focus
+		YxUI:CreateMover(Focus)
 	end
 
 	if Settings["unitframes-boss-enable"] then
 		for i = 1, 8 do
-			local Boss = oUF:Spawn("boss" .. i, "HydraUI Boss " .. i)
+			local Boss = oUF:Spawn("boss" .. i, "YxUI Boss " .. i)
 			Boss:SetSize(Settings["unitframes-boss-width"], Settings["unitframes-boss-health-height"] + Settings["unitframes-boss-power-height"] + 3)
-			Boss:SetParent(HydraUI.UIParent)
+			Boss:SetParent(YxUI.UIParent)
 
 			if (i == 1) then
-				Boss:SetPoint("LEFT", HydraUI.UIParent, 300, 200)
+				Boss:SetPoint("LEFT", YxUI.UIParent, 300, 200)
 			else
-				Boss:SetPoint("TOP", HydraUI.UnitFrames["boss" .. (i-1)], "BOTTOM", 0, -28) -- -2
+				Boss:SetPoint("TOP", YxUI.UnitFrames["boss" .. (i-1)], "BOTTOM", 0, -28) -- -2
 			end
 
-			HydraUI:CreateMover(Boss)
+			YxUI:CreateMover(Boss)
 
-			HydraUI.UnitFrames["boss" .. i] = Boss
+			YxUI.UnitFrames["boss" .. i] = Boss
 		end
 	end
 
@@ -892,7 +892,7 @@ function UF:Load()
 			YOffset = Settings["party-spacing"]
 		end
 
-		local Party = oUF:SpawnHeader("HydraUI Party", nil, "party,solo",
+		local Party = oUF:SpawnHeader("YxUI Party", nil, "party,solo",
 			"initial-width", Settings["party-width"],
 			"initial-height", (Settings["party-health-height"] + Settings["party-power-height"] + 3),
 			"isTesting", false,
@@ -911,18 +911,18 @@ function UF:Load()
 			]]
 		)
 
-		self.PartyAnchor = CreateFrame("Frame", "HydraUI Party Anchor", HydraUI.UIParent)
+		self.PartyAnchor = CreateFrame("Frame", "YxUI Party Anchor", YxUI.UIParent)
 		self.PartyAnchor:SetSize((5 * Settings["party-width"] + (4 * Settings["party-spacing"])), (Settings["party-health-height"] + Settings["party-power-height"]) + 3)
-		self.PartyAnchor:SetPoint("BOTTOMLEFT", HydraUIChatFrameTop, "TOPLEFT", -3, 5)
+		self.PartyAnchor:SetPoint("BOTTOMLEFT", YxUIChatFrameTop, "TOPLEFT", -3, 5)
 
 		Party:SetPoint("BOTTOMLEFT", self.PartyAnchor, 0, 0)
-		Party:SetParent(HydraUI.UIParent)
+		Party:SetParent(YxUI.UIParent)
 
-		HydraUI.UnitFrames["party"] = Party
+		YxUI.UnitFrames["party"] = Party
 
 		--UpdatePartyShowRole(Settings["party-show-role"])
 
-		HydraUI:CreateMover(self.PartyAnchor)
+		YxUI:CreateMover(self.PartyAnchor)
 
 		if Settings["party-pets-enable"] then
 			local XOffset = 0
@@ -942,7 +942,7 @@ function UF:Load()
 				YOffset = Settings["party-spacing"]
 			end
 
-			local PartyPet = oUF:SpawnHeader("HydraUI Party Pets", "SecureGroupPetHeaderTemplate", "party,solo",
+			local PartyPet = oUF:SpawnHeader("YxUI Party Pets", "SecureGroupPetHeaderTemplate", "party,solo",
 				"initial-width", Settings["party-pets-width"],
 				"initial-height", (Settings["party-pets-health-height"] + 2),
 				"showSolo", Settings["party-show-solo"],
@@ -960,21 +960,21 @@ function UF:Load()
 				]]
 			)
 
-			self.PartyPetAnchor = CreateFrame("Frame", "HydraUI Party Pet Anchor", HydraUI.UIParent)
+			self.PartyPetAnchor = CreateFrame("Frame", "YxUI Party Pet Anchor", YxUI.UIParent)
 			self.PartyPetAnchor:SetSize((5 * Settings["party-width"] + (4 * Settings["party-spacing"])), Settings["party-pets-health-height"] + 2)
 			self.PartyPetAnchor:SetPoint("TOPLEFT", self.PartyAnchor, "BOTTOMLEFT", 0, -2)
 
 			PartyPet:SetPoint("TOPLEFT", self.PartyPetAnchor, 0, 0)
-			PartyPet:SetParent(HydraUI.UIParent)
+			PartyPet:SetParent(YxUI.UIParent)
 
-			HydraUI:CreateMover(self.PartyPetAnchor)
+			YxUI:CreateMover(self.PartyPetAnchor)
 
-			HydraUI.UnitFrames["party-pets"] = PartyPet
+			YxUI.UnitFrames["party-pets"] = PartyPet
 		end
 	end
 
 	if Settings["raid-enable"] then
-		local Raid = oUF:SpawnHeader("HydraUI Raid", nil, "raid,solo",
+		local Raid = oUF:SpawnHeader("YxUI Raid", nil, "raid,solo",
 			"initial-width", Settings["raid-width"],
 			"initial-height", (Settings["raid-health-height"] + Settings["raid-power-height"] + 3),
 			"isTesting", false,
@@ -1000,10 +1000,10 @@ function UF:Load()
 		local UnitHeight = (Settings["raid-health-height"] + Settings["raid-power-height"]) + 1
 		local MaxSize = floor(40 / Settings["raid-max-columns"])
 
-		self.RaidAnchor = CreateFrame("Frame", "HydraUI Raid Anchor", HydraUI.UIParent)
+		self.RaidAnchor = CreateFrame("Frame", "YxUI Raid Anchor", YxUI.UIParent)
 		self.RaidAnchor:SetWidth((MaxSize * Settings["raid-width"] + (MaxSize * Settings["raid-x-offset"] - 2)))
 		self.RaidAnchor:SetHeight(UnitHeight * (Settings["raid-max-columns"] + 1) + (Settings["raid-y-offset"] * (Settings["raid-max-columns"] - 1)))
-		self.RaidAnchor:SetPoint("BOTTOMLEFT", HydraUIChatFrameTop, "TOPLEFT", -3, 10)
+		self.RaidAnchor:SetPoint("BOTTOMLEFT", YxUIChatFrameTop, "TOPLEFT", -3, 10)
 
 		if CompactRaidFrameContainer then
 			CompactRaidFrameContainer:UnregisterAllEvents()
@@ -1014,16 +1014,16 @@ function UF:Load()
 		end
 
 		Raid:SetPoint("BOTTOMLEFT", self.RaidAnchor, 0, 0)
-		Raid:SetParent(HydraUI.UIParent)
+		Raid:SetParent(YxUI.UIParent)
 
-		HydraUI:CreateMover(self.RaidAnchor)
+		YxUI:CreateMover(self.RaidAnchor)
 
-		HydraUI.UnitFrames["raid"] = Raid
+		YxUI.UnitFrames["raid"] = Raid
 
 		UpdateRaidSortingMethod(Settings["raid-sorting-method"])
 
 		if Settings["raid-pets-enable"] then
-			local RaidPet = oUF:SpawnHeader("HydraUI Raid Pets", "SecureGroupPetHeaderTemplate", "raid,solo",
+			local RaidPet = oUF:SpawnHeader("YxUI Raid Pets", "SecureGroupPetHeaderTemplate", "raid,solo",
 			"initial-width", Settings["raid-width"],
 			"initial-height", (Settings["raid-pets-health-height"] + 2),
 			"isTesting", false,
@@ -1046,17 +1046,17 @@ function UF:Load()
 			]]
 			)
 
-			self.RaidPetAnchor = CreateFrame("Frame", "HydraUI Raid Pet Anchor", HydraUI.UIParent)
+			self.RaidPetAnchor = CreateFrame("Frame", "YxUI Raid Pet Anchor", YxUI.UIParent)
 			self.RaidPetAnchor:SetWidth((floor(40 / Settings["raid-max-columns"]) * Settings["raid-width"] + (floor(40 / Settings["raid-max-columns"]) * Settings["raid-x-offset"] - 2)))
 			self.RaidPetAnchor:SetHeight(Settings["raid-pets-health-height"] * (Settings["raid-max-columns"] + (Settings["raid-y-offset"])) - 1)
 			self.RaidPetAnchor:SetPoint("BOTTOMLEFT", self.RaidAnchor, "TOPLEFT", 0, 0)
 
-			HydraUI:CreateMover(self.RaidPetAnchor)
+			YxUI:CreateMover(self.RaidPetAnchor)
 
 			RaidPet:SetPoint("TOPLEFT", self.RaidPetAnchor, 0, 0)
-			RaidPet:SetParent(HydraUI.UIParent)
+			RaidPet:SetParent(YxUI.UIParent)
 
-			HydraUI.UnitFrames["raid-pets"] = RaidPet
+			YxUI.UnitFrames["raid-pets"] = RaidPet
 		end
 	end
 
@@ -1069,7 +1069,7 @@ function UF:Load()
 	end
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Unit Frames"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Unit Frames"], function(left, right)
 	left:CreateHeader(Language["Font"])
 	left:CreateDropdown("unitframes-font", Settings["unitframes-font"], Assets:GetFontList(), Language["Font"], Language["Set the font of the unit frames"], nil, "Font")
 	left:CreateSlider("unitframes-font-size", Settings["unitframes-font-size"], 8, 32, 1, Language["Font Size"], Language["Set the font size of the unit frames"])
@@ -1079,12 +1079,12 @@ HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Unit Frames"]
 	right:CreateSwitch("unitframes-display-aura-timers", Settings["unitframes-display-aura-timers"], Language["Display Aura Timers"], Language["Display the timer on unit frame auras"], ReloadUI):RequiresReload(true)
 end)
 
---/run HydraUIFakeBosses()
-HydraUIFakeBosses = function()
+--/run YxUIFakeBosses()
+YxUIFakeBosses = function()
 	local Boss
 
 	for i = 1, 8 do
-		Boss = HydraUI.UnitFrames["boss"..i]
+		Boss = YxUI.UnitFrames["boss"..i]
 
 		if (not Boss:IsShown()) then
 			Boss.unit = "player"

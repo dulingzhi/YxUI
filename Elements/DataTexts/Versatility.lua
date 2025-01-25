@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local CR_VERSATILITY_DAMAGE_DONE = CR_VERSATILITY_DAMAGE_DONE
 local GetCombatRating = GetCombatRating
@@ -20,7 +20,7 @@ local OnEnter = function(self)
 	local DamageReduction = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_TAKEN) + GetVersatilityBonus(CR_VERSATILITY_DAMAGE_TAKEN)
 
 	GameTooltip:AddLine(Label, 1, 1, 1)
-	GameTooltip:AddLine(format(CR_VERSATILITY_TOOLTIP, DamageBonus, DamageReduction, HydraUI:Comma(Versatility), DamageBonus, DamageReduction), nil, nil, nil, true)
+	GameTooltip:AddLine(format(CR_VERSATILITY_TOOLTIP, DamageBonus, DamageReduction, YxUI:Comma(Versatility), DamageBonus, DamageReduction), nil, nil, nil, true)
 
 	GameTooltip:Show()
 end
@@ -34,7 +34,7 @@ local Update = function(self, event, unit)
 		return
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.02f%%|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE) + GetVersatilityBonus(CR_VERSATILITY_DAMAGE_DONE))
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.02f%%|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE) + GetVersatilityBonus(CR_VERSATILITY_DAMAGE_DONE))
 end
 
 local OnEnable = function(self)
@@ -57,4 +57,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Versatility", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Versatility", OnEnable, OnDisable, Update)

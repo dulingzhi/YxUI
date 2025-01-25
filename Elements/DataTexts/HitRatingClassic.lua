@@ -1,4 +1,4 @@
-local HydraUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetHitModifier = GetHitModifier
 local GetSpellHitModifier = GetSpellHitModifier
@@ -27,7 +27,7 @@ local Update = function(self, event, unit)
 		Rating = Hit
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.2f%%|r", Settings["data-text-label-color"], Label, HydraUI.ValueColor, Rating)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%.2f%%|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Rating)
 end
 
 local OnEnable = function(self)
@@ -46,4 +46,4 @@ local OnDisable = function(self)
 	self.Text:SetText("")
 end
 
-HydraUI:AddDataText("Hit", OnEnable, OnDisable, Update)
+YxUI:AddDataText("Hit", OnEnable, OnDisable, Update)

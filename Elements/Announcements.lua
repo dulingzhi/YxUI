@@ -1,6 +1,6 @@
-local HydraUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-local Announcements = HydraUI:NewModule("Announcements")
+local Announcements = YxUI:NewModule("Announcements")
 local EventType, SourceGUID, DestName, SpellID, SpellName
 local InterruptMessage = ACTION_SPELL_INTERRUPT .. " %s's \124cff71d5ff\124Hspell:%d:0\124h[%s]\124h\124r."
 local DispelledMessage = ACTION_SPELL_DISPEL .. " %s's \124cff71d5ff\124Hspell:%d:0\124h[%s]\124h\124r."
@@ -132,7 +132,7 @@ function Announcements:Load()
 	self:SetScript("OnEvent", self.OnEvent)
 end
 
-HydraUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
 	left:CreateHeader(Language["Interrupt Announcements"])
 	left:CreateSwitch("announcements-enable", Settings["announcements-enable"], Language["Enable Announcements"], Language["Announce to the selected channel when you successfully perform an interrupt spell"], ReloadUI):RequiresReload(true)
 	left:CreateDropdown("announcements-channel", Settings["announcements-channel"], {[Language["Self"]] = "SELF", [Language["Say"]] = "SAY", [Language["Group"]] = "GROUP", [Language["Emote"]] = "EMOTE"}, Language["Set Channel"], Language["Set the channel to announce to"])
