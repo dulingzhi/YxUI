@@ -223,30 +223,30 @@ end
 
 -- Backdrops
 YxUI.Backdrop = {
-	bgFile = "Interface\\AddOns\\YxUI\\Media\\Textures\\HydraUIBlank.tga",
+	bgFile = "Interface\\AddOns\\YxUI\\Media\\Textures\\YxUIBlank.tga",
 	insets = {top = 0, left = 0, bottom = 0, right = 0},
 }
 
 YxUI.BackdropAndBorder = {
-	bgFile = "Interface\\AddOns\\YxUI\\Media\\Textures\\HydraUIBlank.tga",
-	edgeFile = "Interface\\AddOns\\YxUI\\Media\\Textures\\HydraUIBlank.tga",
+	bgFile = "Interface\\AddOns\\YxUI\\Media\\Textures\\YxUIBlank.tga",
+	edgeFile = "Interface\\AddOns\\YxUI\\Media\\Textures\\YxUIBlank.tga",
 	edgeSize = 1,
 	insets = {top = 0, left = 0, bottom = 0, right = 0},
 }
 
 YxUI.Outline = {
-	edgeFile = "Interface\\AddOns\\YxUI\\Media\\Textures\\HydraUIBlank.tga",
+	edgeFile = "Interface\\AddOns\\YxUI\\Media\\Textures\\YxUIBlank.tga",
 	edgeSize = 1,
 	insets = {left = 0, right = 0, top = 0, bottom = 0},
 }
 
 local Outside = {
-	edgeFile = "Interface\\AddOns\\YxUI\\Media\\Textures\\HydraUIBlank.tga",
+	edgeFile = "Interface\\AddOns\\YxUI\\Media\\Textures\\YxUIBlank.tga",
 }
 
 local Inside = {
-	bgFile = "Interface\\AddOns\\YxUI\\Media\\Textures\\HydraUIBlank.tga",
-	edgeFile = "Interface\\AddOns\\YxUI\\Media\\Textures\\HydraUIBlank.tga",
+	bgFile = "Interface\\AddOns\\YxUI\\Media\\Textures\\YxUIBlank.tga",
+	edgeFile = "Interface\\AddOns\\YxUI\\Media\\Textures\\YxUIBlank.tga",
 }
 
 function YxUI:AddBackdrop(frame, texture)
