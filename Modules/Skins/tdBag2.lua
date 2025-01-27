@@ -1,15 +1,13 @@
-local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
-
-if not IsAddOnLoaded("tdBag2") or not _G.tdBag2 then return end
+local Y, L, A, C, D = select(2, ...):get()
 
 local function skin(self)
     self.fixedWidth = self.fixedWidth - 22
     self.fixedHeight = self.fixedHeight - 15
 
-    T.SkinFrame(self, true)
+    Y.SkinFrame(self, true)
 
     do
-        self.OwnerSelector:SkinButton()
+        -- self.OwnerSelector:SkinButton()
         self.OwnerSelector:SetSize(20, 20)
         self.OwnerSelector:SetPoint('TOPLEFT', 2, -2)
         local icon = self.OwnerSelector:CreateTexture(nil, "ARTWORK")
@@ -18,7 +16,7 @@ local function skin(self)
         hooksecurefunc(self.OwnerSelector, "UpdateIcon", function()
             icon:SetTexture(self.portrait:GetTexture())
             icon:SetTexCoord(self.portrait:GetTexCoord())
-            icon:SkinIcon()
+            -- icon:SkinIcon()
         end)
     end
 
@@ -31,7 +29,7 @@ local function skin(self)
         for _, button in ipairs({ self.BagFrame:GetChildren() }) do
             local obj = button.Icon or button:GetNormalTexture()
             local tex = obj and obj:GetTexture()
-            button:SkinButton()
+            -- button:SkinButton()
             local icon = button:CreateTexture(nil, "ARTWORK")
             icon:SetPoint('CENTER')
             icon:SetTexture(tex)
@@ -49,7 +47,7 @@ local function skin(self)
         end
     end)
 
-    T.SkinEditBox(self.SearchBox)
+    -- T.SkinEditBox(self.SearchBox)
     self.SearchBox:SetHeight(20)
 
     hooksecurefunc(self, 'PlaceSearchBox', function()
@@ -70,13 +68,13 @@ local function skin(self)
 
     self.PluginFrame:SetPoint('TOPRIGHT', -2, -31)
     hooksecurefunc(self.PluginFrame, 'CreatePluginButton', function(f, plugin)
-        f.pluginButtons[plugin.key]:SkinButton()
+        -- f.pluginButtons[plugin.key]:SkinButton()
         f.pluginButtons[plugin.key].texture:SetAlpha(0)
         local icon = f.pluginButtons[plugin.key]:CreateTexture(nil, "ARTWORK")
         icon:SetPoint('CENTER')
         icon:SetSize(22, 22)
         icon:SetTexture(plugin.icon)
-        icon:SkinIcon()
+        -- icon:SkinIcon()
     end)
 
     self.Inset:SetPoint('TOPLEFT', 2, -60)
@@ -90,7 +88,7 @@ local function skin(self)
         if f.LeftSeparator then
             f.LeftSeparator:SetAlpha(0)
         end
-        f:SetTemplate("Overlay")
+        -- f:SetTemplate("Overlay")
     end
 
     skinbg(self.MoneyFrame)
@@ -99,8 +97,12 @@ local function skin(self)
     self.TokenFrame:SetPoint('BOTTOMLEFT', 2, 1)
 end
 
-hooksecurefunc(_G.tdBag2, "CreateFrame", function(self, bagId)
-    if bagId == "bag" or bagId == "bank" then
-        skin(self.frames[bagId])
-    end
-end)
+local function SetupUi()
+    hooksecurefunc(_G.tdBag2, "CreateFrame", function(self, bagId)
+        if bagId == "bag" or bagId == "bank" then
+            skin(self.frames[bagId])
+        end
+    end)
+end
+
+Y.Skin:Add("tdBag2", SetupUi)

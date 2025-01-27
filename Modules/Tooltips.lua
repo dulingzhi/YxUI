@@ -264,6 +264,7 @@ local OnTooltipSetUnit = function(self)
 		local Classification = Tooltips.Classifications[UnitClassification(UnitID)]
 		local Flag = ""
 		local Line
+		local LineText
 
 		if (Class == Name) then
 			Class = ""
@@ -324,8 +325,8 @@ local OnTooltipSetUnit = function(self)
 
 		for i = 2, self:NumLines() do
 			Line = _G["GameTooltipTextLeft" .. i]
-
-			if (Line and Line.GetText and Line:GetText() and find(Line:GetText(), "^" .. LEVEL)) then
+			LineText = Line and Line.GetText and Line:GetText() or ""
+			if (find(LineText, "^" .. LEVEL)) then
 				if Race then
 					Line:SetText(format("%s %s|r %s %s", LEVEL, Level, Race, Class))
 				elseif CreatureType then
@@ -337,9 +338,9 @@ local OnTooltipSetUnit = function(self)
 				else
 					Line:SetText(format("%s %s|r %s", LEVEL, Level, Class))
 				end
-			elseif (Line and find(Line:GetText(), PVP)) then
+			elseif (find(LineText, PVP)) then
 				Line:SetText(format("|cFFEE4D4D%s|r", PVP))
-			elseif Line and Guild and find(Line:GetText(), Guild) then
+			elseif Guild and find(LineText, Guild) then
 				if (Guild == MyGuild) then
 					if Settings["tooltips-display-rank"] then
 						Guild = format("|cFF5DADE2<%s>|r (%s)", Guild, Rank)

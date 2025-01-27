@@ -6,6 +6,7 @@
 ## SavedVariables: YxUIProfileData, YxUIProfiles, YxUIData, YxUIGold
 
 Modules\Initialize.lua
+Modules\API.lua
 Libs\LibStub.lua
 Libs\CallbackHandler-1.0.lua
 Libs\LibClassicCasterino.lua
@@ -117,4 +118,4 @@ Modules\PVPObjectives.lua
 Modules\Credit.lua
 Modules\Debug.lua
 Modules\Skin.lua
-Skins\Load.xml
+Modules\Skins\Load.xml
