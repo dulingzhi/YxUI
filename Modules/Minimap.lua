@@ -1,21 +1,21 @@
-local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local Y, L, A, C, D = YxUIGlobal:get()
 
-local Map = YxUI:NewModule("Minimap")
+local Map = Y:NewModule("Minimap")
 
 -- Default settings values
-Defaults["minimap-enable"] = true
-Defaults["minimap-size"] = 140
-Defaults["minimap-show-top"] = true
-Defaults["minimap-show-bottom"] = true
-Defaults["minimap-buttons-enable"] = true
-Defaults["minimap-buttons-size"] = 22
-Defaults["minimap-buttons-spacing"] = 2
-Defaults["minimap-buttons-perrow"] = 5
-Defaults["minimap-top-height"] = 28
-Defaults["minimap-bottom-height"] = 28
-Defaults["minimap-top-fill"] = 100
-Defaults["minimap-bottom-fill"] = 100
-Defaults["minimap-show-calendar"] = true
+D["minimap-enable"] = true
+D["minimap-size"] = 160
+D["minimap-show-top"] = true
+D["minimap-show-bottom"] = true
+D["minimap-buttons-enable"] = true
+D["minimap-buttons-size"] = 22
+D["minimap-buttons-spacing"] = 2
+D["minimap-buttons-perrow"] = 8
+D["minimap-top-height"] = 28
+D["minimap-bottom-height"] = 28
+D["minimap-top-fill"] = 100
+D["minimap-bottom-fill"] = 100
+D["minimap-show-calendar"] = true
 
 function Map:Disable(object)
 	if (not object) then
@@ -43,45 +43,45 @@ local OnMouseWheel = function(self, delta)
 end
 
 local MailOnEnter = function()
-	MiniMapMailIcon:SetVertexColor(YxUI:HexToRGB("FFFFFF"))
+	MiniMapMailIcon:SetVertexColor(Y:HexToRGB("FFFFFF"))
 end
 
 local MailOnLeave = function()
-	MiniMapMailIcon:SetVertexColor(YxUI:HexToRGB("EEEEEE"))
+	MiniMapMailIcon:SetVertexColor(Y:HexToRGB("EEEEEE"))
 end
 
 function Map:Style()
-	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
-	local Border = Settings["ui-border-thickness"]
-	local Width = Settings["minimap-size"] + (Border * 2)
+	local R, G, B = Y:HexToRGB(C["ui-window-main-color"])
+	local Border = C["ui-border-thickness"]
+	local Width = C["minimap-size"] + (Border * 2)
 
 	-- Backdrop
-	self:SetPoint("TOPRIGHT", YxUI.UIParent, -12, -12)
-	self:SetSize((Settings["minimap-size"] + 8), ((Settings["minimap-show-top"] == true and 22 or 0) + (Settings["minimap-show-bottom"] == true and 22 or 0) + 8 + Settings["minimap-size"]))
+	self:SetPoint("TOPRIGHT", Y.UIParent, -12, -12)
+	self:SetSize((C["minimap-size"] + 8), ((C["minimap-show-top"] == true and 22 or 0) + (C["minimap-show-bottom"] == true and 22 or 0) + 8 + C["minimap-size"]))
 
 	self.TopFrame = CreateFrame("Frame", "YxUIMinimapTop", self, "BackdropTemplate")
-	self.TopFrame:SetSize(Width, Settings["minimap-top-height"])
+	self.TopFrame:SetSize(Width, C["minimap-top-height"])
 	self.TopFrame:SetPoint("TOP", self, 0, 0)
-	YxUI:AddBackdrop(self.TopFrame, Assets:GetTexture("YxUI 4"))
-	self.TopFrame.Outside:SetBackdropColor(R, G, B, (Settings["minimap-top-fill"] / 100))
+	Y:AddBackdrop(self.TopFrame, A:GetTexture("YxUI 4"))
+	self.TopFrame.Outside:SetBackdropColor(R, G, B, (C["minimap-top-fill"] / 100))
 
 	self.Middle = CreateFrame("Frame", nil, self, "BackdropTemplate")
-	self.Middle:SetSize(Width, Settings["minimap-size"])
+	self.Middle:SetSize(Width, C["minimap-size"])
 	self.Middle:SetPoint("TOP", self.TopFrame, "BOTTOM", 0, 1 > Border and 1 or (Border + 2))
-	YxUI:AddBackdrop(self.Middle)
+	Y:AddBackdrop(self.Middle)
 	self.Middle.Outside:SetBackdropColor(R, G, B, 0)
 
 	self.BottomFrame = CreateFrame("Frame", "YxUIMinimapBottom", self, "BackdropTemplate")
-	self.BottomFrame:SetSize(Width, Settings["minimap-bottom-height"])
+	self.BottomFrame:SetSize(Width, C["minimap-bottom-height"])
 	self.BottomFrame:SetPoint("TOP", self.Middle, "BOTTOM", 0, 1 > Border and 1 or (Border + 2))
-	YxUI:AddBackdrop(self.BottomFrame, Assets:GetTexture("YxUI 4"))
-	self.BottomFrame.Outside:SetBackdropColor(R, G, B, (Settings["minimap-bottom-fill"] / 100))
+	Y:AddBackdrop(self.BottomFrame, A:GetTexture("YxUI 4"))
+	self.BottomFrame.Outside:SetBackdropColor(R, G, B, (C["minimap-bottom-fill"] / 100))
 
 	-- Style minimap
-	Minimap:SetMaskTexture(Assets:GetTexture("Blank"))
+	Minimap:SetMaskTexture(A:GetTexture("Blank"))
 	Minimap:SetParent(self)
 	Minimap:ClearAllPoints()
-	Minimap:SetSize(Settings["minimap-size"], Settings["minimap-size"])
+	Minimap:SetSize(C["minimap-size"], C["minimap-size"])
 	Minimap:SetPoint("TOPLEFT", self.Middle, Border + 1, -(Border + 1))
 	Minimap:SetPoint("BOTTOMRIGHT", self.Middle, -(Border + 1), Border + 1)
 	Minimap:EnableMouseWheel(true)
@@ -91,13 +91,13 @@ function Map:Style()
 		MinimapCompassTexture:SetTexture(nil)
 	end
 
-	if YxUI.IsMainline then
+	if Y.IsMainline then
 	    Minimap:SetArchBlobRingScalar(0)
 		Minimap:SetQuestBlobRingScalar(0)
 
 		if QueueStatusButton then
 			QueueStatusButton:ClearAllPoints()
-			QueueStatusButton:SetPoint("BOTTOMLEFT", YxUI.UIParent, "BOTTOMRIGHT", -460, 13)
+			QueueStatusButton:SetPoint("BOTTOMLEFT", Y.UIParent, "BOTTOMRIGHT", -460, 13)
 
 			if (not QueueStatusButton:IsMovable()) then
 				QueueStatusButton:SetMovable(true)
@@ -127,9 +127,36 @@ function Map:Style()
 		end
 	else
 		if MiniMapLFGFrame then
+			MiniMapLFGFrame:SetSize(18, 18)
 			MiniMapLFGFrame:ClearAllPoints()
-			MiniMapLFGFrame:SetPoint("BOTTOMRIGHT", Minimap, 0, -3)
-			MiniMapLFGFrame:SetFrameLevel(10)
+			MiniMapLFGFrame:SetPoint("BOTTOMRIGHT", Minimap, "BOTTOMRIGHT", 0, 0)
+			MiniMapLFGFrame.SetPoint = Y.Dummy
+			MiniMapLFGFrameBorder:Hide()
+			
+			MiniMapLFGFrameIcon:SetAlpha(0)
+			MiniMapLFGFrameIcon:Hide()
+			
+			local queueIcon = MiniMapLFGFrame:CreateTexture(nil, "ARTWORK")
+			queueIcon:SetPoint("CENTER", MiniMapLFGFrame)
+			queueIcon:SetSize(36, 36)
+			queueIcon:SetTexture("Interface\\Minimap\\Dungeon_Icon")
+
+			local anim = queueIcon:CreateAnimationGroup()
+			anim:SetLooping("REPEAT")
+			anim.rota = anim:CreateAnimation("Rotation")
+			anim.rota:SetDuration(2)
+			anim.rota:SetDegrees(360)
+
+			hooksecurefunc("EyeTemplate_StartAnimating", function()
+				anim:Play()
+			end)
+
+			hooksecurefunc("EyeTemplate_StopAnimating", function()
+				anim:Pause()
+			end)
+			if MiniMapLFGFrameIcon:GetScript('OnUpdate') then
+				anim:Play()
+			end
 		end
 
 		if LFGMinimapFrame then
@@ -170,8 +197,8 @@ function Map:Style()
 		end
 
 		MiniMapMailIcon:SetSize(32, 32)
-		MiniMapMailIcon:SetTexture(Assets:GetTexture("Mail 2"))
-		MiniMapMailIcon:SetVertexColor(YxUI:HexToRGB("EEEEEE"))
+		MiniMapMailIcon:SetTexture(A:GetTexture("Mail 2"))
+		MiniMapMailIcon:SetVertexColor(Y:HexToRGB("EEEEEE"))
 	end
 
 	if MinimapNorthTag then
@@ -187,15 +214,15 @@ function Map:Style()
 		self.Tracking:SetSize(24, 24)
 		self.Tracking:SetPoint("TOPLEFT", Minimap, 2, -2)
 		self.Tracking:SetFrameLevel(10)
-		self.Tracking:SetBackdrop(YxUI.BackdropAndBorder)
+		self.Tracking:SetBackdrop(Y.BackdropAndBorder)
 		self.Tracking:SetBackdropColor(0, 0, 0)
 		self.Tracking:SetBackdropBorderColor(0, 0, 0)
 
 		self.Tracking.Tex = self.Tracking:CreateTexture(nil, "ARTWORK")
 		self.Tracking.Tex:SetPoint("TOPLEFT", self.Tracking, 1, -1)
 		self.Tracking.Tex:SetPoint("BOTTOMRIGHT", self.Tracking, -1, 1)
-		self.Tracking.Tex:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-		self.Tracking.Tex:SetVertexColor(YxUI:HexToRGB(Settings["ui-header-texture-color"]))
+		self.Tracking.Tex:SetTexture(A:GetTexture(C["ui-header-texture"]))
+		self.Tracking.Tex:SetVertexColor(Y:HexToRGB(C["ui-header-texture-color"]))
 
 		MiniMapTracking:SetParent(self.Tracking)
 		MiniMapTracking:ClearAllPoints()
@@ -234,38 +261,62 @@ function Map:Style()
 	self:Disable(MiniMapMailBorder)
 	self:Disable(TimeManagerClockButton)
 
-	if (YxUI.ClientVersion > 30000) then
-		GameTimeFrame:ClearAllPoints()
-		GameTimeFrame:SetParent(Minimap)
-		GameTimeFrame:SetPoint("TOPRIGHT", Minimap, 1, -1)
-		GameTimeFrame:SetFrameLevel(10)
+	if (Y.ClientVersion > 30000) then
+		local GameTimeFrame = GameTimeFrame
+		local calendarText = GameTimeFrame:CreateFontString(nil, "OVERLAY")
 
-		if (not Settings["minimap-show-calendar"]) then
+		GameTimeFrame:SetParent(Minimap)
+		GameTimeFrame:SetFrameLevel(16)
+		GameTimeFrame:ClearAllPoints()
+		GameTimeFrame:SetPoint("TOPRIGHT", Minimap, -4, -4)
+		GameTimeFrame:SetHitRectInsets(0, 0, 0, 0)
+		GameTimeFrame:SetSize(22, 22)
+		GameTimeFrame:SetNormalTexture("Interface\\AddOns\\YxUI\\Media\\Textures\\Minimap\\Calendar.blp")
+		GameTimeFrame:SetPushedTexture("Interface\\AddOns\\YxUI\\Media\\Textures\\Minimap\\Calendar.blp")
+		GameTimeFrame:SetHighlightTexture(0)
+		GameTimeFrame:GetNormalTexture():SetTexCoord(0, 1, 0, 1)
+		GameTimeFrame:GetPushedTexture():SetTexCoord(0, 1, 0, 1)
+
+		calendarText:ClearAllPoints()
+		calendarText:SetPoint("CENTER", 0, -3)
+		calendarText:SetFont(A:GetFont("Matthan"), 12)
+		calendarText:SetTextColor(0, 0, 0)
+		calendarText:SetShadowOffset(0, 0)
+		calendarText:SetAlpha(0.9)
+		calendarText:SetText(C_DateAndTime.GetCurrentCalendarTime().monthDay)
+
+		hooksecurefunc("GameTimeFrame_SetDate", function()
+			calendarText:SetText(C_DateAndTime.GetCurrentCalendarTime().monthDay)
+		end)
+
+		if (not C["minimap-show-calendar"]) then
 			GameTimeFrame:Hide()
+		else
+			GameTimeFrame:Show()
 		end
 	end
 
-	if Settings["minimap-show-top"] and not Settings["minimap-show-bottom"] then
+	if C["minimap-show-top"] and not C["minimap-show-bottom"] then
 		Minimap:SetPoint("BOTTOM", Map, 0, 4)
-	elseif Settings["minimap-show-bottom"] and not Settings["minimap-show-top"] then
+	elseif C["minimap-show-bottom"] and not C["minimap-show-top"] then
 		Minimap:SetPoint("TOP", Map, 0, -4)
 	else
 		Minimap:SetPoint("CENTER", Map, 0, 0)
 	end
 
-	if (not Settings["minimap-show-top"]) then
+	if (not C["minimap-show-top"]) then
 		self.TopFrame:Hide()
 	end
 
-	if (not Settings["minimap-show-bottom"]) then
+	if (not C["minimap-show-bottom"]) then
 		self.BottomFrame:Hide()
 	end
 
-	YxUI:CreateMover(self)
+	Y:CreateMover(self)
 end
 
 local UpdateMinimapSize = function(value)
-	Map:SetSize((value + 8), ((Settings["minimap-show-top"] == true and Settings["minimap-top-height"] or 0) + (Settings["minimap-show-bottom"] == true and Settings["minimap-bottom-height"] or 0) + 8 + value))
+	Map:SetSize((value + 8), ((C["minimap-show-top"] == true and C["minimap-top-height"] or 0) + (C["minimap-show-bottom"] == true and C["minimap-bottom-height"] or 0) + 8 + value))
 
 	Minimap:SetSize(value, value)
 	Minimap:SetZoom(Minimap:GetZoom() + 1)
@@ -278,7 +329,7 @@ local UpdateMinimapSize = function(value)
 end
 
 local UpdateShowTopBar = function(value)
-	local Anchor = YxUI:GetModule("DataText"):GetAnchor("Minimap-Top")
+	local Anchor = Y:GetModule("DataText"):GetAnchor("Minimap-Top")
 
 	if value then
 		Map.TopFrame:Show()
@@ -294,11 +345,11 @@ local UpdateShowTopBar = function(value)
 		end
 	end
 
-	UpdateMinimapSize(Settings["minimap-size"])
+	UpdateMinimapSize(C["minimap-size"])
 end
 
 local UpdateShowBottomBar = function(value)
-	local Anchor = YxUI:GetModule("DataText"):GetAnchor("Minimap-Bottom")
+	local Anchor = Y:GetModule("DataText"):GetAnchor("Minimap-Bottom")
 
 	if value then
 		Map.BottomFrame:Show()
@@ -314,7 +365,7 @@ local UpdateShowBottomBar = function(value)
 		end
 	end
 
-	UpdateMinimapSize(Settings["minimap-size"])
+	UpdateMinimapSize(C["minimap-size"])
 end
 
 local UpdateTopHeight = function(value)
@@ -326,13 +377,13 @@ local UpdateBottomHeight = function(value)
 end
 
 local UpdateTopFill = function(value)
-	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
+	local R, G, B = Y:HexToRGB(C["ui-window-main-color"])
 
 	Map.TopFrame.Outside:SetBackdropColor(R, G, B, (value / 100))
 end
 
 local UpdateBottomFill = function(value)
-	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
+	local R, G, B = Y:HexToRGB(C["ui-window-main-color"])
 
 	Map.BottomFrame.Outside:SetBackdropColor(R, G, B, (value / 100))
 end
@@ -354,7 +405,7 @@ local UpdateShowCalendar = function(value)
 end
 
 function Map:Load()
-	if (not Settings["minimap-enable"]) then
+	if (not C["minimap-enable"]) then
 		return
 	end
 
@@ -365,21 +416,21 @@ function Map:Load()
 	end
 end
 
-YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Minimap"], function(left, right)
-	left:CreateHeader(Language["Enable"])
-	left:CreateSwitch("minimap-enable", Settings["minimap-enable"], Language["Enable Minimap Module"], Language["Enable the YxUI mini map module"], ReloadUI):RequiresReload(true)
+Y:GetModule("GUI"):AddWidgets(L["General"], L["Minimap"], function(left, right)
+	left:CreateHeader(L["Enable"])
+	left:CreateSwitch("minimap-enable", C["minimap-enable"], L["Enable Minimap Module"], L["Enable the YxUI mini map module"], ReloadUI):RequiresReload(true)
 
-	left:CreateHeader(Language["Styling"])
-	left:CreateSwitch("minimap-show-top", Settings["minimap-show-top"], Language["Enable Top Bar"], Language["Enable the data text bar on top of the mini map"], UpdateShowTopBar)
-	left:CreateSwitch("minimap-show-bottom", Settings["minimap-show-bottom"], Language["Enable Bottom Bar"], Language["Enable the data text bar on the bottom of the mini map"], UpdateShowBottomBar)
+	left:CreateHeader(L["Styling"])
+	left:CreateSwitch("minimap-show-top", C["minimap-show-top"], L["Enable Top Bar"], L["Enable the data text bar on top of the mini map"], UpdateShowTopBar)
+	left:CreateSwitch("minimap-show-bottom", C["minimap-show-bottom"], L["Enable Bottom Bar"], L["Enable the data text bar on the bottom of the mini map"], UpdateShowBottomBar)
 
-	if (YxUI.ClientVersion > 30000) then
-		left:CreateSwitch("minimap-show-calendar", Settings["minimap-show-calendar"], Language["Enable Calendar"], Language["Enable the calendar button on the minimap"], UpdateShowCalendar)
+	if (Y.ClientVersion > 30000) then
+		left:CreateSwitch("minimap-show-calendar", C["minimap-show-calendar"], L["Enable Calendar"], L["Enable the calendar button on the minimap"], UpdateShowCalendar)
 	end
 
-	left:CreateSlider("minimap-size", Settings["minimap-size"], 100, 250, 10, Language["Mini Map Size"], Language["Set the size of the mini map"], UpdateMinimapSize)
-	left:CreateSlider("minimap-top-height", Settings["minimap-top-height"], 14, 40, 1, Language["Top Height"], Language["Set the height for the top of the minimap"], UpdateTopHeight)
-	left:CreateSlider("minimap-bottom-height", Settings["minimap-bottom-height"], 14, 40, 1, Language["Bottom Height"], Language["Set the height for the bottom of the minimap"], UpdateBottomHeight)
-	left:CreateSlider("minimap-top-fill", Settings["minimap-top-fill"], 0, 100, 5, Language["Top Fill"], Language["Set the opacity for the top of the minimap"], UpdateTopFill, nil, "%")
-	left:CreateSlider("minimap-bottom-fill", Settings["minimap-bottom-fill"], 0, 100, 5, Language["Bottom Fill"], Language["Set the opacity for the bottom of the minimap"], UpdateBottomFill, nil, "%")
+	left:CreateSlider("minimap-size", C["minimap-size"], 100, 250, 10, L["Mini Map Size"], L["Set the size of the mini map"], UpdateMinimapSize)
+	left:CreateSlider("minimap-top-height", C["minimap-top-height"], 14, 40, 1, L["Top Height"], L["Set the height for the top of the minimap"], UpdateTopHeight)
+	left:CreateSlider("minimap-bottom-height", C["minimap-bottom-height"], 14, 40, 1, L["Bottom Height"], L["Set the height for the bottom of the minimap"], UpdateBottomHeight)
+	left:CreateSlider("minimap-top-fill", C["minimap-top-fill"], 0, 100, 5, L["Top Fill"], L["Set the opacity for the top of the minimap"], UpdateTopFill, nil, "%")
+	left:CreateSlider("minimap-bottom-fill", C["minimap-bottom-fill"], 0, 100, 5, L["Bottom Fill"], L["Set the opacity for the bottom of the minimap"], UpdateBottomFill, nil, "%")
 end)

@@ -219,7 +219,6 @@ function MinimapButtons:CreatePanel()
 	Frame:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-bg-color"]))
 	Frame:SetBackdropBorderColor(0, 0, 0)
 	Frame:SetFrameStrata("LOW")
-	Frame:SetPoint("TOPRIGHT", YxUI:GetModule("Minimap").BottomFrame, "BOTTOMRIGHT", 0, -2)
 
 	self.Panel = Frame
 end
@@ -235,16 +234,36 @@ end
 local DelayedLoad = function()
 	MinimapButtons:CreatePanel()
 	MinimapButtons:SkinButtons()
+	MinimapButtons:Hide()
 
 	if (#MinimapButtons.Items == 0) then
-		MinimapButtons:Hide()
-
 		return
 	end
 
 	UpdateBar()
 
-	YxUI:CreateMover(MinimapButtons.Panel)
+	local bu = CreateFrame("Button", nil, Minimap)
+	bu:SetAlpha(0.6)
+	bu:SetSize(16, 16)
+	bu:SetPoint("BOTTOMLEFT", -7, -7)
+	bu:SetHighlightTexture("Interface\\COMMON\\Indicator-Yellow")
+	bu:SetPushedTexture("Interface\\COMMON\\Indicator-Green")
+	bu.Icon = bu:CreateTexture(nil, "ARTWORK")
+	bu.Icon:SetAllPoints()
+	bu.Icon:SetTexture("Interface\\COMMON\\Indicator-Gray")
+
+	bu:SetScript("OnClick", function()
+		PlaySound(825)
+		if MinimapButtons.Panel:IsShown() then
+			C_Timer.After(0.5, function()
+				MinimapButtons.Panel:Hide()
+			end)
+			UIFrameFadeOut(MinimapButtons.Panel, 0.5, MinimapButtons.Panel:GetAlpha(), 0)
+		else
+			UIFrameFadeIn(MinimapButtons.Panel, 0.5, MinimapButtons.Panel:GetAlpha(), 1)
+		end
+	end)
+	MinimapButtons.Panel:SetPoint("RIGHT", bu, "LEFT", -1, 0)
 end
 
 function MinimapButtons:Load()

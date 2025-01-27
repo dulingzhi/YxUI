@@ -186,6 +186,12 @@ function Y:OnEvent(event)
 	self:LoadModules()
 	self:LoadPlugins()
 
+	-- Set the UI scale
+	if Settings["enable-scale"] and Settings["ui-scale"] and Settings["ui-scale"] ~= Y.UiScale then
+		C_CVar.SetCVar("uiScale", Settings["ui-scale"])
+		Y.UiScale = Settings["ui-scale"]
+	end
+
 	self:UnregisterEvent(event)
 end
 

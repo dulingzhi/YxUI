@@ -1,4 +1,3 @@
----@class YxUI, Language, Assets, Settings, Defaults
 local Y, L, A, C, D = YxUIGlobal:get()
 
 local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")

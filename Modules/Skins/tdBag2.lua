@@ -1,4 +1,4 @@
-local Y, L, A, C, D = select(2, ...):get()
+local Y, L, A, C, D = YxUIGlobal:get()
 
 local function skin(self)
     self.fixedWidth = self.fixedWidth - 22
