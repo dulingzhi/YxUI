@@ -1270,20 +1270,21 @@ function GUI:CreateGUI()
 	ScrollBar.Progress:SetVertexColor(YxUI:HexToRGB(Settings["ui-widget-bright-color"]))
 	ScrollBar.Progress:SetAlpha(SELECTED_HIGHLIGHT_ALPHA)
 
-	-- Close button
-	self.CloseButton = CreateFrame("Frame", nil, self)
-	self.CloseButton:SetSize(HEADER_HEIGHT, HEADER_HEIGHT)
-	self.CloseButton:SetPoint("RIGHT", self.Header, 0, -1)
-	self.CloseButton:SetScript("OnEnter", function(self) self.Cross:SetVertexColor(YxUI:HexToRGB("C0392B")) end)
-	self.CloseButton:SetScript("OnLeave", function(self) self.Cross:SetVertexColor(YxUI:HexToRGB("EEEEEE")) end)
-	self.CloseButton:SetScript("OnMouseUp", function(self)
+    local function CloseWindow()
 		GUI.ScaleOut:Play()
 		GUI.FadeOut:Play()
 
 		if (GUI.ColorPicker and GUI.ColorPicker:GetAlpha() > 0) then
 			GUI.ColorPicker.FadeOut:Play()
 		end
-	end)
+	end
+	-- Close button
+	self.CloseButton = CreateFrame("Frame", nil, self)
+	self.CloseButton:SetSize(HEADER_HEIGHT, HEADER_HEIGHT)
+	self.CloseButton:SetPoint("RIGHT", self.Header, 0, -1)
+	self.CloseButton:SetScript("OnEnter", function(self) self.Cross:SetVertexColor(YxUI:HexToRGB("C0392B")) end)
+	self.CloseButton:SetScript("OnLeave", function(self) self.Cross:SetVertexColor(YxUI:HexToRGB("EEEEEE")) end)
+	self.CloseButton:SetScript("OnMouseUp", CloseWindow)
 
 	self.CloseButton.Cross = self.CloseButton:CreateTexture(nil, "OVERLAY")
 	self.CloseButton.Cross:SetPoint("CENTER", self.CloseButton, 0, 0)
@@ -1305,6 +1306,19 @@ function GUI:CreateGUI()
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:SetScript("OnEvent", self.OnEvent)
+    self:SetScript('OnShow', function()
+		self:SetScript('OnKeyDown', function (_, key)
+            if key == 'ESCAPE' then
+                CloseWindow()
+                self:SetPropagateKeyboardInput(false)
+            else
+                self:SetPropagateKeyboardInput(true)
+            end
+        end)
+    end)
+    self:SetScript('OnHide', function()
+        self:SetScript('OnKeyDown', nil)
+    end)
 
 	self:ShowWindow(Language["General"], Language["General"])
 

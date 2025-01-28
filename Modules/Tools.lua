@@ -194,7 +194,9 @@ local NewPrint = function(...)
 	end
 end
 
-setprinthandler(NewPrint)
+if not IsAddOnLoaded('!!!tdDevTools') then
+    setprinthandler(NewPrint)
+end
 
 function YxUI:print(...)
 	if Settings["ui-widget-color"] then
