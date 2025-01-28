@@ -6,6 +6,7 @@ local Fonts = {}
 local Textures = {}
 local Styles = {}
 local Palettes = {}
+local Borders = {}
 --local Sounds = {}
 
 local FontList = {}
@@ -13,6 +14,7 @@ local FontIsPixel = {}
 local TextureList = {}
 local StyleList = {}
 local PaletteList = {}
+local BorderList = {}
 --local SoundList = {}
 
 local OutlineList = {
@@ -80,6 +82,33 @@ end
 
 function A:GetTextureList()
 	return TextureList
+end
+
+-- Borders
+function A:SetBorder(name, info, silent)
+    if Borders[name] then
+        return
+    end
+
+    Borders[name] = info
+
+    if (not silent) then
+        BorderList[name] = info
+
+        SharedMedia:Register("border", name, info)
+    end
+end
+
+function A:GetBorder(name)
+    if Borders[name] then
+        return Borders[name]
+    else
+        return Borders["Default"]
+    end
+end
+
+function A:GetBorderList()
+    return BorderList
 end
 
 -- Style templates
@@ -294,3 +323,8 @@ A:SetPalette("Rapid", { -- https://www.rapidtables.com/web/color/RGB_Color.html
 	{"FF9999", "FFCC99", "FFFF99", "CCFF99", "99FF99", "99FFCC", "99FFFF", "99CCFF", "9999FF", "CC99FF", "FF99FF", "FF99CC", "E0E0E0"},
 	{"FFCCCC", "FFE5CC", "FFFFCC", "E5FFCC", "CCFFCC", "CCFFE5", "CCFFFF", "CCE5FF", "CCCCFF", "E5CCFF", "FFCCFF", "FFCCE5", "FFFFFF"}
 })
+
+-- Borders
+A:SetBorder("YxUI", "Interface\\AddOns\\YxUI\\Media\\Textures\\Border\\YxUI\\Border.tga")
+A:SetBorder("YxUI Tooltip", "Interface\\AddOns\\YxUI\\Media\\Textures\\Border\\YxUI\\Border_Tooltip.tga")
+A:SetBorder("Glow Overlay", "Interface\\AddOns\\YxUI\\Media\\Textures\\Border\\Border_Glow_Overlay.tga")

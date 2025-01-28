@@ -68,6 +68,7 @@ function DT:NewAnchor(name, parent)
 	Anchor:SetFrameStrata(parent:GetFrameStrata())
 	Anchor.Name = name
 	Anchor.SetTooltip = SetTooltip
+    parent.Anchor = Anchor
 
 	Anchor.Text = Anchor:CreateFontString(nil, "OVERLAY")
 	YxUI:SetFontInfo(Anchor.Text, Settings["data-text-font"], Settings["data-text-font-size"], Settings["data-text-font-flags"])

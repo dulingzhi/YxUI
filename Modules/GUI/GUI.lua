@@ -1306,7 +1306,7 @@ function GUI:CreateGUI()
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:SetScript("OnEvent", self.OnEvent)
 
-	self:ShowWindow("General", "General")
+	self:ShowWindow(Language["General"], Language["General"])
 
 	if self.QueueAlert then
 		self.QueueAlert = nil
