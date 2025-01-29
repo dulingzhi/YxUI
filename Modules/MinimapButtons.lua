@@ -1,8 +1,8 @@
 -- File written by Smelly, maintained by Jai
 
-local YxUI, Language, Assets, Settings = select(2, ...):get()
+local Y, L, A, C = select(2, ...):get()
 
-local MinimapButtons = YxUI:NewModule("Minimap Buttons")
+local MinimapButtons = Y:NewModule("Minimap Buttons")
 
 local lower = string.lower
 local find = string.find
@@ -168,17 +168,10 @@ function MinimapButtons:SkinButtons()
                 end
 
                 Child.Backdrop = CreateFrame("Frame", nil, Child, "BackdropTemplate")
-                Child.Backdrop:SetPoint("TOPLEFT", Child, 0, 0)
-                Child.Backdrop:SetPoint("BOTTOMRIGHT", Child, 0, 0)
-                Child.Backdrop:SetBackdrop(YxUI.Backdrop)
-                Child.Backdrop:SetBackdropColor(0, 0, 0)
+                Child.Backdrop:SetPoint("TOPLEFT", Child, -8, 8)
+                Child.Backdrop:SetPoint("BOTTOMRIGHT", Child, 8, -8)
                 Child.Backdrop:SetFrameLevel(Child:GetFrameLevel() - 1)
-
-                Child.Backdrop.Texture = Child.Backdrop:CreateTexture(nil, "BORDER")
-                Child.Backdrop.Texture:SetPoint("TOPLEFT", Child.Backdrop, 1, -1)
-                Child.Backdrop.Texture:SetPoint("BOTTOMRIGHT", Child.Backdrop, -1, 1)
-                Child.Backdrop.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-                Child.Backdrop.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
+                Child.Backdrop:SetBackdrop({edgeFile = A:GetBorder("YxUI"), edgeSize = 12})
 
                 Child:SetFrameLevel(Minimap:GetFrameLevel() + 10)
                 Child:SetFrameStrata(Minimap:GetFrameStrata())
@@ -186,7 +179,7 @@ function MinimapButtons:SkinButtons()
                 if (Type == "Button" or Type == "Frame") then
                     if (Child.SetHighlightTexture) then
                         local Highlight = Child:CreateTexture(nil, "ARTWORK")
-                        Highlight:SetTexture(Assets:GetTexture(Settings["action-bars-button-highlight"]))
+                        Highlight:SetTexture(A:GetTexture(C["action-bars-button-highlight"]))
                         Highlight:SetVertexColor(1, 1, 1, 0.2)
                         Highlight:SetPoint("TOPLEFT", Child, 1, -1)
                         Highlight:SetPoint("BOTTOMRIGHT", Child, -1, 1)
@@ -197,7 +190,7 @@ function MinimapButtons:SkinButtons()
 
                     if (Child.SetPushedTexture) then
                         local Pushed = Child:CreateTexture(nil, "ARTWORK")
-                        Pushed:SetTexture(Assets:GetTexture(Settings["action-bars-button-highlight"]))
+                        Pushed:SetTexture(A:GetTexture(C["action-bars-button-highlight"]))
                         Pushed:SetVertexColor(0.9, 0.8, 0.1, 0.3)
                         Pushed:SetPoint("TOPLEFT", Child, 1, -1)
                         Pushed:SetPoint("BOTTOMRIGHT", Child, -1, 1)
@@ -217,12 +210,8 @@ function MinimapButtons:SkinButtons()
 end
 
 function MinimapButtons:CreatePanel()
-    local Frame = CreateFrame("Frame", "YxUI Minimap Buttons", YxUI.UIParent, "BackdropTemplate")
-    Frame:SetBackdrop(YxUI.BackdropAndBorder)
-    Frame:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-bg-color"]))
-    Frame:SetBackdropBorderColor(0, 0, 0)
+    local Frame = CreateFrame("Frame", "YxUI Minimap Buttons", Y.UIParent, "BackdropTemplate")
     Frame:SetFrameStrata("LOW")
-
     self.Panel = Frame
 end
 
@@ -238,7 +227,7 @@ function MinimapButtons:Hide(fade)
 end
 
 local UpdateBar = function()
-    MinimapButtons:PositionButtons(Settings["minimap-buttons-perrow"], Settings["minimap-buttons-size"], Settings["minimap-buttons-spacing"])
+    MinimapButtons:PositionButtons(C["minimap-buttons-perrow"], C["minimap-buttons-size"], C["minimap-buttons-spacing"])
 end
 
 local DelayedLoad = function()
@@ -254,7 +243,8 @@ local DelayedLoad = function()
 
     local bu = CreateFrame("Button", nil, Minimap:GetParent())
     bu:SetSize(16, 16)
-    bu:SetPoint("BOTTOMLEFT", 0, 0)
+    bu:SetAlpha(0.7)
+    bu:SetPoint("BOTTOMLEFT", 1, 1)
     bu:SetHighlightTexture("Interface\\COMMON\\Indicator-Yellow")
     bu:SetPushedTexture("Interface\\COMMON\\Indicator-Green")
     bu.Icon = bu:CreateTexture(nil, "ARTWORK")
@@ -281,17 +271,17 @@ local DelayedLoad = function()
 end
 
 function MinimapButtons:Load()
-    if (not Settings["minimap-buttons-enable"]) then
+    if (not C["minimap-buttons-enable"]) then
         return
     end
 
     C_Timer.After(2, DelayedLoad)
 end
 
-YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Minimap"], function(left, right)
-    right:CreateHeader(Language["Minimap Buttons"])
-    right:CreateSwitch("minimap-buttons-enable", Settings["minimap-buttons-enable"], Language["Enable Minimap Button Bar"], "", ReloadUI):RequiresReload(true)
-    right:CreateSlider("minimap-buttons-size", Settings["minimap-buttons-size"], 16, 44, 1, Language["Button Size"], "", UpdateBar)
-    right:CreateSlider("minimap-buttons-spacing", Settings["minimap-buttons-spacing"], 1, 5, 1, Language["Button Spacing"], "", UpdateBar)
-    right:CreateSlider("minimap-buttons-perrow", Settings["minimap-buttons-perrow"], 1, 20, 1, Language["Buttons Per Row"], Language["Set the number of buttons per row"], UpdateBar)
+Y:GetModule("GUI"):AddWidgets(L["General"], L["Minimap"], function(left, right)
+    right:CreateHeader(L["Minimap Buttons"])
+    right:CreateSwitch("minimap-buttons-enable", C["minimap-buttons-enable"], L["Enable Minimap Button Bar"], "", ReloadUI):RequiresReload(true)
+    right:CreateSlider("minimap-buttons-size", C["minimap-buttons-size"], 16, 44, 1, L["Button Size"], "", UpdateBar)
+    right:CreateSlider("minimap-buttons-spacing", C["minimap-buttons-spacing"], 1, 6, 1, L["Button Spacing"], "", UpdateBar)
+    right:CreateSlider("minimap-buttons-perrow", C["minimap-buttons-perrow"], 1, 20, 1, L["Buttons Per Row"], L["Set the number of buttons per row"], UpdateBar)
 end)
