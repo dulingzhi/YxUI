@@ -135,6 +135,12 @@ function MinimapButtons:SkinButtons()
                     Child:SetScript("OnDragStop", nil)
                 end
 
+                if (Child:HasScript("OnClick")) then
+                    Child:HookScript("OnClick", function()
+                        self:Hide(true)
+                    end)
+                end
+
                 for i = 1, Child:GetNumRegions() do
                     local Region = select(i, Child:GetRegions())
 
@@ -171,37 +177,26 @@ function MinimapButtons:SkinButtons()
                 Child.Backdrop:SetPoint("TOPLEFT", Child, -8, 8)
                 Child.Backdrop:SetPoint("BOTTOMRIGHT", Child, 8, -8)
                 Child.Backdrop:SetFrameLevel(Child:GetFrameLevel() - 1)
-                Child.Backdrop:SetBackdrop({edgeFile = A:GetBorder("YxUI"), edgeSize = 12})
+                Child.Backdrop:SetBackdrop({
+                    edgeFile = A:GetBorder("YxUI"),
+                    edgeSize = 12,
+                    bgFile = A:GetTexture(C["ui-header-texture"]),
+                    insets = { left = 8, right = 8, top = 8, bottom = 8 }
+                })
+                Child.Backdrop:SetBackdropColor(0, 0, 0, 1)
 
                 Child:SetFrameLevel(Minimap:GetFrameLevel() + 10)
                 Child:SetFrameStrata(Minimap:GetFrameStrata())
 
-                if (Type == "Button" or Type == "Frame") then
-                    if (Child.SetHighlightTexture) then
-                        local Highlight = Child:CreateTexture(nil, "ARTWORK")
-                        Highlight:SetTexture(A:GetTexture(C["action-bars-button-highlight"]))
-                        Highlight:SetVertexColor(1, 1, 1, 0.2)
-                        Highlight:SetPoint("TOPLEFT", Child, 1, -1)
-                        Highlight:SetPoint("BOTTOMRIGHT", Child, -1, 1)
-
-                        Child.Highlight = Highlight
-                        Child:SetHighlightTexture(Highlight)
-                    end
-
-                    if (Child.SetPushedTexture) then
-                        local Pushed = Child:CreateTexture(nil, "ARTWORK")
-                        Pushed:SetTexture(A:GetTexture(C["action-bars-button-highlight"]))
-                        Pushed:SetVertexColor(0.9, 0.8, 0.1, 0.3)
-                        Pushed:SetPoint("TOPLEFT", Child, 1, -1)
-                        Pushed:SetPoint("BOTTOMRIGHT", Child, -1, 1)
-
-                        Child.Pushed = Pushed
-                        Child:SetPushedTexture(Pushed)
-                    end
+                if Type == 'Button' then
+                    Child:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square") -- prevent nil function
+                    Child:GetHighlightTexture():SetAllPoints(Child)
+                elseif Type == "Frame" then
+                    Child.highlight = Child:CreateTexture(nil, "HIGHLIGHT")
+                    Child.highlight:SetPoint("TOPLEFT", Child, "TOPLEFT", 2, -2)
+                    Child.highlight:SetPoint("BOTTOMRIGHT", Child, "BOTTOMRIGHT", -2, 2)
+                    Child.highlight:SetColorTexture(1, 1, 1, 0.25)
                 end
-                Child:HookScript('OnClick', function()
-                    self:Hide(true)
-                end)
 
                 tinsert(self.Items, Child)
             end
@@ -267,7 +262,7 @@ local DelayedLoad = function()
             bu:UnregisterEvent("GLOBAL_MOUSE_UP")
         end
     end)
-    MinimapButtons.Panel:SetPoint("RIGHT", bu, "LEFT", -1, 0)
+    MinimapButtons.Panel:SetPoint("BOTTOMRIGHT", bu, "LEFT", -1, 0)
 end
 
 function MinimapButtons:Load()
