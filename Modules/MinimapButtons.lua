@@ -126,6 +126,7 @@ function MinimapButtons:SkinButtons()
 
             if Valid then
                 Child:SetParent(self.Panel)
+                Child:SetSize(22, 22)
 
                 if (Child:HasScript("OnDragStart")) then
                     Child:SetScript("OnDragStart", nil)
@@ -173,18 +174,6 @@ function MinimapButtons:SkinButtons()
                     end
                 end
 
-                Child.Backdrop = CreateFrame("Frame", nil, Child, "BackdropTemplate")
-                Child.Backdrop:SetPoint("TOPLEFT", Child, -8, 8)
-                Child.Backdrop:SetPoint("BOTTOMRIGHT", Child, 8, -8)
-                Child.Backdrop:SetFrameLevel(Child:GetFrameLevel() - 1)
-                Child.Backdrop:SetBackdrop({
-                    edgeFile = A:GetBorder("YxUI"),
-                    edgeSize = 12,
-                    bgFile = A:GetTexture(C["ui-header-texture"]),
-                    insets = { left = 8, right = 8, top = 8, bottom = 8 }
-                })
-                Child.Backdrop:SetBackdropColor(0, 0, 0, 1)
-
                 Child:SetFrameLevel(Minimap:GetFrameLevel() + 10)
                 Child:SetFrameStrata(Minimap:GetFrameStrata())
 
@@ -198,6 +187,7 @@ function MinimapButtons:SkinButtons()
                     Child.highlight:SetColorTexture(1, 1, 1, 0.25)
                 end
 
+                Child:CreateBorder()
                 tinsert(self.Items, Child)
             end
         end
@@ -239,7 +229,7 @@ local DelayedLoad = function()
     local bu = CreateFrame("Button", nil, Minimap:GetParent())
     bu:SetSize(16, 16)
     bu:SetAlpha(0.7)
-    bu:SetPoint("BOTTOMLEFT", 1, 1)
+    bu:SetPoint("BOTTOMLEFT", -7, -7)
     bu:SetHighlightTexture("Interface\\COMMON\\Indicator-Yellow")
     bu:SetPushedTexture("Interface\\COMMON\\Indicator-Green")
     bu.Icon = bu:CreateTexture(nil, "ARTWORK")

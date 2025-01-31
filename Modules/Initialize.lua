@@ -54,6 +54,7 @@ end
 function Y.Scale(x)
 	return Y.Mult * math.floor(x / Y.Mult + 0.5)
 end
+Y.TexCoords = { 0.08, 0.92, 0.08, 0.92 }
 
 if (Y.UserLocale == "enGB") then
 	Y.UserLocale = "enUS"

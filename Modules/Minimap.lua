@@ -11,11 +11,12 @@ D["minimap-buttons-enable"] = true
 D["minimap-buttons-size"] = 22
 D["minimap-buttons-spacing"] = 6
 D["minimap-buttons-perrow"] = 8
-D["minimap-top-height"] = 28
-D["minimap-bottom-height"] = 35
+D["minimap-top-height"] = 15
+D["minimap-bottom-height"] = 15
 D["minimap-top-fill"] = 0
 D["minimap-bottom-fill"] = 0
 D["minimap-show-calendar"] = true
+D["minimap-mail-pulse"] = true
 
 function Map:Disable(object)
     if (not object) then
@@ -54,11 +55,8 @@ function Map:Style()
     local R, G, B = Y:HexToRGB(C["ui-window-main-color"])
 
     -- Backdrop
-    self:SetPoint("TOPRIGHT", Y.UIParent, 0, 0)
+    self:SetPoint("TOPRIGHT", Y.UIParent, -4, -4)
     self:SetSize(C["minimap-size"], C["minimap-size"])
-    self.Outside = CreateFrame("Frame", nil, self, "BackdropTemplate")
-    self.Outside:SetAllPoints(self)
-    self.Outside:SetBackdrop({ edgeFile = A:GetBorder("YxUI"), edgeSize = 12 })
 
     -- Style minimap
     Minimap:SetMaskTexture(A:GetTexture("Blank"))
@@ -66,10 +64,78 @@ function Map:Style()
     Minimap:SetParent(self)
     Minimap:ClearAllPoints()
     Minimap:SetSize(C["minimap-size"], C["minimap-size"])
-    Minimap:SetPoint("TOPLEFT", self.Outside, 9, -9)
-    Minimap:SetPoint("BOTTOMRIGHT", self.Outside, -9, 9)
+    Minimap:SetAllPoints(self)
     Minimap:EnableMouseWheel(true)
     Minimap:SetScript("OnMouseWheel", OnMouseWheel)
+
+    local minimapBorder = CreateFrame("Frame", nil, Minimap)
+    minimapBorder:SetAllPoints(Minimap)
+    minimapBorder:SetFrameLevel(Minimap:GetFrameLevel())
+    minimapBorder:SetFrameStrata("LOW")
+    minimapBorder:CreateBorder()
+
+    if C["minimap-mail-pulse"] then
+        local MinimapMailFrame = MiniMapMailFrame or MinimapCluster.IndicatorFrame.MailFrame
+
+        local minimapMailPulse = CreateFrame("Frame", nil, Minimap, "BackdropTemplate")
+        minimapMailPulse:SetBackdrop({
+            edgeFile = A:GetTexture("Glow Overlay"),
+            edgeSize = 12,
+        })
+        minimapMailPulse:SetPoint("TOPLEFT", minimapBorder, -5, 5)
+        minimapMailPulse:SetPoint("BOTTOMRIGHT", minimapBorder, 5, -5)
+        minimapMailPulse:Hide()
+
+        local anim = minimapMailPulse:CreateAnimationGroup()
+        anim:SetLooping("BOUNCE")
+        anim.fader = anim:CreateAnimation("Alpha")
+        anim.fader:SetFromAlpha(0.8)
+        anim.fader:SetToAlpha(0.2)
+        anim.fader:SetDuration(1)
+        anim.fader:SetSmoothing("OUT")
+
+        -- Add comments to describe the purpose of the function
+        local function updateMinimapBorderAnimation(_, event)
+            local borderColor = nil
+
+            -- If player enters combat, set border color to red
+            if event == "PLAYER_REGEN_DISABLED" then
+                borderColor = { 1, 0, 0, 0.8 }
+            elseif not InCombatLockdown() then
+                if C_Calendar.GetNumPendingInvites() > 0 or MinimapMailFrame:IsShown() then
+                    -- If there are pending calendar invites or minimap mail frame is shown, set border color to yellow
+                    borderColor = { 1, 1, 0, 0.8 }
+                end
+            end
+
+            -- If a border color was set, show the minimap mail pulse frame and play the animation
+            if borderColor then
+                minimapMailPulse:Show()
+                minimapMailPulse:SetBackdropBorderColor(unpack(borderColor))
+                anim:Play()
+            else
+                minimapMailPulse:Hide()
+                minimapMailPulse:SetBackdropBorderColor(1, 1, 0, 0.8)
+                -- Stop the animation
+                anim:Stop()
+            end
+        end
+        self:RegisterEvent("CALENDAR_UPDATE_PENDING_INVITES", updateMinimapBorderAnimation)
+        self:RegisterEvent("PLAYER_REGEN_DISABLED", updateMinimapBorderAnimation)
+        self:RegisterEvent("PLAYER_REGEN_ENABLED", updateMinimapBorderAnimation)
+        self:RegisterEvent("UPDATE_PENDING_MAIL", updateMinimapBorderAnimation)
+
+        MinimapMailFrame:HookScript("OnHide", function()
+            if InCombatLockdown() then
+                return
+            end
+
+            if anim and anim:IsPlaying() then
+                anim:Stop()
+                minimapMailPulse:Hide()
+            end
+        end)
+    end
 
     self.TopFrame = CreateFrame("Frame", "YxUIMinimapTop", self, "BackdropTemplate")
     self.TopFrame:SetHeight(C["minimap-top-height"])

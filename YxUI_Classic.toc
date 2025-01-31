@@ -36,6 +36,7 @@ Modules\Styles.lua
 Modules\Defaults.lua
 Modules\GUI\GUI.lua
 Modules\GUI\Widgets.lua
+Modules\GUI\Border.lua
 Modules\Profiles.lua
 Modules\Colors.lua
 Modules\Throttle.lua
