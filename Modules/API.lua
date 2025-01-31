@@ -1126,24 +1126,19 @@ function Y.SkinFrame(frame, backdrop, x, y, x1, y1)
     frame:StripTextures()
 
     if backdrop then
-        frame:CreateBackdrop("Transparent")
-        if x and y then
-            if not x1 or y1 then
-                x1 = x1 or -x
-                y1 = y1 or y
-                y = -y
-            end
-            frame.backdrop:SetPoint("TOPLEFT", x, y)
-            frame.backdrop:SetPoint("BOTTOMRIGHT", x1, y1)
-        end
+        frame:CreateBorder()
     else
         frame:SetTemplate("Transparent")
     end
 
-    -- local closeButton = frame.CloseButton or (name and _G[name .. "CloseButton"])
-    -- if closeButton then
-    -- 	Y.SkinCloseButton(closeButton, frame.backdrop)
-    -- end
+    local closeButton = frame.CloseButton or (name and _G[name .. "CloseButton"])
+    if closeButton then
+        closeButton:CreateBorder()
+        closeButton:SetSize(26, 26)
+        closeButton:ClearAllPoints()
+        closeButton:SetPoint('TOPRIGHT', frame, 0, 0)
+        closeButton.KKUI_Border:SetOffset(-10)
+    end
 
     if portraitFrame then portraitFrame:SetAlpha(0) end
     if portraitFrameOverlay then portraitFrameOverlay:SetAlpha(0) end
