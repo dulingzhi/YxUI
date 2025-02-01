@@ -16,7 +16,6 @@ local function skin(self)
         hooksecurefunc(self.OwnerSelector, "UpdateIcon", function()
             icon:SetTexture(self.portrait:GetTexture())
             icon:SetTexCoord(self.portrait:GetTexCoord())
-            -- icon:SkinIcon()
         end)
     end
 
@@ -68,13 +67,12 @@ local function skin(self)
 
     self.PluginFrame:SetPoint('TOPRIGHT', -2, -31)
     hooksecurefunc(self.PluginFrame, 'CreatePluginButton', function(f, plugin)
-        f.pluginButtons[plugin.key]:CreateBorder()
-        f.pluginButtons[plugin.key].texture:SetAlpha(0)
-        local icon = f.pluginButtons[plugin.key]:CreateTexture(nil, "ARTWORK")
-        icon:SetPoint('CENTER')
-        icon:SetSize(22, 22)
+        local button = f.pluginButtons[plugin.key]
+        button:SkinButton()
+        button.texture:SetAlpha(0)
+        local icon = button:CreateTexture(nil, "ARTWORK")
+        icon:SetAllPoints()
         icon:SetTexture(plugin.icon)
-        -- icon:SkinIcon()
     end)
 
     self.Inset:SetPoint('TOPLEFT', 2, -60)
@@ -88,7 +86,6 @@ local function skin(self)
         if f.LeftSeparator then
             f.LeftSeparator:SetAlpha(0)
         end
-        -- f:SetTemplate("Overlay")
     end
 
     skinbg(self.MoneyFrame)

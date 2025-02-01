@@ -299,9 +299,9 @@ end
 ----------------------------------------------------------------------------------------
 Y.SetModifiedBackdrop = function(self)
     if not self.IsEnabled or self:IsEnabled() then
-        self:SetBackdropBorderColor(unpack(C.media.classborder_color))
+        self:SetBackdropBorderColor(Y.UserColor.r, Y.UserColor.g, Y.UserColor.b, 1)
         if self.overlay then
-            self.overlay:SetVertexColor(C.media.classborder_color[1] * 0.3, C.media.classborder_color[2] * 0.3, C.media.classborder_color[3] * 0.3, 1)
+            self.overlay:SetVertexColor(Y.UserColor.r * 0.3, Y.UserColor.g * 0.3, Y.UserColor.b * 0.3, 1)
         end
     end
 end
@@ -338,7 +338,7 @@ local function SkinButton(f, strip)
     if f.BottomMiddle then f.BottomMiddle:Hide() end
     if f.MiddleMiddle then f.MiddleMiddle:Hide() end
 
-    f:SetTemplate("Overlay")
+    f:CreateBorder()
     f:HookScript("OnEnter", Y.SetModifiedBackdrop)
     f:HookScript("OnLeave", Y.SetOriginalBackdrop)
 end

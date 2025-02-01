@@ -67,8 +67,23 @@ function Map:Style()
     Minimap:SetAllPoints(self)
     Minimap:EnableMouseWheel(true)
     Minimap:SetScript("OnMouseWheel", OnMouseWheel)
+    Minimap:SetScript("OnMouseUp", function(self, button)
+        if not Y.IsClassic and button == "RightButton" then
+            if not Y.IsMainline then
+                ToggleDropDownMenu(nil, nil, MiniMapTrackingDropDown, "cursor", 0, 0, "MENU", 2)
+            else
+                ToggleDropDownMenu(1, nil, MinimapCluster.Tracking.DropDown, "cursor", 0, 0, "MENU", 2)
+            end
+        elseif button == "LeftButton" then
+            if Minimap.OnClick then
+                Minimap.OnClick(self)
+            else
+                Minimap_OnClick(self)
+            end
+        end
+    end)
 
-    local minimapBorder = CreateFrame("Frame", nil, Minimap)
+    local minimapBorder = CreateFrame("Frame", "KKUI_MinimapBorder", Minimap)
     minimapBorder:SetAllPoints(Minimap)
     minimapBorder:SetFrameLevel(Minimap:GetFrameLevel())
     minimapBorder:SetFrameStrata("LOW")
@@ -79,7 +94,7 @@ function Map:Style()
 
         local minimapMailPulse = CreateFrame("Frame", nil, Minimap, "BackdropTemplate")
         minimapMailPulse:SetBackdrop({
-            edgeFile = A:GetTexture("Glow Overlay"),
+            edgeFile = A:GetBorder("Glow Overlay"),
             edgeSize = 12,
         })
         minimapMailPulse:SetPoint("TOPLEFT", minimapBorder, -5, 5)
@@ -95,7 +110,7 @@ function Map:Style()
         anim.fader:SetSmoothing("OUT")
 
         -- Add comments to describe the purpose of the function
-        local function updateMinimapBorderAnimation(_, event)
+        local function updateMinimapBorderAnimation(_, event, ...)
             local borderColor = nil
 
             -- If player enters combat, set border color to red
@@ -120,10 +135,11 @@ function Map:Style()
                 anim:Stop()
             end
         end
-        self:RegisterEvent("CALENDAR_UPDATE_PENDING_INVITES", updateMinimapBorderAnimation)
-        self:RegisterEvent("PLAYER_REGEN_DISABLED", updateMinimapBorderAnimation)
-        self:RegisterEvent("PLAYER_REGEN_ENABLED", updateMinimapBorderAnimation)
-        self:RegisterEvent("UPDATE_PENDING_MAIL", updateMinimapBorderAnimation)
+        self:RegisterEvent("CALENDAR_UPDATE_PENDING_INVITES")
+        self:RegisterEvent("PLAYER_REGEN_DISABLED")
+        self:RegisterEvent("PLAYER_REGEN_ENABLED")
+        self:RegisterEvent("UPDATE_PENDING_MAIL")
+        self:SetScript('OnEvent', updateMinimapBorderAnimation)
 
         MinimapMailFrame:HookScript("OnHide", function()
             if InCombatLockdown() then
@@ -269,9 +285,7 @@ function Map:Style()
         MiniMapMailFrame:HookScript("OnLeave", MailOnLeave)
         MiniMapMailFrame:SetFrameLevel(10)
 
-        if (MiniMapTracking and MiniMapTracking:IsShown()) then
-            MiniMapMailFrame:SetPoint("TOPLEFT", MiniMapTracking, "BOTTOMLEFT", -7, 16)
-        elseif (MiniMapTrackingFrame and MiniMapTrackingFrame:IsShown()) then
+        if (MiniMapTrackingFrame and MiniMapTrackingFrame:IsShown()) then
             MiniMapMailFrame:SetPoint("TOPLEFT", MiniMapTrackingFrame, "BOTTOMLEFT", -7, 16)
         else
             MiniMapMailFrame:SetPoint("TOPLEFT", Minimap, 4, 12)
@@ -288,30 +302,6 @@ function Map:Style()
 
     if MiniMapTrackingBackground then
         MiniMapTrackingBackground:SetTexture(nil)
-    end
-
-    if (MiniMapTracking and MiniMapTracking:IsShown()) then
-        self.Tracking = CreateFrame("Frame", nil, Minimap, "BackdropTemplate")
-        self.Tracking:SetSize(24, 24)
-        self.Tracking:SetPoint("TOPLEFT", Minimap, 1, -1)
-        self.Tracking:SetFrameLevel(10)
-        self.Tracking:SetBackdrop(Y.BackdropAndBorder)
-        self.Tracking:SetBackdropColor(0, 0, 0)
-        self.Tracking:SetBackdropBorderColor(0, 0, 0)
-
-        self.Tracking.Tex = self.Tracking:CreateTexture(nil, "ARTWORK")
-        self.Tracking.Tex:SetPoint("TOPLEFT", self.Tracking, 1, -1)
-        self.Tracking.Tex:SetPoint("BOTTOMRIGHT", self.Tracking, -1, 1)
-        self.Tracking.Tex:SetTexture(A:GetTexture(C["ui-header-texture"]))
-        self.Tracking.Tex:SetVertexColor(Y:HexToRGB(C["ui-header-texture-color"]))
-
-        MiniMapTracking:SetParent(self.Tracking)
-        MiniMapTracking:ClearAllPoints()
-        MiniMapTracking:SetPoint("CENTER", self.Tracking, 0, 0)
-
-        MiniMapTrackingIcon:SetSize(20, 20)
-        MiniMapTrackingIcon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-        MiniMapTrackingIcon:SetPoint("CENTER", self.Tracking)
     end
 
     if MiniMapTrackingFrame then
@@ -341,6 +331,7 @@ function Map:Style()
     self:Disable(MiniMapWorldMapButton)
     self:Disable(MiniMapMailBorder)
     self:Disable(TimeManagerClockButton)
+    self:Disable(MiniMapTracking)
 
     if (Y.ClientVersion > 30000) then
         local GameTimeFrame = GameTimeFrame
