@@ -200,9 +200,9 @@ end
 
 function YxUI:print(...)
 	if Settings["ui-widget-color"] then
-		print("|cFF" .. Settings["ui-widget-color"] .. "Yx|rUI:", ...)
+		NewPrint("|cFF" .. Settings["ui-widget-color"] .. "Yx|rUI:", ...)
 	else
-		print("|cFF" .. Defaults["ui-widget-color"] .. "Yx|rUI:", ...)
+		NewPrint("|cFF" .. Defaults["ui-widget-color"] .. "Yx|rUI:", ...)
 	end
 end
 

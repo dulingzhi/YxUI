@@ -43,6 +43,7 @@ Modules\Announcements.lua
 Modules\Fonts.lua
 Modules\Chat.lua
 Modules\ChatBubbles.lua
+Modules\ChatHistory.lua
 Modules\Experience.lua
 Modules\Reputation.lua
 Modules\ActionBars\ActionBars.lua

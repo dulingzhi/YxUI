@@ -565,6 +565,9 @@ local function addonStyled(_, addon)
     if tipTable[addon] then
         tipTable[addon]()
         tipTable[addon] = nil
+        if not next(tipTable) then
+            Tooltips:UnEvent("ADDON_LOADED")
+        end
     end
 end
 Tooltips:Event("ADDON_LOADED", addonStyled)
@@ -705,36 +708,10 @@ end
 
 function Tooltips:SkinItemRef()
     if Y.IsMainline then
-        ItemRefTooltip.CloseButton:Hide()
+        Y.SkinCloseButton(ItemRefTooltip.CloseButton, ItemRefTooltip)
     else
-        ItemRefCloseButton:Hide()
+        Y.SkinCloseButton(ItemRefCloseButton, ItemRefTooltip)
     end
-
-    -- Close button
-    local CloseButton = CreateFrame("Frame", nil, ItemRefTooltip, "BackdropTemplate")
-    CloseButton:SetSize(20, 20)
-    CloseButton:SetPoint("TOPRIGHT", ItemRefTooltip, -3, -4)
-    CloseButton:SetBackdrop(Y.BackdropAndBorder)
-    CloseButton:SetBackdropColor(0, 0, 0, 0)
-    CloseButton:SetBackdropBorderColor(0, 0, 0)
-    CloseButton:SetScript("OnEnter", ItemRefCloseOnEnter)
-    CloseButton:SetScript("OnLeave", ItemRefCloseOnLeave)
-    CloseButton:SetScript("OnMouseUp", ItemRefCloseOnMouseUp)
-    CloseButton:SetScript("OnMouseDown", ItemRefCloseOnMouseDown)
-
-    CloseButton.Texture = CloseButton:CreateTexture(nil, "ARTWORK")
-    CloseButton.Texture:SetPoint("TOPLEFT", CloseButton, 1, -1)
-    CloseButton.Texture:SetPoint("BOTTOMRIGHT", CloseButton, -1, 1)
-    CloseButton.Texture:SetTexture(A:GetTexture(C["ui-header-texture"]))
-    CloseButton.Texture:SetVertexColor(Y:HexToRGB(C["ui-widget-bright-color"]))
-
-    CloseButton.Cross = CloseButton:CreateTexture(nil, "OVERLAY")
-    CloseButton.Cross:SetPoint("CENTER", CloseButton, 0, 0)
-    CloseButton.Cross:SetSize(16, 16)
-    CloseButton.Cross:SetTexture(A:GetTexture("Close"))
-    CloseButton.Cross:SetVertexColor(Y:HexToRGB("EEEEEE"))
-
-    ItemRefTooltip.NewCloseButton = CloseButton
 end
 
 function Tooltips:OnEvent(event, guid)

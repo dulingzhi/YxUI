@@ -7,7 +7,7 @@ local function skin(self)
     Y.SkinFrame(self, true)
 
     do
-        self.OwnerSelector:CreateBorder()
+        self.OwnerSelector:SkinButton()
         self.OwnerSelector:SetSize(20, 20)
         self.OwnerSelector:SetPoint('TOPLEFT', 2, -2)
         local icon = self.OwnerSelector:CreateTexture(nil, "ARTWORK")
@@ -28,7 +28,7 @@ local function skin(self)
         for _, button in ipairs({ self.BagFrame:GetChildren() }) do
             local obj = button.Icon or button:GetNormalTexture()
             local tex = obj and obj:GetTexture()
-            button:CreateBorder()
+            button:SkinButton()
             local icon = button:CreateTexture(nil, "ARTWORK")
             icon:SetPoint('CENTER')
             icon:SetTexture(tex)

@@ -64,15 +64,15 @@ local function CreateBorder(bFrame, ...)
         local BorderOffset = bOffset or -4
         local BorderColor = bColor or { 1, 1, 1 }
 
-        local kkui_border = Y.CreateBorder(bFrame, bSubLevel or "OVERLAY", bLayer or 1)
-        kkui_border:SetSize(BorderSize)
-        kkui_border:SetTexture(BorderTexture)
-        kkui_border:SetOffset(BorderOffset)
+        local border = Y.CreateBorder(bFrame, bSubLevel or "OVERLAY", bLayer or 1)
+        border:SetSize(BorderSize)
+        border:SetTexture(BorderTexture)
+        border:SetOffset(BorderOffset)
 
         local r, g, b = unpack(BorderColor)
-        kkui_border:SetVertexColor(r, g, b)
+        border:SetVertexColor(r, g, b)
 
-        bFrame.YxUIBorder = kkui_border
+        bFrame.YxUIBorder = border
     end
 
     if not bFrame.YxUIBackground then
@@ -82,14 +82,14 @@ local function CreateBorder(bFrame, ...)
         local BackgroundPoint = bgPoint or 0
         local BackgroundColor = bgColor or { 0.060, 0.060, 0.060, 0.9 }
 
-        local kkui_background = bFrame:CreateTexture(nil, BackgroundSubLevel, nil, BackgroundLayer)
-        kkui_background:SetTexture(BackgroundTexture, true, true)
-        kkui_background:SetTexCoord(Y.TexCoords[1], Y.TexCoords[2], Y.TexCoords[3], Y.TexCoords[4])
-        kkui_background:SetPoint("TOPLEFT", bFrame, "TOPLEFT", BackgroundPoint, -BackgroundPoint)
-        kkui_background:SetPoint("BOTTOMRIGHT", bFrame, "BOTTOMRIGHT", -BackgroundPoint, BackgroundPoint)
-        kkui_background:SetVertexColor(unpack(BackgroundColor))
+        local background = bFrame:CreateTexture(nil, BackgroundSubLevel, nil, BackgroundLayer)
+        background:SetTexture(BackgroundTexture, true, true)
+        background:SetTexCoord(Y.TexCoords[1], Y.TexCoords[2], Y.TexCoords[3], Y.TexCoords[4])
+        background:SetPoint("TOPLEFT", bFrame, "TOPLEFT", BackgroundPoint, -BackgroundPoint)
+        background:SetPoint("BOTTOMRIGHT", bFrame, "BOTTOMRIGHT", -BackgroundPoint, BackgroundPoint)
+        background:SetVertexColor(unpack(BackgroundColor))
 
-        bFrame.YxUIBackground = kkui_background
+        bFrame.YxUIBackground = background
     end
 
     return bFrame
@@ -245,52 +245,57 @@ end
 ----------------------------------------------------------------------------------------
 --	Style ActionBars/Bags buttons function(by Chiril & Karudon)
 ----------------------------------------------------------------------------------------
-local function StyleButton(button, t, size, setBackdrop)
-    if not size then size = 2 end
-    if button.SetHighlightTexture and not button.hover then
-        local hover = button:CreateTexture()
-        hover:SetColorTexture(1, 1, 1, 0.3)
-        if setBackdrop then
-            hover:SetInside(button.backdrop)
-        else
-            hover:SetPoint("TOPLEFT", button, size, -size)
-            hover:SetPoint("BOTTOMRIGHT", button, -size, size)
+
+-- Create Texture
+local function CreateTexture(button, noTexture, texturePath, desaturated, vertexColor, setPoints)
+    if not noTexture then
+        local texture = button:CreateTexture()
+        texture:SetTexture(texturePath)
+        texture:SetPoint("TOPLEFT", button, "TOPLEFT", setPoints, -setPoints)
+        texture:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -setPoints, setPoints)
+        texture:SetBlendMode("ADD")
+
+        if desaturated then
+            texture:SetDesaturated(true)
         end
-        button.hover = hover
-        button:SetHighlightTexture(hover)
+
+        if vertexColor then
+            texture:SetVertexColor(unpack(vertexColor))
+        end
+
+        return texture
+    end
+end
+
+local function StyleButton(button, noHover, noPushed, noChecked, setPoints)
+    -- setPoints default value is 0
+    setPoints = setPoints or 0
+
+    -- Create highlight, pushed, and checked textures for the button if they do not exist
+    if button.SetHighlightTexture and not noHover then
+        button.hover = CreateTexture(button, noHover, "Interface\\Buttons\\ButtonHilight-Square", false, nil, setPoints)
+        button:SetHighlightTexture(button.hover)
     end
 
-    if not t and button.SetPushedTexture and not button.pushed then
-        local pushed = button:CreateTexture()
-        pushed:SetColorTexture(0.9, 0.8, 0.1, 0.3)
-        if setBackdrop then
-            pushed:SetInside(button.backdrop)
-        else
-            pushed:SetPoint("TOPLEFT", button, size, -size)
-            pushed:SetPoint("BOTTOMRIGHT", button, -size, size)
-        end
-        button.pushed = pushed
-        button:SetPushedTexture(pushed)
+    if button.SetPushedTexture and not noPushed then
+        button.pushed = CreateTexture(button, noPushed, "Interface\\Buttons\\ButtonHilight-Square", true, { 246 / 255, 196 / 255, 66 / 255 }, setPoints)
+        button:SetPushedTexture(button.pushed)
     end
 
-    if button.SetCheckedTexture and not button.checked then
-        local checked = button:CreateTexture()
-        checked:SetColorTexture(0, 1, 0, 0.3)
-        if setBackdrop then
-            checked:SetInside(button.backdrop)
-        else
-            checked:SetPoint("TOPLEFT", button, size, -size)
-            checked:SetPoint("BOTTOMRIGHT", button, -size, size)
-        end
-        button.checked = checked
-        button:SetCheckedTexture(checked)
+    if button.SetCheckedTexture and not noChecked then
+        button.checked = CreateTexture(button, noChecked, "Interface\\Buttons\\CheckButtonHilight", false, nil, setPoints)
+        button:SetCheckedTexture(button.checked)
     end
 
-    local cooldown = button:GetName() and _G[button:GetName() .. "Cooldown"]
+    local name = button.GetName and button:GetName()
+    local cooldown = name and _G[name .. "Cooldown"]
+
     if cooldown then
         cooldown:ClearAllPoints()
-        cooldown:SetPoint("TOPLEFT", button, size, -size)
-        cooldown:SetPoint("BOTTOMRIGHT", button, -size, size)
+        cooldown:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1)
+        cooldown:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1)
+        cooldown:SetDrawEdge(false)
+        cooldown:SetSwipeColor(0, 0, 0, 1)
     end
 end
 
@@ -298,18 +303,14 @@ end
 --	Style buttons function
 ----------------------------------------------------------------------------------------
 Y.SetModifiedBackdrop = function(self)
-    if not self.IsEnabled or self:IsEnabled() then
-        self:SetBackdropBorderColor(Y.UserColor.r, Y.UserColor.g, Y.UserColor.b, 1)
-        if self.overlay then
-            self.overlay:SetVertexColor(Y.UserColor.r * 0.3, Y.UserColor.g * 0.3, Y.UserColor.b * 0.3, 1)
-        end
+    if self.YxUIBorder and (not self.IsEnabled or self:IsEnabled()) then
+        self.YxUIBorder:SetVertexColor(102 / 255, 157 / 255, 255 / 255)
     end
 end
 
 Y.SetOriginalBackdrop = function(self)
-    self:SetBackdropBorderColor(unpack(C.media.border_color))
-    if self.overlay then
-        self.overlay:SetVertexColor(0.1, 0.1, 0.1, 1)
+    if self.YxUIBorder then
+        self.YxUIBorder:SetVertexColor(1, 1, 1)
     end
 end
 
@@ -831,43 +832,44 @@ function Y.SkinCheckBoxAtlas(checkbox, size)
     end
 end
 
-function Y.SkinCloseButton(f, point, text, pixel)
-    f:StripTextures()
-    f:SetTemplate("Overlay")
-    f:SetSize(18, 18)
+function Y.SkinCloseButton(self, parent, xOffset, yOffset)
+    -- Define the parent frame and x,y offset of the close button
+    parent = parent or self:GetParent()
+    xOffset = xOffset or -6
+    yOffset = yOffset or -6
 
-    if not text then text = "x" end
-    if text == "-" and not pixel then
-        f.text = f:CreateTexture(nil, "OVERLAY")
-        f.text:SetSize(7, 1)
-        f.text:SetPoint("CENTER")
-        f.text:SetTexture(C.media.blank)
-    end
-    if text == "-" and pixel then
-        f.text = f:CreateTexture(nil, "OVERLAY")
-        f.text:SetSize(5, 1)
-        f.text:SetPoint("CENTER")
-        f.text:SetTexture(C.media.blank)
-    end
-    if not f.text then
-        if pixel then
-            f.text = f:FontString(nil, [[Interface\AddOns\YevhenUI\Media\Fonts\Pixel.ttf]], 8)
-            f.text:SetPoint("CENTER", 0, 0)
-        else
-            f.text = f:FontString(nil, C.media.normal_font, 17)
-            f.text:SetPoint("CENTER", 0, 1)
-        end
-        f.text:SetText(text)
+    -- Set the size of the close button and its position relative to the parent frame
+    self:SetSize(16, 16)
+    self:ClearAllPoints()
+    self:SetPoint("TOPRIGHT", parent, "TOPRIGHT", xOffset, yOffset)
+
+    -- Remove any textures that may already be applied to the button
+    self:StripTextures()
+    -- Check if there is a Border attribute, if so set its alpha to 0
+    if self.Border then
+        self.Border:SetAlpha(0)
     end
 
-    if point then
-        f:SetPoint("TOPRIGHT", point, "TOPRIGHT", -4, -4)
-    else
-        f:SetPoint("TOPRIGHT", -4, -4)
-    end
+    -- Create a border for the button with specific color and alpha values
+    self:CreateBorder(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, { 0.85, 0.25, 0.25 })
+    -- Apply the 'StyleButton' function to the button
+    self:StyleButton()
 
-    f:HookScript("OnEnter", Y.SetModifiedBackdrop)
-    f:HookScript("OnLeave", Y.SetOriginalBackdrop)
+    -- Remove the default disabled texture
+    self:SetDisabledTexture("")
+    -- Get the disabled texture and set its color and draw layer
+    local dis = self:GetDisabledTexture()
+    dis:SetVertexColor(0, 0, 0, 0.4)
+    dis:SetDrawLayer("OVERLAY")
+    dis:SetAllPoints()
+
+    -- Create a texture for the button
+    local tex = self:CreateTexture()
+    -- Set the texture to CustomCloseButton
+    tex:SetTexture("Interface\\AddOns\\YxUI\\Media\\Textures\\CloseButton_32")
+    -- Set the texture to cover the entire button
+    tex:SetAllPoints()
+    self.__texture = tex
 end
 
 function Y.SkinSlider(f)
@@ -1133,11 +1135,7 @@ function Y.SkinFrame(frame, backdrop, x, y, x1, y1)
 
     local closeButton = frame.CloseButton or (name and _G[name .. "CloseButton"])
     if closeButton then
-        closeButton:CreateBorder()
-        closeButton:SetSize(26, 26)
-        closeButton:ClearAllPoints()
-        closeButton:SetPoint('TOPRIGHT', frame, 0, 0)
-        closeButton.YxUIBorder:SetOffset(-10)
+        Y.SkinCloseButton(closeButton, frame)
     end
 
     if portraitFrame then portraitFrame:SetAlpha(0) end

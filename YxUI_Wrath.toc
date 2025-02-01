@@ -46,6 +46,7 @@ Modules\Popup.lua
 Modules\Gold.lua
 Modules\Chat.lua
 Modules\ChatBubbles.lua
+Modules\ChatHistory.lua
 Modules\Experience.lua
 Modules\Reputation.lua
 Modules\ActionBars\ActionBars.lua
