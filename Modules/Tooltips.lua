@@ -1,29 +1,29 @@
-local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+local Y, L, A, C, D = YxUIGlobal:get()
 
-local Tooltips = YxUI:NewModule("Tooltips")
+local Tooltips = Y:NewModule("Tooltips")
 
 -- Default settings values
-Defaults["tooltips-enable"] = true
-Defaults["tooltips-on-cursor"] = false
-Defaults["tooltips-show-id"] = false
-Defaults["tooltips-display-realm"] = true
-Defaults["tooltips-display-title"] = true
-Defaults["tooltips-display-rank"] = false
-Defaults["tooltips-font"] = "Roboto"
-Defaults["tooltips-font-size"] = 12
-Defaults["tooltips-font-flags"] = ""
-Defaults["tooltips-hide-on-unit"] = "NEVER"
-Defaults["tooltips-hide-on-item"] = "NEVER"
-Defaults["tooltips-hide-on-action"] = "NEVER"
-Defaults["tooltips-health-bar-height"] = 15
-Defaults["tooltips-show-health-text"] = true
-Defaults["tooltips-show-target"] = true
-Defaults["tooltips-cursor-anchor"] = "ANCHOR_CURSOR"
-Defaults["tooltips-cursor-anchor-x"] = 0
-Defaults["tooltips-cursor-anchor-y"] = 8
-Defaults["tooltips-show-health"] = true
-Defaults["tooltips-show-price"] = true
-Defaults["tooltips-opacity"] = 100
+D["tooltips-enable"] = true
+D["tooltips-on-cursor"] = false
+D["tooltips-show-id"] = false
+D["tooltips-display-realm"] = true
+D["tooltips-display-title"] = true
+D["tooltips-display-rank"] = false
+D["tooltips-font"] = "Roboto"
+D["tooltips-font-size"] = 12
+D["tooltips-font-flags"] = ""
+D["tooltips-hide-on-unit"] = "NEVER"
+D["tooltips-hide-on-item"] = "NEVER"
+D["tooltips-hide-on-action"] = "NEVER"
+D["tooltips-health-bar-height"] = 15
+D["tooltips-show-health-text"] = true
+D["tooltips-show-target"] = true
+D["tooltips-cursor-anchor"] = "ANCHOR_CURSOR"
+D["tooltips-cursor-anchor-x"] = 0
+D["tooltips-cursor-anchor-y"] = 8
+D["tooltips-show-health"] = true
+D["tooltips-show-price"] = true
+D["tooltips-opacity"] = 100
 
 local select = select
 local find = string.find
@@ -56,251 +56,275 @@ local GetHappiness
 local GameTooltipStatusBar = GameTooltipStatusBar
 local MyGuild
 
-if (not YxUI.IsMainline) then
-	GetHappiness = GetPetHappiness
+if (not Y.IsMainline) then
+    GetHappiness = GetPetHappiness
 end
 
 Tooltips.Handled = {
-	GameTooltip,
-	ItemRefTooltip,
-	ItemRefShoppingTooltip1,
-	ItemRefShoppingTooltip2,
-	--AutoCompleteBox,
-	FriendsTooltip,
-	ShoppingTooltip1,
-	ShoppingTooltip2,
-	EmbeddedItemTooltip,
+    ['GameTooltip'] = false,
+    ['ItemRefTooltip'] = false,
+    ['ItemRefShoppingTooltip1'] = false,
+    ['ItemRefShoppingTooltip2'] = false,
+    --AutoCompleteBox] = false,
+    ['FriendsTooltip'] = false,
+    ['ShoppingTooltip1'] = false,
+    ['ShoppingTooltip2'] = false,
+    ['EmbeddedItemTooltip'] = false,
+    ['FrameStackTooltip'] = 'Blizzard_DebugTools',
+    ['EventTraceTooltip'] = 'Blizzard_EventTrace',
+    ['LibDBIconTooltip'] = false,
+    ['AceConfigDialogTooltip'] = false,
 }
 
 Tooltips.Classifications = {
-	["rare"] = Language["|cFFBDBDBDRare|r"],
-	["elite"] = Language["|cFFFDD835Elite|r"],
-	["rareelite"] = Language["|cFFBDBDBDRare Elite|r"],
-	["worldboss"] = Language["Boss"],
+    ["rare"] = L["|cFFBDBDBDRare|r"],
+    ["elite"] = L["|cFFFDD835Elite|r"],
+    ["rareelite"] = L["|cFFBDBDBDRare Elite|r"],
+    ["worldboss"] = L["Boss"],
 }
 
 Tooltips.HappinessLevels = {
-	[1] = Language["Unhappy"],
-	[2] = Language["Content"],
-	[3] = Language["Happy"]
+    [1] = L["Unhappy"],
+    [2] = L["Content"],
+    [3] = L["Happy"]
 }
 
 function Tooltips:UpdateFonts(tooltip)
-	for i = 1, tooltip:GetNumRegions() do
-		local Region = select(i, tooltip:GetRegions())
+    for i = 1, tooltip:GetNumRegions() do
+        local Region = select(i, tooltip:GetRegions())
 
-		if (Region:GetObjectType() == "FontString") then
-			YxUI:SetFontInfo(Region, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
-		end
-	end
+        if (Region:GetObjectType() == "FontString") then
+            Y:SetFontInfo(Region, C["tooltips-font"], C["tooltips-font-size"], C["tooltips-font-flags"])
+        end
+    end
 
-	for i = 1, tooltip:GetNumChildren() do
-		local Child = select(i, tooltip:GetChildren())
+    for i = 1, tooltip:GetNumChildren() do
+        local Child = select(i, tooltip:GetChildren())
 
-		if (Child and Child.GetName and Child:GetName() ~= nil and find(Child:GetName(), "MoneyFrame")) then
-			local Prefix = _G[Child:GetName() .. "PrefixText"]
-			local Suffix = _G[Child:GetName() .. "SuffixText"]
+        if (Child and Child.GetName and Child:GetName() ~= nil and find(Child:GetName(), "MoneyFrame")) then
+            local Prefix = _G[Child:GetName() .. "PrefixText"]
+            local Suffix = _G[Child:GetName() .. "SuffixText"]
 
-			if Prefix then
-				YxUI:SetFontInfo(Prefix, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
-			end
+            if Prefix then
+                Y:SetFontInfo(Prefix, C["tooltips-font"], C["tooltips-font-size"], C["tooltips-font-flags"])
+            end
 
-			if Suffix then
-				YxUI:SetFontInfo(Suffix, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
-			end
-		end
-	end
+            if Suffix then
+                Y:SetFontInfo(Suffix, C["tooltips-font"], C["tooltips-font-size"], C["tooltips-font-flags"])
+            end
+        end
+    end
 
-	if tooltip.numMoneyFrames then
-		local MoneyFrame
+    if tooltip.numMoneyFrames then
+        local MoneyFrame
 
-		for i = 1, tooltip.numMoneyFrames do
-			MoneyFrame = _G[tooltip:GetName() .. "MoneyFrame" .. i]
+        for i = 1, tooltip.numMoneyFrames do
+            MoneyFrame = _G[tooltip:GetName() .. "MoneyFrame" .. i]
 
-			if MoneyFrame then
-				for j = 1, MoneyFrame:GetNumChildren() do
-					local Region = select(j, MoneyFrame:GetChildren())
+            if MoneyFrame then
+                for j = 1, MoneyFrame:GetNumChildren() do
+                    local Region = select(j, MoneyFrame:GetChildren())
 
-					if (Region and Region.GetName and Region:GetName()) then
-						local Text = _G[Region:GetName() .. "Text"]
+                    if (Region and Region.GetName and Region:GetName()) then
+                        local Text = _G[Region:GetName() .. "Text"]
 
-						if Text then
-							YxUI:SetFontInfo(Text, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
-						end
-					end
-				end
-			end
-		end
-	end
+                        if Text then
+                            Y:SetFontInfo(Text, C["tooltips-font"], C["tooltips-font-size"], C["tooltips-font-flags"])
+                        end
+                    end
+                end
+            end
+        end
+    end
 
-	self:UpdateStatusBarFonts()
+    self:UpdateStatusBarFonts()
+end
+
+local StripBackdrop = function(self)
+    if self.NineSlice then
+        self.NineSlice:SetAlpha(0)
+    end
+    if self.SetBackdrop then
+        self:SetBackdrop(nil)
+    end
 end
 
 local SetTooltipStyle = function(self)
-	if self.NineSlice then
-		self.NineSlice:Hide()
-	end
+    if not self or self:IsForbidden() then
+        return
+    end
 
-	if self.Styled then
-		Tooltips:UpdateFonts(self)
-	else
-		local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
-		local Level = self:GetFrameLevel()
+    if self.Styled then
+        Tooltips:UpdateFonts(self)
 
-		self.Backdrop = CreateFrame("Frame", nil, self, "BackdropTemplate")
-		self.Backdrop:SetPoint("TOPLEFT", self, 0, 0)
-		self.Backdrop:SetPoint("BOTTOMRIGHT", self, 0, 0)
-		self.Backdrop:SetFrameLevel(Level > 1 and Level - 1 or 0)
-		self.Backdrop:SetFrameStrata(self:GetFrameStrata())
-		YxUI:AddBackdrop(self.Backdrop)
-		self.Backdrop.Outside:SetBackdropColor(R, G, B, (Settings["tooltips-opacity"] / 100))
+        local data = self.GetTooltipData and self:GetTooltipData()
+        if data then
+            local link = data.guid and C_Item.GetItemLinkByGUID(data.guid) or data.hyperlink
+            if link then
+                local quality = select(3, C_Item.GetItemInfo(link))
+                local color = Y.QualityColors[quality or 1]
+                if color then
+                    self.bg.YxUIBorder:SetVertexColor(color.r, color.g, color.b)
+                end
+            end
+        end
+    else
+        StripBackdrop(self)
+        self:DisableDrawLayer("BACKGROUND")
 
-		if (self == AutoCompleteBox) then
-			for i = 1, AUTOCOMPLETE_MAX_BUTTONS do
-				YxUI:SetFontInfo(_G["AutoCompleteButton" .. i .. "Text"], Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
-			end
+        self.bg = CreateFrame("Frame", nil, self)
+        self.bg:ClearAllPoints()
+        self.bg:SetPoint("TOPLEFT", self, "TOPLEFT", 2, -2)
+        self.bg:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 2)
+        self.bg:SetFrameLevel(self:GetFrameLevel())
+        self.bg:CreateBorder()
+        self.bg.YxUIBorder:SetVertexColor(1, 1, 1) -- Default color
 
-			YxUI:SetFontInfo(AutoCompleteInstructions, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
-		end
+        if (self == AutoCompleteBox) then
+            for i = 1, AUTOCOMPLETE_MAX_BUTTONS do
+                Y:SetFontInfo(_G["AutoCompleteButton" .. i .. "Text"], C["tooltips-font"], C["tooltips-font-size"], C["tooltips-font-flags"])
+            end
 
-		Tooltips:UpdateFonts(self)
+            Y:SetFontInfo(AutoCompleteInstructions, C["tooltips-font"], C["tooltips-font-size"], C["tooltips-font-flags"])
+        end
 
-		self.Styled = true
+        Tooltips:UpdateFonts(self)
 
-		self:Show()
-	end
+        self.Styled = true
+
+        self:Show()
+    end
 end
 
 local GetUnitColor = function(unit)
-	local Color
+    local Color
 
-	if UnitIsPlayer(unit) then
-		local Class = select(2, UnitClass(unit))
+    if UnitIsPlayer(unit) then
+        local Class = select(2, UnitClass(unit))
 
-		if Class then
-			Color = YxUI.ClassColors[Class]
-		end
-	else
-		local Reaction = UnitReaction(unit, "player")
+        if Class then
+            Color = Y.ClassColors[Class]
+        end
+    else
+        local Reaction = UnitReaction(unit, "player")
 
-		if Reaction then
-			Color = YxUI.ReactionColors[Reaction]
-		end
-	end
+        if Reaction then
+            Color = Y.ReactionColors[Reaction]
+        end
+    end
 
-	if Color then
-		return YxUI:RGBToHex(Color[1], Color[2], Color[3])
-	else
-		return "FFFFFF"
-	end
+    if Color then
+        return Y:RGBToHex(Color[1], Color[2], Color[3])
+    else
+        return "FFFFFF"
+    end
 end
 
 local FilterUnit = function(unit)
-	local State
+    local State
 
-	if UnitPlayerControlled(unit) then
-		if UnitCanAttack(unit, "player") then
-			if (not UnitCanAttack("player", unit)) then
-				State = 1
-			else
-				State = 2
-			end
-		elseif UnitCanAttack("player", unit) then
-			State = 1
-		elseif UnitIsPVP(unit) then
-			State = 1
-		else
-			State = 1
-		end
-	else
-		local Reaction = UnitReaction(unit, "player")
+    if UnitPlayerControlled(unit) then
+        if UnitCanAttack(unit, "player") then
+            if (not UnitCanAttack("player", unit)) then
+                State = 1
+            else
+                State = 2
+            end
+        elseif UnitCanAttack("player", unit) then
+            State = 1
+        elseif UnitIsPVP(unit) then
+            State = 1
+        else
+            State = 1
+        end
+    else
+        local Reaction = UnitReaction(unit, "player")
 
-		if Reaction then
-			if (Reaction >= 4) then
-				State = 1
-			else
-				State = 2
-			end
-		else
-			State = 1
-		end
-	end
+        if Reaction then
+            if (Reaction >= 4) then
+                State = 1
+            else
+                State = 2
+            end
+        else
+            State = 1
+        end
+    end
 
-	if (Settings["tooltips-hide-on-unit"] == "FRIENDLY" and State == 1) then
-		return true
-	elseif (Settings["tooltips-hide-on-unit"] == "HOSTILE" and State == 2) then
-		return true
-	end
+    if (C["tooltips-hide-on-unit"] == "FRIENDLY" and State == 1) then
+        return true
+    elseif (C["tooltips-hide-on-unit"] == "HOSTILE" and State == 2) then
+        return true
+    end
 end
 
 local OnTooltipSetUnit = function(self)
-	if (Settings["tooltips-hide-on-unit"] == "NO_COMBAT" and InCombatLockdown()) or Settings["tooltips-hide-on-unit"] == "ALWAYS" then
-		self:Hide()
+    if (C["tooltips-hide-on-unit"] == "NO_COMBAT" and InCombatLockdown()) or C["tooltips-hide-on-unit"] == "ALWAYS" then
+        self:Hide()
 
-		return
-	end
+        return
+    end
 
-	local Unit, UnitID = self:GetUnit()
+    local Unit, UnitID = self:GetUnit()
 
-	if UnitID then
-		local Class = UnitClass(UnitID)
+    if UnitID then
+        local Class = UnitClass(UnitID)
 
-		if (not Class) then
-			return
-		end
+        if (not Class) then
+            return
+        end
 
-		if FilterUnit(UnitID) then
-			self:Hide()
-			return
-		end
+        if FilterUnit(UnitID) then
+            self:Hide()
+            return
+        end
 
-		local Name, Realm = UnitName(UnitID)
-		local Race = UnitRace(UnitID)
-		local Level = UnitLevel(UnitID)
-		local Title = UnitPVPName(UnitID)
-		local Guild, Rank = GetGuildInfo(UnitID)
-		local Color = GetUnitColor(UnitID)
-		local CreatureType = UnitCreatureType(UnitID)
-		local Classification = Tooltips.Classifications[UnitClassification(UnitID)]
-		local Flag = ""
-		local Line
-		local LineText
+        local Name, Realm = UnitName(UnitID)
+        local Race = UnitRace(UnitID)
+        local Level = UnitLevel(UnitID)
+        local Title = UnitPVPName(UnitID)
+        local Guild, Rank = GetGuildInfo(UnitID)
+        local Color = GetUnitColor(UnitID)
+        local CreatureType = UnitCreatureType(UnitID)
+        local Classification = Tooltips.Classifications[UnitClassification(UnitID)]
+        local Flag = ""
+        local Line
+        local LineText
 
-		if (Class == Name) then
-			Class = ""
-		end
+        if (Class == Name) then
+            Class = ""
+        end
 
-		GameTooltipStatusBar:SetStatusBarColor(YxUI:HexToRGB(Color))
-		GameTooltipStatusBar.BG:SetVertexColor(YxUI:HexToRGB(Color))
+        GameTooltipStatusBar:SetStatusBarColor(Y:HexToRGB(Color))
 
-		if YxUI.IsMainline then
-			local EffectiveLevel = UnitEffectiveLevel(UnitID)
+        if Y.IsMainline then
+            local EffectiveLevel = UnitEffectiveLevel(UnitID)
 
-			if (EffectiveLevel > 0 and EffectiveLevel ~= Level) then
-				local EffectiveColor = GetQuestDifficultyColor(EffectiveLevel)
-				local EffectiveHex = YxUI:RGBToHex(EffectiveColor.r, EffectiveColor.g, EffectiveColor.b)
+            if (EffectiveLevel > 0 and EffectiveLevel ~= Level) then
+                local EffectiveColor = GetQuestDifficultyColor(EffectiveLevel)
+                local EffectiveHex = Y:RGBToHex(EffectiveColor.r, EffectiveColor.g, EffectiveColor.b)
 
-				local LevelColor = GetQuestDifficultyColor(Level)
-				local ColorHex = YxUI:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
+                local LevelColor = GetQuestDifficultyColor(Level)
+                local ColorHex = Y:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
 
-				if (Level == -1) then
-					Level = "??"
-				end
+                if (Level == -1) then
+                    Level = "??"
+                end
 
-				Level = format("|cFF%s%s|r (|cFF%s%s|r)", EffectiveHex, EffectiveLevel, ColorHex, Level)
-			end
-		else
-			local LevelColor = GetQuestDifficultyColor(Level)
-			local Hex = YxUI:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
+                Level = format("|cFF%s%s|r (|cFF%s%s|r)", EffectiveHex, EffectiveLevel, ColorHex, Level)
+            end
+        else
+            local LevelColor = GetQuestDifficultyColor(Level)
+            local Hex = Y:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
 
-			if (Level == -1) then
-				Level = "??"
-			end
+            if (Level == -1) then
+                Level = "??"
+            end
 
-			Level = format("|cFF%s%s|r", Hex, Level)
-		end
+            Level = format("|cFF%s%s|r", Hex, Level)
+        end
 
-		--[[if CanInspect(UnitID) then
+        --[[if CanInspect(UnitID) then
 			if self.GUID then
 				if UnitGUID(UnitID) == self.GUID then
 					print(UnitName())
@@ -311,503 +335,508 @@ local OnTooltipSetUnit = function(self)
 			end
 		end]]
 
-		if UnitIsAFK(UnitID) then
-			Flag = "|cFFFDD835" .. CHAT_FLAG_AFK .. "|r "
-		elseif UnitIsDND(UnitID) then
-			Flag = "|cFFF44336" .. CHAT_FLAG_DND .. "|r "
-		end
+        if UnitIsAFK(UnitID) then
+            Flag = "|cFFFDD835" .. CHAT_FLAG_AFK .. "|r "
+        elseif UnitIsDND(UnitID) then
+            Flag = "|cFFF44336" .. CHAT_FLAG_DND .. "|r "
+        end
 
-		if (Realm and Realm ~= "" and Settings["tooltips-display-realm"]) then
-			GameTooltipTextLeft1:SetText(format("%s|cFF%s%s - %s|r", Flag, Color, (Settings["tooltips-display-title"] and Title or Name), Realm))
-		else
-			GameTooltipTextLeft1:SetText(format("%s|cFF%s%s|r", Flag, Color, (Settings["tooltips-display-title"] and Title or Name)))
-		end
+        if (Realm and Realm ~= "" and C["tooltips-display-realm"]) then
+            GameTooltipTextLeft1:SetText(format("%s|cFF%s%s - %s|r", Flag, Color, (C["tooltips-display-title"] and Title or Name), Realm))
+        else
+            GameTooltipTextLeft1:SetText(format("%s|cFF%s%s|r", Flag, Color, (C["tooltips-display-title"] and Title or Name)))
+        end
 
-		for i = 2, self:NumLines() do
-			Line = _G["GameTooltipTextLeft" .. i]
-			LineText = Line and Line.GetText and Line:GetText() or ""
-			if (find(LineText, "^" .. LEVEL)) then
-				if Race then
-					Line:SetText(format("%s %s|r %s %s", LEVEL, Level, Race, Class))
-				elseif CreatureType then
-					if Classification then
-						Line:SetText(format("%s %s|r %s %s", LEVEL, Level, Classification, CreatureType))
-					else
-						Line:SetText(format("%s %s|r %s", LEVEL, Level, CreatureType))
-					end
-				else
-					Line:SetText(format("%s %s|r %s", LEVEL, Level, Class))
-				end
-			elseif (find(LineText, PVP)) then
-				Line:SetText(format("|cFFEE4D4D%s|r", PVP))
-			elseif Guild and find(LineText, Guild) then
-				if (Guild == MyGuild) then
-					if Settings["tooltips-display-rank"] then
-						Guild = format("|cFF5DADE2<%s>|r (%s)", Guild, Rank)
-					else
-						Guild = format("|cFF5DADE2<%s>|r", Guild)
-					end
-				else
-					if Settings["tooltips-display-rank"] then
-						Guild = format("|cFF66BB6A<%s>|r (%s)", Guild, Rank)
-					else
-						Guild = format("|cFF66BB6A<%s>|r", Guild)
-					end
-				end
+        for i = 2, self:NumLines() do
+            Line = _G["GameTooltipTextLeft" .. i]
+            LineText = Line and Line.GetText and Line:GetText() or ""
+            if (find(LineText, "^" .. LEVEL)) then
+                if Race then
+                    Line:SetText(format("%s %s|r %s %s", LEVEL, Level, Race, Class))
+                elseif CreatureType then
+                    if Classification then
+                        Line:SetText(format("%s %s|r %s %s", LEVEL, Level, Classification, CreatureType))
+                    else
+                        Line:SetText(format("%s %s|r %s", LEVEL, Level, CreatureType))
+                    end
+                else
+                    Line:SetText(format("%s %s|r %s", LEVEL, Level, Class))
+                end
+            elseif (find(LineText, PVP)) then
+                Line:SetText(format("|cFFEE4D4D%s|r", PVP))
+            elseif Guild and find(LineText, Guild) then
+                if (Guild == MyGuild) then
+                    if C["tooltips-display-rank"] then
+                        Guild = format("|cFF5DADE2<%s>|r (%s)", Guild, Rank)
+                    else
+                        Guild = format("|cFF5DADE2<%s>|r", Guild)
+                    end
+                else
+                    if C["tooltips-display-rank"] then
+                        Guild = format("|cFF66BB6A<%s>|r (%s)", Guild, Rank)
+                    else
+                        Guild = format("|cFF66BB6A<%s>|r", Guild)
+                    end
+                end
 
-				Line:SetText(Guild)
-			end
-		end
+                Line:SetText(Guild)
+            end
+        end
 
-		if (Settings["tooltips-show-target"] and (UnitID ~= "player" and UnitExists(UnitID .. "target"))) then
-			local TargetColor = GetUnitColor(UnitID .. "target")
+        if (C["tooltips-show-target"] and (UnitID ~= "player" and UnitExists(UnitID .. "target"))) then
+            local TargetColor = GetUnitColor(UnitID .. "target")
 
-			self:AddLine(Language["Targeting: |cFF"] .. TargetColor .. UnitName(UnitID .. "target") .. "|r", 1, 1, 1)
-		end
+            self:AddLine(L["Targeting: |cFF"] .. TargetColor .. UnitName(UnitID .. "target") .. "|r", 1, 1, 1)
+        end
 
-		if ((not YxUI.IsMainline) and YxUI.UserClass == "HUNTER" and UnitID == "pet") then
-			local Level = GetHappiness()
+        if ((not Y.IsMainline) and Y.UserClass == "HUNTER" and UnitID == "pet") then
+            local Level = GetHappiness()
 
-			if Level then
-				local Color = YxUI.HappinessColors[Level]
+            if Level then
+                local Color = Y.HappinessColors[Level]
 
-				if Color then
-					self:AddLine(" ")
-					self:AddDoubleLine(Language["Happiness:"], format("|cFF%s%s|r", YxUI:RGBToHex(Color[1], Color[2], Color[3]), Tooltips.HappinessLevels[Level]))
-				end
-			end
-		end
-	end
+                if Color then
+                    self:AddLine(" ")
+                    self:AddDoubleLine(L["Happiness:"], format("|cFF%s%s|r", Y:RGBToHex(Color[1], Color[2], Color[3]), Tooltips.HappinessLevels[Level]))
+                end
+            end
+        end
+    end
 end
 
 local OnTooltipSetItem = function(self)
-	if (Settings["tooltips-hide-on-item"] == "NO_COMBAT" and InCombatLockdown()) or Settings["tooltips-hide-on-item"] == "ALWAYS" then
-		self:Hide()
+    if (C["tooltips-hide-on-item"] == "NO_COMBAT" and InCombatLockdown()) or C["tooltips-hide-on-item"] == "ALWAYS" then
+        self:Hide()
 
-		return
-	end
+        return
+    end
 
-	if (MerchantFrame and MerchantFrame:IsShown()) or (not self.GetItem) then
-		return
-	end
+    if (MerchantFrame and MerchantFrame:IsShown()) or (not self.GetItem) then
+        return
+    end
 
-	local Name, Link = self:GetItem()
+    local Name, Link = self:GetItem()
 
-	if (not Link) then
-		return
-	end
+    if (not Link) then
+        return
+    end
 
-	if (not YxUI.IsMainline) and Settings["tooltips-show-price"] then
-		local Price = select(11, GetItemInfo(Link))
+    if (not Y.IsMainline) and C["tooltips-show-price"] then
+        local Price = select(11, GetItemInfo(Link))
 
-		if Price then
-			local MouseFocus
-			local Count = 1
+        if Price then
+            local MouseFocus
+            local Count = 1
 
-			if GetMouseFocus then
-				MouseFocus = GetMouseFocus()
-			elseif GetMouseFoci then
-				MouseFocus = GetMouseFoci()
-				MouseFocus = MouseFocus[1]
-			end
+            if GetMouseFocus then
+                MouseFocus = GetMouseFocus()
+            elseif GetMouseFoci then
+                MouseFocus = GetMouseFoci()
+                MouseFocus = MouseFocus[1]
+            end
 
-			if (MouseFocus and MouseFocus.count) then
-				Count = MouseFocus.count
-			end
+            if (MouseFocus and MouseFocus.count) then
+                Count = MouseFocus.count
+            end
 
-			if (Count and type(Count) == "number") then
-				local CopperValue = Price * Count
+            if (Count and type(Count) == "number") then
+                local CopperValue = Price * Count
 
-				if (CopperValue > 0) then
-					local CoinString = GetCoinTextureString(CopperValue)
+                if (CopperValue > 0) then
+                    local CoinString = GetCoinTextureString(CopperValue)
 
-					if CoinString then
-						self:AddLine(CoinString, 1, 1, 1)
-					end
-				end
-			end
-		end
-	end
+                    if CoinString then
+                        self:AddLine(CoinString, 1, 1, 1)
+                    end
+                end
+            end
+        end
+    end
 
-	if Settings["tooltips-show-id"] then
-		local id = match(Link, ":(%w+)")
+    if C["tooltips-show-id"] then
+        local id = match(Link, ":(%w+)")
 
-		self:AddLine(" ")
-		self:AddLine(format("%s |cFFFFFFFF%d|r", ID, id))
-	end
+        self:AddLine(" ")
+        self:AddLine(format("%s |cFFFFFFFF%d|r", ID, id))
+    end
 end
 
 local OnItemRefTooltipSetItem = function(self)
-	if (not self.GetItem) then
-		return
-	end
+    if (not self.GetItem) then
+        return
+    end
 
-	local Link = select(2, self:GetItem())
+    local Link = select(2, self:GetItem())
 
-	if (not Link) then
-		return
-	end
+    if (not Link) then
+        return
+    end
 
-	local Price = select(11, GetItemInfo(Link))
+    local Price = select(11, GetItemInfo(Link))
 
-	if (Price and Price > 0) then
-		local CoinString = GetCoinTextureString(Price)
+    if (Price and Price > 0) then
+        local CoinString = GetCoinTextureString(Price)
 
-		if CoinString then
-			self:AddLine(CoinString, 1, 1, 1)
-		end
-	end
+        if CoinString then
+            self:AddLine(CoinString, 1, 1, 1)
+        end
+    end
 
-	if Settings["tooltips-show-id"] then
-		local id = match(Link, ":(%w+)")
+    if C["tooltips-show-id"] then
+        local id = match(Link, ":(%w+)")
 
-		self:AddLine(" ")
-		self:AddLine(format("%s |cFFFFFFFF%d|r", ID, id))
-	end
+        self:AddLine(" ")
+        self:AddLine(format("%s |cFFFFFFFF%d|r", ID, id))
+    end
 end
 
 local OnTooltipSetSpell = function(self)
-	if (Settings["tooltips-hide-on-action"] == "NO_COMBAT" and InCombatLockdown()) or Settings["tooltips-hide-on-action"] == "ALWAYS" then
-		self:Hide()
+    if (C["tooltips-hide-on-action"] == "NO_COMBAT" and InCombatLockdown()) or C["tooltips-hide-on-action"] == "ALWAYS" then
+        self:Hide()
 
-		return
-	end
+        return
+    end
 
-	if (not Settings["tooltips-show-id"]) then
-		return
-	end
+    if (not C["tooltips-show-id"]) then
+        return
+    end
 
-	local id = select(2, self:GetSpell())
+    local id = select(2, self:GetSpell())
 
-	self:AddLine(" ")
-	self:AddLine(format("%s |cFFFFFFFF%d|r", ID, id))
+    self:AddLine(" ")
+    self:AddLine(format("%s |cFFFFFFFF%d|r", ID, id))
 end
 
 local SetDefaultAnchor = function(self, parent)
-	if Settings["tooltips-on-cursor"] then
-		self:SetOwner(parent, Settings["tooltips-cursor-anchor"], Settings["tooltips-cursor-anchor-x"], Settings["tooltips-cursor-anchor-y"])
+    if self:IsForbidden() then
+        return
+    end
+    if not parent then
+        return
+    end
+    if C["tooltips-on-cursor"] then
+        self:SetOwner(parent, C["tooltips-cursor-anchor"], C["tooltips-cursor-anchor-x"], C["tooltips-cursor-anchor-y"])
+        return
+    end
 
-		return
-	end
+    self:ClearAllPoints()
 
-	self:ClearAllPoints()
-
-	local Offset = Settings["ui-border-thickness"]
-
-	if Settings["right-window-enable"] then
-		self:SetPoint("BOTTOMLEFT", Tooltips, 0, 3 + Offset)
-	else
-		self:SetPoint("BOTTOMRIGHT", Tooltips, 0, 3 + Offset)
-	end
+    local Offset = C["ui-border-thickness"]
+    if C["right-window-enable"] then
+        self:SetPoint("BOTTOMLEFT", Tooltips, 0, 3 + Offset)
+    else
+        self:SetPoint("BOTTOMRIGHT", Tooltips, 0, 3 + Offset)
+    end
 end
 
 local OnTooltipSetAura = function(self, unit, index, filter)
-	if (not Settings["tooltips-show-id"]) or not UnitAura then
-		return
-	end
+    if (not C["tooltips-show-id"]) or not UnitAura then
+        return
+    end
 
-	local _, _, _, _, _, _, Caster, _, _, id = UnitAura(unit, index, filter)
+    local _, _, _, _, _, _, Caster, _, _, id = UnitAura(unit, index, filter)
 
-	if (not id) then
-		return
-	end
+    if (not id) then
+        return
+    end
 
-	if Caster then
-		local Name = UnitName(Caster)
-		local _, Class = UnitClass(Caster)
-		local Color = RAID_CLASS_COLORS[Class]
+    if Caster then
+        local Name = UnitName(Caster)
+        local _, Class = UnitClass(Caster)
+        local Color = RAID_CLASS_COLORS[Class]
 
-		self:AddLine(" ")
-		self:AddDoubleLine(format("%s |cFFFFFFFF%d|r", ID, id), format("|c%s%s|r", Color.colorStr, Name))
-	else
-		self:AddLine(" ")
-		self:AddLine(format("%s |cFFFFFFFF%d|r", ID, id))
-	end
+        self:AddLine(" ")
+        self:AddDoubleLine(format("%s |cFFFFFFFF%d|r", ID, id), format("|c%s%s|r", Color.colorStr, Name))
+    else
+        self:AddLine(" ")
+        self:AddLine(format("%s |cFFFFFFFF%d|r", ID, id))
+    end
 
-	self:Show()
+    self:Show()
 end
 
-local StripBackdrop = function(self)
-	self.NineSlice:SetAlpha(0)
+-- Tooltip Skin Registration
+local tipTable = {}
+function Tooltips:RegisterTooltips(addon, func)
+    tipTable[addon] = func
 end
+
+local function addonStyled(_, addon)
+    if tipTable[addon] then
+        tipTable[addon]()
+        tipTable[addon] = nil
+    end
+end
+Tooltips:Event("ADDON_LOADED", addonStyled)
 
 function Tooltips:AddHooks()
-	for i = 1, #self.Handled do
-		self.Handled[i]:HookScript("OnShow", SetTooltipStyle)
-	end
+    for k, v in pairs(self.Handled) do
+        if _G[k] then
+            _G[k]:HookScript("OnShow", SetTooltipStyle)
+        elseif v then
+            self:RegisterTooltips(v, function()
+                if _G[k] then
+                    _G[k]:HookScript("OnShow", SetTooltipStyle)
+                else
+                    print("Tooltip not found: " .. k .. " (addon: " .. v .. ")")
+                end
+            end)
+        else
+            print("Tooltip not found: " .. k)
+        end
+    end
 
-	if (TooltipDataProcessor and not YxUI.IsCata) then
-		TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit)
-		TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetItem)
-		TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, OnTooltipSetSpell)
-	else
-		GameTooltip:HookScript("OnTooltipSetUnit", OnTooltipSetUnit)
-		GameTooltip:HookScript("OnTooltipSetItem", OnTooltipSetItem)
-		GameTooltip:HookScript("OnTooltipSetSpell", OnTooltipSetSpell)
+    if (TooltipDataProcessor and not Y.IsCata) then
+        TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit)
+        TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetItem)
+        TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, OnTooltipSetSpell)
+    else
+        GameTooltip:HookScript("OnTooltipSetUnit", OnTooltipSetUnit)
+        GameTooltip:HookScript("OnTooltipSetItem", OnTooltipSetItem)
+        GameTooltip:HookScript("OnTooltipSetSpell", OnTooltipSetSpell)
 
-		ItemRefTooltip:HookScript("OnTooltipSetItem", OnItemRefTooltipSetItem)
-	end
+        ItemRefTooltip:HookScript("OnTooltipSetItem", OnItemRefTooltipSetItem)
+    end
 
-	hooksecurefunc("GameTooltip_SetDefaultAnchor", SetDefaultAnchor)
-	hooksecurefunc("SharedTooltip_SetBackdropStyle", StripBackdrop)
+    hooksecurefunc("GameTooltip_SetDefaultAnchor", SetDefaultAnchor)
+    hooksecurefunc("SharedTooltip_SetBackdropStyle", StripBackdrop)
 
-	hooksecurefunc(GameTooltip, "SetUnitAura", OnTooltipSetAura)
-	hooksecurefunc(GameTooltip, "SetUnitBuff", OnTooltipSetAura)
-	hooksecurefunc(GameTooltip, "SetUnitDebuff", OnTooltipSetAura)
+    hooksecurefunc(GameTooltip, "SetUnitAura", OnTooltipSetAura)
+    hooksecurefunc(GameTooltip, "SetUnitBuff", OnTooltipSetAura)
+    hooksecurefunc(GameTooltip, "SetUnitDebuff", OnTooltipSetAura)
 end
 
 local OnValueChanged = function(self)
-	local Unit = select(2, self:GetParent():GetUnit())
+    local Unit = select(2, self:GetParent():GetUnit())
 
-	if (not Unit) then
-		return
-	end
+    if (not Unit) then
+        return
+    end
 
-	local Color = GetUnitColor(Unit)
+    local Color = GetUnitColor(Unit)
 
-	self:SetStatusBarColor(YxUI:HexToRGB(Color))
-	self.BG:SetVertexColor(YxUI:HexToRGB(Color))
+    self:SetStatusBarColor(Y:HexToRGB(Color))
 
-	if (not Settings["tooltips-show-health-text"]) then
-		return
-	end
+    if (not C["tooltips-show-health-text"]) then
+        return
+    end
 
-	local Current = UnitHealth(Unit)
-	local Max = UnitHealthMax(Unit)
+    local Current = UnitHealth(Unit)
+    local Max = UnitHealthMax(Unit)
 
-	if (Max == 0) then
-		if UnitIsDead(Unit) then
-			self.HealthValue:SetText("|cFFD64545" .. Language["Dead"] .. "|r")
-		elseif UnitIsGhost(Unit) then
-			self.HealthValue:SetText("|cFFEEEEEE" .. Language["Ghost"] .. "|r")
-		else
-			self.HealthValue:SetText(" ")
-			self.HealthPercent:SetText(" ")
-		end
-	else
-		if UnitIsDead(Unit) then
-			self.HealthValue:SetText("|cFFD64545" .. Language["Dead"] .. "|r")
-		elseif UnitIsGhost(Unit) then
-			self.HealthValue:SetText("|cFFEEEEEE" .. Language["Ghost"] .. "|r")
-		else
-			self.HealthValue:SetText(format("%s / %s", YxUI:ShortValue(Current), YxUI:ShortValue(Max)))
-		end
+    if (Max == 0) then
+        if UnitIsDead(Unit) then
+            self.HealthValue:SetText("|cFFD64545" .. L["Dead"] .. "|r")
+        elseif UnitIsGhost(Unit) then
+            self.HealthValue:SetText("|cFFEEEEEE" .. L["Ghost"] .. "|r")
+        else
+            self.HealthValue:SetText(" ")
+            self.HealthPercent:SetText(" ")
+        end
+    else
+        if UnitIsDead(Unit) then
+            self.HealthValue:SetText("|cFFD64545" .. L["Dead"] .. "|r")
+        elseif UnitIsGhost(Unit) then
+            self.HealthValue:SetText("|cFFEEEEEE" .. L["Ghost"] .. "|r")
+        else
+            self.HealthValue:SetText(format("%s / %s", Y:ShortValue(Current), Y:ShortValue(Max)))
+        end
 
-		self.HealthPercent:SetText(format("%s%%", floor((Current / Max * 100 + 0.05) * 10) / 10))
-	end
+        self.HealthPercent:SetText(format("%s%%", floor((Current / Max * 100 + 0.05) * 10) / 10))
+    end
 end
 
 local OnShow = function(self)
-	if (not Settings["tooltips-show-health"]) then
-		GameTooltipStatusBar:Hide()
+    if (not C["tooltips-show-health"]) then
+        GameTooltipStatusBar:Hide()
 
-		return
-	end
+        return
+    end
 
-	OnValueChanged(self)
+    OnValueChanged(self)
 end
 
 function Tooltips:UpdateStatusBarFonts()
-	YxUI:SetFontInfo(GameTooltipStatusBar.HealthValue, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
-	YxUI:SetFontInfo(GameTooltipStatusBar.HealthPercent, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
+    Y:SetFontInfo(GameTooltipStatusBar.HealthValue, C["tooltips-font"], C["tooltips-font-size"], C["tooltips-font-flags"])
+    Y:SetFontInfo(GameTooltipStatusBar.HealthPercent, C["tooltips-font"], C["tooltips-font-size"], C["tooltips-font-flags"])
 end
 
 function Tooltips:StyleStatusBar()
-	local Border = Settings["ui-border-thickness"]
-	local Adjust = 1 > Border and 1 or (Border + 2)
+    GameTooltipStatusBar:ClearAllPoints()
+    GameTooltipStatusBar:SetPoint("BOTTOMLEFT", GameTooltipStatusBar:GetParent(), "TOPLEFT", 2, 3)
+    GameTooltipStatusBar:SetPoint("BOTTOMRIGHT", GameTooltipStatusBar:GetParent(), "TOPRIGHT", -2, 3)
+    GameTooltipStatusBar:SetStatusBarTexture(A:GetTexture(C["ui-widget-texture"]))
+    GameTooltipStatusBar:SetHeight(12)
+    GameTooltipStatusBar:CreateBorder()
 
-	GameTooltipStatusBar:ClearAllPoints()
-	GameTooltipStatusBar:SetHeight(Settings["tooltips-health-bar-height"])
-	GameTooltipStatusBar:SetPoint("BOTTOMLEFT", GameTooltipStatusBar:GetParent(), "TOPLEFT", Adjust, 0)
-	GameTooltipStatusBar:SetPoint("BOTTOMRIGHT", GameTooltipStatusBar:GetParent(), "TOPRIGHT", -Adjust, 0)
-	GameTooltipStatusBar:SetStatusBarTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
+    GameTooltipStatusBar.HealthValue = GameTooltipStatusBar:CreateFontString(nil, "OVERLAY")
+    Y:SetFontInfo(GameTooltipStatusBar.HealthValue, C["tooltips-font"], C["tooltips-font-size"], C["tooltips-font-flags"])
+    GameTooltipStatusBar.HealthValue:SetPoint("LEFT", GameTooltipStatusBar, 3, 0)
+    GameTooltipStatusBar.HealthValue:SetJustifyH("LEFT")
 
-	GameTooltipStatusBar.BG = GameTooltipStatusBar:CreateTexture(nil, "ARTWORK")
-	GameTooltipStatusBar.BG:SetPoint("TOPLEFT", GameTooltipStatusBar, 0, 0)
-	GameTooltipStatusBar.BG:SetPoint("BOTTOMRIGHT", GameTooltipStatusBar, 0, 0)
-	GameTooltipStatusBar.BG:SetTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
-	GameTooltipStatusBar.BG:SetAlpha(0.2)
+    GameTooltipStatusBar.HealthPercent = GameTooltipStatusBar:CreateFontString(nil, "OVERLAY")
+    Y:SetFontInfo(GameTooltipStatusBar.HealthPercent, C["tooltips-font"], C["tooltips-font-size"], C["tooltips-font-flags"])
+    GameTooltipStatusBar.HealthPercent:SetPoint("RIGHT", GameTooltipStatusBar, -3, 0)
+    GameTooltipStatusBar.HealthPercent:SetJustifyH("RIGHT")
 
-	GameTooltipStatusBar.Backdrop = CreateFrame("Frame", nil, GameTooltipStatusBar, "BackdropTemplate")
-	GameTooltipStatusBar.Backdrop:SetPoint("TOPLEFT", GameTooltipStatusBar, -Adjust, Adjust)
-	GameTooltipStatusBar.Backdrop:SetPoint("BOTTOMRIGHT", GameTooltipStatusBar, Adjust, -Adjust)
-
-	YxUI:AddBackdrop(GameTooltipStatusBar.Backdrop)
-	GameTooltipStatusBar.Backdrop.Outside:SetFrameLevel(GameTooltip:GetFrameLevel() - 1)
-
-	GameTooltipStatusBar.BG2 = GameTooltipStatusBar:CreateTexture(nil, "BACKGROUND")
-	GameTooltipStatusBar.BG2:SetAllPoints(GameTooltipStatusBar)
-	GameTooltipStatusBar.BG2:SetTexture(Assets:GetTexture("Blank"))
-	GameTooltipStatusBar.BG2:SetVertexColor(0, 0, 0)
-
-	GameTooltipStatusBar.HealthValue = GameTooltipStatusBar:CreateFontString(nil, "OVERLAY")
-	YxUI:SetFontInfo(GameTooltipStatusBar.HealthValue, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
-	GameTooltipStatusBar.HealthValue:SetPoint("LEFT", GameTooltipStatusBar, 3, 0)
-	GameTooltipStatusBar.HealthValue:SetJustifyH("LEFT")
-
-	GameTooltipStatusBar.HealthPercent = GameTooltipStatusBar:CreateFontString(nil, "OVERLAY")
-	YxUI:SetFontInfo(GameTooltipStatusBar.HealthPercent, Settings["tooltips-font"], Settings["tooltips-font-size"], Settings["tooltips-font-flags"])
-	GameTooltipStatusBar.HealthPercent:SetPoint("RIGHT", GameTooltipStatusBar, -3, 0)
-	GameTooltipStatusBar.HealthPercent:SetJustifyH("RIGHT")
-
-	GameTooltipStatusBar:HookScript("OnValueChanged", OnValueChanged)
-	GameTooltipStatusBar:HookScript("OnShow", OnShow)
+    GameTooltipStatusBar:HookScript("OnValueChanged", OnValueChanged)
+    GameTooltipStatusBar:HookScript("OnShow", OnShow)
 end
 
 local ItemRefCloseOnEnter = function(self)
-	self.Cross:SetVertexColor(YxUI:HexToRGB("C0392B"))
+    self.Cross:SetVertexColor(Y:HexToRGB("C0392B"))
 end
 
 local ItemRefCloseOnLeave = function(self)
-	self.Cross:SetVertexColor(YxUI:HexToRGB("EEEEEE"))
+    self.Cross:SetVertexColor(Y:HexToRGB("EEEEEE"))
 end
 
 local ItemRefCloseOnMouseUp = function(self)
-	self.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-widget-bright-color"]))
+    self.Texture:SetVertexColor(Y:HexToRGB(C["ui-widget-bright-color"]))
 
-	ItemRefTooltip:Hide()
+    ItemRefTooltip:Hide()
 end
 
 local ItemRefCloseOnMouseDown = function(self)
-	local R, G, B = YxUI:HexToRGB(Settings["ui-widget-bright-color"])
+    local R, G, B = Y:HexToRGB(C["ui-widget-bright-color"])
 
-	self.Texture:SetVertexColor(R * 0.5, G * 0.5, B * 0.5)
+    self.Texture:SetVertexColor(R * 0.5, G * 0.5, B * 0.5)
 end
 
 function Tooltips:SkinItemRef()
-	if YxUI.IsMainline then
-		ItemRefTooltip.CloseButton:Hide()
-	else
-		ItemRefCloseButton:Hide()
-	end
+    if Y.IsMainline then
+        ItemRefTooltip.CloseButton:Hide()
+    else
+        ItemRefCloseButton:Hide()
+    end
 
-	-- Close button
-	local CloseButton = CreateFrame("Frame", nil, ItemRefTooltip, "BackdropTemplate")
-	CloseButton:SetSize(20, 20)
-	CloseButton:SetPoint("TOPRIGHT", ItemRefTooltip, -3, -4)
-	CloseButton:SetBackdrop(YxUI.BackdropAndBorder)
-	CloseButton:SetBackdropColor(0, 0, 0, 0)
-	CloseButton:SetBackdropBorderColor(0, 0, 0)
-	CloseButton:SetScript("OnEnter", ItemRefCloseOnEnter)
-	CloseButton:SetScript("OnLeave", ItemRefCloseOnLeave)
-	CloseButton:SetScript("OnMouseUp", ItemRefCloseOnMouseUp)
-	CloseButton:SetScript("OnMouseDown", ItemRefCloseOnMouseDown)
+    -- Close button
+    local CloseButton = CreateFrame("Frame", nil, ItemRefTooltip, "BackdropTemplate")
+    CloseButton:SetSize(20, 20)
+    CloseButton:SetPoint("TOPRIGHT", ItemRefTooltip, -3, -4)
+    CloseButton:SetBackdrop(Y.BackdropAndBorder)
+    CloseButton:SetBackdropColor(0, 0, 0, 0)
+    CloseButton:SetBackdropBorderColor(0, 0, 0)
+    CloseButton:SetScript("OnEnter", ItemRefCloseOnEnter)
+    CloseButton:SetScript("OnLeave", ItemRefCloseOnLeave)
+    CloseButton:SetScript("OnMouseUp", ItemRefCloseOnMouseUp)
+    CloseButton:SetScript("OnMouseDown", ItemRefCloseOnMouseDown)
 
-	CloseButton.Texture = CloseButton:CreateTexture(nil, "ARTWORK")
-	CloseButton.Texture:SetPoint("TOPLEFT", CloseButton, 1, -1)
-	CloseButton.Texture:SetPoint("BOTTOMRIGHT", CloseButton, -1, 1)
-	CloseButton.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
-	CloseButton.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-widget-bright-color"]))
+    CloseButton.Texture = CloseButton:CreateTexture(nil, "ARTWORK")
+    CloseButton.Texture:SetPoint("TOPLEFT", CloseButton, 1, -1)
+    CloseButton.Texture:SetPoint("BOTTOMRIGHT", CloseButton, -1, 1)
+    CloseButton.Texture:SetTexture(A:GetTexture(C["ui-header-texture"]))
+    CloseButton.Texture:SetVertexColor(Y:HexToRGB(C["ui-widget-bright-color"]))
 
-	CloseButton.Cross = CloseButton:CreateTexture(nil, "OVERLAY")
-	CloseButton.Cross:SetPoint("CENTER", CloseButton, 0, 0)
-	CloseButton.Cross:SetSize(16, 16)
-	CloseButton.Cross:SetTexture(Assets:GetTexture("Close"))
-	CloseButton.Cross:SetVertexColor(YxUI:HexToRGB("EEEEEE"))
+    CloseButton.Cross = CloseButton:CreateTexture(nil, "OVERLAY")
+    CloseButton.Cross:SetPoint("CENTER", CloseButton, 0, 0)
+    CloseButton.Cross:SetSize(16, 16)
+    CloseButton.Cross:SetTexture(A:GetTexture("Close"))
+    CloseButton.Cross:SetVertexColor(Y:HexToRGB("EEEEEE"))
 
-	ItemRefTooltip.NewCloseButton = CloseButton
+    ItemRefTooltip.NewCloseButton = CloseButton
 end
 
 function Tooltips:OnEvent(event, guid)
-	self.GUID = guid
+    self.GUID = guid
 
-	if self.Unit and UnitGUID(self.Unit) == guid then
-		--local Level = CalculateAverageItemLevel(self.Unit)
+    if self.Unit and UnitGUID(self.Unit) == guid then
+        --local Level = CalculateAverageItemLevel(self.Unit)
 
-		--print(format("[%s] Item Level: %.2f", UnitName(self.Unit), Level))
+        --print(format("[%s] Item Level: %.2f", UnitName(self.Unit), Level))
 
-		ClearInspectPlayer()
+        ClearInspectPlayer()
 
-		self.Unit = nil
-	end
+        self.Unit = nil
+    end
 end
 
 function Tooltips:Load()
-	if (not Settings["tooltips-enable"]) then
-		return
-	end
+    if (not C["tooltips-enable"]) then
+        return
+    end
 
-	self:SetSize(200, 26)
+    self:SetSize(200, 26)
 
-	if Settings["right-window-enable"] then
-		local Mod = YxUI:GetModule("Right Window")
-		local Offset = Settings["ui-border-thickness"]
+    if C["right-window-enable"] then
+        local Mod = Y:GetModule("Right Window")
+        local Offset = C["ui-border-thickness"]
 
-		self:SetPoint("BOTTOMLEFT", Mod.TopLeft or Mod.Top, "TOPLEFT", 0, 1 > Offset and -1 or -(Offset + 2))
-	else
-		self:SetPoint("BOTTOMRIGHT", YxUI.UIParent, -13, 101)
-	end
+        self:SetPoint("BOTTOMLEFT", Mod.TopLeft or Mod.Top, "TOPLEFT", 0, 1 > Offset and -1 or -(Offset + 2))
+    else
+        self:SetPoint("BOTTOMRIGHT", Y.UIParent, -195, 50)
+    end
 
-	self:AddHooks()
-	self:StyleStatusBar()
-	self:SkinItemRef()
-	--self:RegisterEvent("INSPECT_READY")
-	--self:SetScript("OnEvent", self.OnEvent)
+    self:AddHooks()
+    self:StyleStatusBar()
+    self:SkinItemRef()
+    --self:RegisterEvent("INSPECT_READY")
+    --self:SetScript("OnEvent", self.OnEvent)
 
-	self.Mover = YxUI:CreateMover(self)
+    self.Mover = Y:CreateMover(self)
 
-	--self.Mover.PreMove = function() GameTooltip_SetDefaultAnchor(GameTooltip, self) GameTooltip:AddLine("Example tooltip") GameTooltip:Show() end
-	--self.Mover.PostMove = function() GameTooltip:Hide() end
+    --self.Mover.PreMove = function() GameTooltip_SetDefaultAnchor(GameTooltip, self) GameTooltip:AddLine("Example tooltip") GameTooltip:Show() end
+    --self.Mover.PostMove = function() GameTooltip:Hide() end
 
-	if IsInGuild() then
-		MyGuild = GetGuildInfo("player")
-	end
+    if IsInGuild() then
+        MyGuild = GetGuildInfo("player")
+    end
 end
 
 local UpdateHealthBarHeight = function(value)
-	GameTooltipStatusBar:SetHeight(value)
+    GameTooltipStatusBar:SetHeight(value)
 end
 
 local UpdateShowHealthText = function(value)
-	if (value ~= true) then
-		GameTooltipStatusBar.HealthValue:SetText(" ")
-		GameTooltipStatusBar.HealthPercent:SetText(" ")
-	end
+    if (value ~= true) then
+        GameTooltipStatusBar.HealthValue:SetText(" ")
+        GameTooltipStatusBar.HealthPercent:SetText(" ")
+    end
 end
 
 local UpdateTooltipBackdrop = function(value)
-	local R, G, B = YxUI:HexToRGB(Settings["ui-window-main-color"])
+    local R, G, B = Y:HexToRGB(C["ui-window-main-color"])
 
-	for i = 1, #Tooltips.Handled do
-		if Tooltips.Handled[i].Backdrop then
-			Tooltips.Handled[i].Backdrop.Outside:SetBackdropColor(R, G, B, (value / 100))
-		end
-	end
+    for k, v in pairs(Tooltips.Handled) do
+        if _G[k] and _G[k].Backdrop then
+            _G[k].Backdrop.Outside:SetBackdropColor(R, G, B, (value / 100))
+        end
+    end
 end
 
-YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Tooltips"], function(left, right)
-	left:CreateHeader(Language["Enable"])
-	left:CreateSwitch("tooltips-enable", Settings["tooltips-enable"], Language["Enable Tooltips Module"], Language["Enable the YxUI tooltips module"], ReloadUI):RequiresReload(true)
+Y:GetModule("GUI"):AddWidgets(L["General"], L["Tooltips"], function(left, right)
+    left:CreateHeader(L["Enable"])
+    left:CreateSwitch("tooltips-enable", C["tooltips-enable"], L["Enable Tooltips Module"], L["Enable the YxUI tooltips module"], ReloadUI):RequiresReload(true)
 
-	left:CreateHeader(Language["Health Bar"])
-	left:CreateSwitch("tooltips-show-health", Settings["tooltips-show-health"], Language["Display Health Bar"], Language["Display the tooltip health bar"])
-	left:CreateSwitch("tooltips-show-health-text", Settings["tooltips-show-health-text"], Language["Display Health Text"], Language["Display health information on the tooltip health bar"], UpdateShowHealthText)
-	left:CreateSlider("tooltips-health-bar-height", Settings["tooltips-health-bar-height"], 2, 30, 1, Language["Health Bar Height"], Language["Set the height of the tooltip health bar"], UpdateHealthBarHeight)
+    left:CreateHeader(L["Health Bar"])
+    left:CreateSwitch("tooltips-show-health", C["tooltips-show-health"], L["Display Health Bar"], L["Display the tooltip health bar"])
+    left:CreateSwitch("tooltips-show-health-text", C["tooltips-show-health-text"], L["Display Health Text"], L["Display health information on the tooltip health bar"], UpdateShowHealthText)
+    left:CreateSlider("tooltips-health-bar-height", C["tooltips-health-bar-height"], 2, 30, 1, L["Health Bar Height"], L["Set the height of the tooltip health bar"], UpdateHealthBarHeight)
 
-	left:CreateHeader(Language["Information"])
-	left:CreateSwitch("tooltips-show-target", Settings["tooltips-show-target"], Language["Display Target"], Language["Display the units current target"])
-	left:CreateSwitch("tooltips-show-id", Settings["tooltips-show-id"], Language["Display ID's"], Language["Display item and spell ID's in the tooltip"])
-	left:CreateSwitch("tooltips-display-realm", Settings["tooltips-display-realm"], Language["Display Realm"], Language["Display character realms"])
-	left:CreateSwitch("tooltips-display-title", Settings["tooltips-display-title"], Language["Display Title"], Language["Display character titles"])
-	left:CreateSwitch("tooltips-display-rank", Settings["tooltips-display-rank"], Language["Display Guild Rank"], Language["Display character guild ranks"])
-	left:CreateSwitch("tooltips-show-price", Settings["tooltips-show-price"], Language["Display Vendor Price"], Language["Display the vendor price of an item"])
+    left:CreateHeader(L["Information"])
+    left:CreateSwitch("tooltips-show-target", C["tooltips-show-target"], L["Display Target"], L["Display the units current target"])
+    left:CreateSwitch("tooltips-show-id", C["tooltips-show-id"], L["Display ID's"], L["Display item and spell ID's in the tooltip"])
+    left:CreateSwitch("tooltips-display-realm", C["tooltips-display-realm"], L["Display Realm"], L["Display character realms"])
+    left:CreateSwitch("tooltips-display-title", C["tooltips-display-title"], L["Display Title"], L["Display character titles"])
+    left:CreateSwitch("tooltips-display-rank", C["tooltips-display-rank"], L["Display Guild Rank"], L["Display character guild ranks"])
+    left:CreateSwitch("tooltips-show-price", C["tooltips-show-price"], L["Display Vendor Price"], L["Display the vendor price of an item"])
 
-	left:CreateHeader(Language["Opacity"])
-	left:CreateSlider("tooltips-opacity", Settings["tooltips-opacity"], 0, 100, 5, Language["Tooltip Opacity"], Language["Set the opacity of the tooltip background"], UpdateTooltipBackdrop)
+    left:CreateHeader(L["Opacity"])
+    left:CreateSlider("tooltips-opacity", C["tooltips-opacity"], 0, 100, 5, L["Tooltip Opacity"], L["Set the opacity of the tooltip background"], UpdateTooltipBackdrop)
 
-	right:CreateHeader(Language["Font"])
-	right:CreateDropdown("tooltips-font", Settings["tooltips-font"], Assets:GetFontList(), Language["Font"], Language["Set the font of the tooltip text"], nil, "Font")
-	right:CreateSlider("tooltips-font-size", Settings["tooltips-font-size"], 8, 32, 1, Language["Font Size"], Language["Set the font size of the tooltip text"])
-	right:CreateDropdown("tooltips-font-flags", Settings["tooltips-font-flags"], Assets:GetFlagsList(), Language["Font Flags"], Language["Set the font flags of the tooltip text"])
+    right:CreateHeader(L["Font"])
+    right:CreateDropdown("tooltips-font", C["tooltips-font"], A:GetFontList(), L["Font"], L["Set the font of the tooltip text"], nil, "Font")
+    right:CreateSlider("tooltips-font-size", C["tooltips-font-size"], 8, 32, 1, L["Font Size"], L["Set the font size of the tooltip text"])
+    right:CreateDropdown("tooltips-font-flags", C["tooltips-font-flags"], A:GetFlagsList(), L["Font Flags"], L["Set the font flags of the tooltip text"])
 
-	right:CreateHeader(Language["Cursor Anchor"])
-	right:CreateSwitch("tooltips-on-cursor", Settings["tooltips-on-cursor"], Language["Tooltip On Cursor"], Language["Anchor the tooltip to the mouse cursor"])
-	right:CreateDropdown("tooltips-cursor-anchor", Settings["tooltips-cursor-anchor"], {[Language["Right"]] = "ANCHOR_CURSOR_RIGHT", [Language["Center"]] = "ANCHOR_CURSOR", [Language["Left"]] = "ANCHOR_CURSOR_LEFT"}, Language["Anchor Point"])
-	right:CreateSlider("tooltips-cursor-anchor-x", Settings["tooltips-cursor-anchor-x"], -64, 64, 1, Language["X Offset"], Language["Set the horizontal offset of the tooltip. Only works with Left or Right anchor."])
-	right:CreateSlider("tooltips-cursor-anchor-y", Settings["tooltips-cursor-anchor-y"], -64, 64, 1, Language["Y Offset"], Language["Set the vertical offset of the tooltip. Only works with Left or Right anchor."])
+    right:CreateHeader(L["Cursor Anchor"])
+    right:CreateSwitch("tooltips-on-cursor", C["tooltips-on-cursor"], L["Tooltip On Cursor"], L["Anchor the tooltip to the mouse cursor"])
+    right:CreateDropdown("tooltips-cursor-anchor", C["tooltips-cursor-anchor"], { [L["Right"]] = "ANCHOR_CURSOR_RIGHT", [L["Center"]] = "ANCHOR_CURSOR", [L["Left"]] = "ANCHOR_CURSOR_LEFT" }, L["Anchor Point"])
+    right:CreateSlider("tooltips-cursor-anchor-x", C["tooltips-cursor-anchor-x"], -64, 64, 1, L["X Offset"], L["Set the horizontal offset of the tooltip. Only works with Left or Right anchor."])
+    right:CreateSlider("tooltips-cursor-anchor-y", C["tooltips-cursor-anchor-y"], -64, 64, 1, L["Y Offset"], L["Set the vertical offset of the tooltip. Only works with Left or Right anchor."])
 
-	right:CreateHeader(Language["Disable Tooltips"])
-	right:CreateDropdown("tooltips-hide-on-unit", Settings["tooltips-hide-on-unit"], {[Language["Never"]] = "NEVER", [Language["Always"]] = "ALWAYS", [Language["Friendly"]] = "FRIENDLY", [Language["Hostile"]] = "HOSTILE", [Language["Combat"]] = "NO_COMBAT"}, Language["Disable Units"], Language["Set the tooltip to not display units"])
-	right:CreateDropdown("tooltips-hide-on-item", Settings["tooltips-hide-on-item"], {[Language["Never"]] = "NEVER", [Language["Always"]] = "ALWAYS", [Language["Combat"]] = "NO_COMBAT"}, Language["Disable Items"], Language["Set the tooltip to not display items"])
-	right:CreateDropdown("tooltips-hide-on-action", Settings["tooltips-hide-on-action"], {[Language["Never"]] = "NEVER", [Language["Always"]] = "ALWAYS", [Language["Combat"]] = "NO_COMBAT"}, Language["Disable Actions"], Language["Set the tooltip to not display actions"])
+    right:CreateHeader(L["Disable Tooltips"])
+    right:CreateDropdown("tooltips-hide-on-unit", C["tooltips-hide-on-unit"], { [L["Never"]] = "NEVER", [L["Always"]] = "ALWAYS", [L["Friendly"]] = "FRIENDLY", [L["Hostile"]] = "HOSTILE", [L["Combat"]] = "NO_COMBAT" }, L["Disable Units"], L["Set the tooltip to not display units"])
+    right:CreateDropdown("tooltips-hide-on-item", C["tooltips-hide-on-item"], { [L["Never"]] = "NEVER", [L["Always"]] = "ALWAYS", [L["Combat"]] = "NO_COMBAT" }, L["Disable Items"], L["Set the tooltip to not display items"])
+    right:CreateDropdown("tooltips-hide-on-action", C["tooltips-hide-on-action"], { [L["Never"]] = "NEVER", [L["Always"]] = "ALWAYS", [L["Combat"]] = "NO_COMBAT" }, L["Disable Actions"], L["Set the tooltip to not display actions"])
 end)

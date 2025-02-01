@@ -1,6 +1,6 @@
 [*]
 end_of_line = crlf
-max_line_length = 240
+max_line_length = 340
 
 [*.{c,cc,cpp,h,hpp,lua}]
 indent_size = 4

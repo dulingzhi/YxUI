@@ -59,7 +59,7 @@ local function CreateBorder(bFrame, ...)
     local bSubLevel, bLayer, bSize, bTexture, bOffset, bColor, bgTexture, bgSubLevel, bgLayer, bgPoint, bgColor = ...
     local BorderSize = 12
 
-    if not bFrame.KKUI_Border then
+    if not bFrame.YxUIBorder then
         local BorderTexture = bTexture or A:GetBorder("YxUI")
         local BorderOffset = bOffset or -4
         local BorderColor = bColor or { 1, 1, 1 }
@@ -72,10 +72,10 @@ local function CreateBorder(bFrame, ...)
         local r, g, b = unpack(BorderColor)
         kkui_border:SetVertexColor(r, g, b)
 
-        bFrame.KKUI_Border = kkui_border
+        bFrame.YxUIBorder = kkui_border
     end
 
-    if not bFrame.KKUI_Background then
+    if not bFrame.YxUIBackground then
         local BackgroundTexture = bgTexture or "Interface\\BUTTONS\\WHITE8X8"
         local BackgroundSubLevel = bgSubLevel or "BACKGROUND"
         local BackgroundLayer = bgLayer or -2
@@ -89,7 +89,7 @@ local function CreateBorder(bFrame, ...)
         kkui_background:SetPoint("BOTTOMRIGHT", bFrame, "BOTTOMRIGHT", -BackgroundPoint, BackgroundPoint)
         kkui_background:SetVertexColor(unpack(BackgroundColor))
 
-        bFrame.KKUI_Background = kkui_background
+        bFrame.YxUIBackground = kkui_background
     end
 
     return bFrame
@@ -1137,7 +1137,7 @@ function Y.SkinFrame(frame, backdrop, x, y, x1, y1)
         closeButton:SetSize(26, 26)
         closeButton:ClearAllPoints()
         closeButton:SetPoint('TOPRIGHT', frame, 0, 0)
-        closeButton.KKUI_Border:SetOffset(-10)
+        closeButton.YxUIBorder:SetOffset(-10)
     end
 
     if portraitFrame then portraitFrame:SetAlpha(0) end

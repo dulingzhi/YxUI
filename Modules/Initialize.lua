@@ -60,6 +60,43 @@ if (Y.UserLocale == "enGB") then
 	Y.UserLocale = "enUS"
 end
 
+-- Lists
+Y.ClassList = {}
+Y.ClassColors = {}
+Y.QualityColors = {}
+
+-- Populate the ClassList table with localized class names
+for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
+	Y.ClassList[v] = k
+end
+
+for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do
+	Y.ClassList[v] = k
+end
+
+-- Populate the ClassColors table with the colors of each class
+local colors = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
+for class, value in pairs(colors) do
+	Y.ClassColors[class] = {}
+	Y.ClassColors[class].r = value.r
+	Y.ClassColors[class].g = value.g
+	Y.ClassColors[class].b = value.b
+	Y.ClassColors[class].colorStr = value.colorStr
+end
+
+-- Get the player's class color
+Y.r, Y.g, Y.b = Y.ClassColors[Y.UserClass].r, Y.ClassColors[Y.UserClass].g, Y.ClassColors[Y.UserClass].b
+Y.MyClassColor = string.format("|cff%02x%02x%02x", Y.r * 255, Y.g * 255, Y.b * 255)
+
+-- Populate the QualityColors table with the colors of each item quality
+local qualityColors = BAG_ITEM_QUALITY_COLORS
+for index, value in pairs(qualityColors) do
+	Y.QualityColors[index] = { r = value.r, g = value.g, b = value.b }
+end
+Y.QualityColors[-1] = { r = 1, g = 1, b = 1 }
+Y.QualityColors[LE_ITEM_QUALITY_POOR or Enum.ItemQuality.Poor] = { r = 0.61, g = 0.61, b = 0.61 }
+Y.QualityColors[LE_ITEM_QUALITY_COMMON or Enum.ItemQuality.Common] = { r = 1, g = 1, b = 1 } -- This is the default color, but it's included here for completeness.
+
 -- Language
 ---@class Language
 local L = {}
@@ -90,6 +127,56 @@ function Y:NewModule(name)
 	Modules[name] = Module
 	ModuleQueue[#ModuleQueue + 1] = Module
 	self[name] = Module
+    Module.events = {}
+    Module.Event = function (self, event, func, unit1, unit2)
+        if event == "CLEU" then
+            event = "COMBAT_LOG_EVENT_UNFILTERED"
+        end
+        -- Check if the event is already registered with the function
+        if self.events[event] and self.events[event][func] then
+            return
+        end
+        if not self.events[event] then
+            self.events[event] = {}
+            if unit1 then
+                self:RegisterUnitEvent(event, unit1, unit2)
+            else
+                self:RegisterEvent(event)
+            end
+        end
+        self.events[event][func] = true
+    end
+    Module.UnEvent = function (self, event, func)
+        if event == "CLEU" then
+            event = "COMBAT_LOG_EVENT_UNFILTERED"
+        end
+    
+        local funcs = self.events[event]
+        if funcs and funcs[func] then
+            funcs[func] = nil
+    
+            if not next(funcs) then
+                self.events[event] = nil
+                self:UnregisterEvent(event)
+            end
+        end
+    end
+    Module:SetScript('OnEvent', function(self, event, ...)
+        local eventFuncs = self.events[event]
+        if eventFuncs then
+            for func in pairs(eventFuncs) do
+                local success, err
+                if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+                    success, err = pcall(func, event, CombatLogGetCurrentEventInfo())
+                else
+                    success, err = pcall(func, event, ...)
+                end
+                if not success then
+                    print("Error in event handler for event:", event, "-", err)
+                end
+            end
+        end
+    end)
 
 	return Module
 end
