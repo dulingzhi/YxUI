@@ -561,12 +561,13 @@ function Tooltips:RegisterTooltips(addon, func)
     tipTable[addon] = func
 end
 
-local function addonStyled(_, addon)
+local function addonStyled(self, _, addon)
+    print("addonStyled", addon)
     if tipTable[addon] then
         tipTable[addon]()
         tipTable[addon] = nil
         if not next(tipTable) then
-            Tooltips:UnEvent("ADDON_LOADED")
+            self:UnEvent("ADDON_LOADED", addonStyled)
         end
     end
 end

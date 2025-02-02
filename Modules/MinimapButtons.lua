@@ -176,18 +176,7 @@ function MinimapButtons:SkinButtons()
 
                 Child:SetFrameLevel(Minimap:GetFrameLevel() + 10)
                 Child:SetFrameStrata(Minimap:GetFrameStrata())
-
-                if Type == 'Button' then
-                    Child:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square") -- prevent nil function
-                    Child:GetHighlightTexture():SetAllPoints(Child)
-                elseif Type == "Frame" then
-                    Child.highlight = Child:CreateTexture(nil, "HIGHLIGHT")
-                    Child.highlight:SetPoint("TOPLEFT", Child, "TOPLEFT", 2, -2)
-                    Child.highlight:SetPoint("BOTTOMRIGHT", Child, "BOTTOMRIGHT", -2, 2)
-                    Child.highlight:SetColorTexture(1, 1, 1, 0.25)
-                end
-
-                Child:CreateBorder()
+                Child:SkinButton()
                 tinsert(self.Items, Child)
             end
         end

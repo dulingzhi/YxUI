@@ -265,7 +265,8 @@ function Chat:CreateChatWindow()
     self.EditBox:SetSize(Width, C["chat-bottom-height"])
     self.EditBox:SetPoint("BOTTOMLEFT", self.Top, "TOPLEFT", 0, 0)
     self.EditBox:CreateBorder()
-    self.EditBox:Hide()
+    self.EditBox:SetAlpha(0)
+    Chat.EditBox:EnableMouse(false)
 
     Y:CreateMover(self, 2)
 end
@@ -335,13 +336,11 @@ end
 
 local OnEditFocusLost = function(self)
     Chat.EditBox:SetAlpha(0)
-    Chat.EditBox:Hide()
     Chat.EditBox:EnableMouse(false)
 end
 
 local OnEditFocusGained = function(self)
     Chat.EditBox:SetAlpha(1)
-    Chat.EditBox:Show()
     Chat.EditBox:EnableMouse(true)
 end
 

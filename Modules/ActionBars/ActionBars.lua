@@ -293,7 +293,7 @@ function AB:StyleActionButton(button)
 		end
 	end
 
-    button:CreateBorder()
+    button:CreateBorder(nil, nil, nil, nil, nil, nil, "Interface\\AddOns\\YxUI\\Media\\Textures\\UI-Slot-Background", nil, nil, nil, { 1, 1, 1 })
 
 	if button:GetCheckedTexture() then
 		local Checked = button:GetCheckedTexture()

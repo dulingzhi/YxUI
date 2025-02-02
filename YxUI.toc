@@ -112,3 +112,5 @@ Modules\Commands.lua
 Modules\PVPObjectives.lua
 Modules\Credit.lua
 Modules\Debug.lua
+Modules\Skin.lua
+Modules\Skins\Load.xml
