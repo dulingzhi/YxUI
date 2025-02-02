@@ -36,6 +36,7 @@ Y.UserRealm = GetRealmName()
 Y.UserLocale = GetLocale()
 Y.UserProfileKey = format("%s:%s", Y.UserName, Y.UserRealm)
 Y.UserColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[Y.UserClass]
+Y.UserLevel = UnitLevel("player")
 Y.ClientVersion = select(4, GetBuildInfo())
 Y.IsClassic = Y.ClientVersion > 10000 and Y.ClientVersion < 20000
 Y.IsTBC = Y.ClientVersion > 20000 and Y.ClientVersion < 30000

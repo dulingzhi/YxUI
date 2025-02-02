@@ -102,6 +102,7 @@ Modules\ActionBars\MicroMenu.lua
 Modules\ActionBars\BagSlots.lua
 Modules\Scale.lua
 Modules\Loot.lua
+Modules\LootRoll.lua
 Modules\DruidMana.lua
 Modules\MirrorTimers.lua
 Modules\ToastFrame.lua

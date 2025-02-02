@@ -101,6 +101,7 @@ Modules\ActionBars\BagSlots.lua
 Modules\Scale.lua
 Modules\ObjectiveTracker.lua
 Modules\Loot.lua
+Modules\LootRoll.lua
 Modules\ManaBar.lua
 Modules\MirrorTimers.lua
 Modules\ToastFrame.lua

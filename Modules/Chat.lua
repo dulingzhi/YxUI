@@ -266,7 +266,7 @@ function Chat:CreateChatWindow()
     self.EditBox:SetPoint("BOTTOMLEFT", self.Top, "TOPLEFT", 0, 0)
     self.EditBox:CreateBorder()
     self.EditBox:SetAlpha(0)
-    Chat.EditBox:EnableMouse(false)
+    self.EditBox:EnableMouse(false)
 
     Y:CreateMover(self, 2)
 end
@@ -865,11 +865,11 @@ function Chat:MoveChatFrames()
     GeneralDockManager:SetFrameStrata("MEDIUM")
 
     if (Y.ClientVersion >= 100000) then
-        GeneralDockManager:SetPoint("LEFT", self.Top, 0, 0)
-        GeneralDockManager:SetPoint("RIGHT", self.Top, 0, 0)
+        GeneralDockManager:SetPoint("TOPLEFT", self.Top, 0, 0)
+        GeneralDockManager:SetPoint("BOTTOMRIGHT", self.Top, 0, 0)
     else
-        GeneralDockManager:SetPoint("LEFT", self.Top, 0, 5)
-        GeneralDockManager:SetPoint("RIGHT", self.Top, 0, 5)
+        GeneralDockManager:SetPoint("TOPLEFT", self.Top, 0, 5)
+        GeneralDockManager:SetPoint("BOTTOMRIGHT", self.Top, 0, 5)
     end
 
     GeneralDockManagerOverflowButton:ClearAllPoints()
@@ -1118,6 +1118,37 @@ local MoveChatFrames = function()
     Chat:MoveChatFrames()
 end
 
+-- Tab colors
+local function UpdateTabColors(self, selected)
+	if selected then
+		self.Text:SetTextColor(1, 0.8, 0)
+		self.whisperIndex = 0
+	else
+		self.Text:SetTextColor(0.5, 0.5, 0.5)
+	end
+
+	if self.whisperIndex == 1 then
+		self.glow:SetVertexColor(1, 0.5, 1)
+	elseif self.whisperIndex == 2 then
+		self.glow:SetVertexColor(0, 1, 0.96)
+	else
+		self.glow:SetVertexColor(1, 0.8, 0)
+	end
+end
+
+local function UpdateTabEventColors(self, event)
+	local tab = _G[self:GetName() .. "Tab"]
+	local selected = GeneralDockManager.selected:GetID() == tab:GetID()
+
+	if event == "CHAT_MSG_WHISPER" then
+		tab.whisperIndex = 1
+		UpdateTabColors(tab, selected)
+	elseif event == "CHAT_MSG_BN_WHISPER" then
+		tab.whisperIndex = 2
+		UpdateTabColors(tab, selected)
+	end
+end
+
 function Chat:Load()
     if (not C["chat-enable"]) then
         return
@@ -1145,6 +1176,8 @@ function Chat:Load()
     hooksecurefunc("ChatEdit_UpdateHeader", UpdateHeader)
     hooksecurefunc("FCF_OpenTemporaryWindow", OpenTemporaryWindow)
     hooksecurefunc("FCF_RestorePositionAndDimensions", MoveChatFrames)
+	hooksecurefunc("FCFTab_UpdateColors", UpdateTabColors)
+	hooksecurefunc("FloatingChatFrame_OnEvent", UpdateTabEventColors)
 
     if Y.IsMainline then
         self:Event("PLAYER_ENTERING_WORLD", self.MoveChatFrames)
