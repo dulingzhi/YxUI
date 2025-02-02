@@ -1,7 +1,5 @@
 local Y, L, A, C, D = YxUIGlobal:get()
 
-D["loot-roll-auto-greed"] = true
-
 ----------------------------------------------------------------------------------------
 --	Based on teksLoot(by Tekkub)
 ----------------------------------------------------------------------------------------
@@ -288,8 +286,6 @@ local function START_LOOT_ROLL(rollID, time)
     local texture, name, _, quality, bop, canNeed, canGreed, canDisenchant, reasonNeed, reasonGreed, reasonDisenchant, deSkillRequired, canTransmog = GetLootRollItemInfo(rollID)
     f.button.icon:SetTexture(texture)
     f.button.link = GetLootRollItemLink(rollID)
-
-    if C["loot-roll-auto-greed"] and Y.UserLevel >= MAX_PLAYER_LEVEL and quality == 2 and not bop then return end
 
     if canNeed then
         f.need:Enable()

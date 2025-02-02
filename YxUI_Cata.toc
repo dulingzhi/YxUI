@@ -118,3 +118,6 @@ Modules\PVPObjectives.lua
 Modules\DeathStrikePrediction.lua
 Modules\Credit.lua
 Modules\Debug.lua
+Modules\Skin.lua
+Modules\Skins\Load.xml
+Modules\Miscellaneous.lua

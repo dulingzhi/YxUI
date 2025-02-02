@@ -61,7 +61,7 @@ function ChatHistory:Setup()
     end) -- save any history for Pet Combat Log and whispers
 
     local frames = { GetFramesRegisteredForEvent("PLAYER_LEAVING_WORLD") }
-    while frames[1] ~= self do
+    while frames[1] and frames[1] ~= self do
         frames[1]:UnregisterEvent("PLAYER_LEAVING_WORLD")
         frames[1]:RegisterEvent("PLAYER_LEAVING_WORLD")
         table.remove(frames, 1)

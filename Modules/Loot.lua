@@ -91,5 +91,4 @@ end
 YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
 	right:CreateHeader(Language["Loot"])
 	right:CreateSwitch("fast-loot", Settings["fast-loot"], Language["Enable Fast Loot"], Language["Speed up auto looting"], UpdateFastLoot)
-	right:CreateSwitch("loot-roll-auto-greed", Settings["loot-roll-auto-greed"], Language["Enable Auto Greed"], Language["Auto greed green equipment"])
 end)
