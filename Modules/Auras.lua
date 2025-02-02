@@ -21,7 +21,7 @@ local DebuffColors = YxUI.DebuffColors
 Defaults["auras-enable"] = true
 Defaults["auras-show"] = true
 Defaults["auras-size"] = 30
-Defaults["auras-spacing"] = 2
+Defaults["auras-spacing"] = 5
 Defaults["auras-row-spacing"] = 16
 Defaults["auras-per-row"] = 12
 
@@ -132,6 +132,7 @@ end
 
 YxUISkinAura = function(button)
 	button:RegisterForClicks("RightButtonUp")
+    button:CreateBorder()
 
 	local Backdrop = CreateFrame("Frame", nil, button, "BackdropTemplate")
 	Backdrop:SetAllPoints(button)

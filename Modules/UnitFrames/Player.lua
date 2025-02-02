@@ -30,9 +30,9 @@ Defaults["player-move-resource"] = false
 Defaults["player-move-power"] = false
 Defaults["player-enable"] = true
 Defaults.PlayerBuffSize = 28
-Defaults.PlayerBuffSpacing = 2
+Defaults.PlayerBuffSpacing = 3
 Defaults.PlayerDebuffSize = 28
-Defaults.PlayerDebuffSpacing = 2
+Defaults.PlayerDebuffSpacing = 3
 Defaults.PlayerHealthTexture = "YxUI 4"
 Defaults.PlayerPowerTexture = "YxUI 4"
 Defaults.PlayerResourceTexture = "YxUI 4"
@@ -61,6 +61,7 @@ YxUI.StyleFuncs["player"] = function(self, unit)
 	Health:SetHeight(Settings["unitframes-player-health-height"])
 	Health:SetStatusBarTexture(Assets:GetTexture(Settings.PlayerHealthTexture))
 	Health:SetReverseFill(Settings["unitframes-player-health-reverse"])
+    Health:CreateBorder()
 
 	local HealBar = CreateFrame("StatusBar", nil, Health)
 	HealBar:SetWidth(Settings["unitframes-player-width"])
@@ -125,6 +126,12 @@ YxUI.StyleFuncs["player"] = function(self, unit)
 		Portrait.BG:SetPoint("BOTTOMRIGHT", Portrait, 1, -1)
 		Portrait.BG:SetTexture(Assets:GetTexture(Settings["Blank"]))
 		Portrait.BG:SetVertexColor(0, 0, 0)
+
+        Portrait.Border = CreateFrame("Frame", nil, self)
+        Portrait.Border:SetAllPoints(Portrait)
+        Portrait.Border:CreateBorder()
+        Portrait.Border.YxUIBackground:Hide()
+
 	elseif (Settings["player-portrait-style"] == "OVERLAY") then
 		Portrait = CreateFrame("PlayerModel", nil, self)
 		Portrait:SetSize(Settings["unitframes-player-width"], Settings["unitframes-player-health-height"] )
@@ -134,6 +141,7 @@ YxUI.StyleFuncs["player"] = function(self, unit)
 		Portrait = CreateFrame("PlayerModel", nil, self)
 		Portrait:SetSize(55, Settings["unitframes-player-health-height"] + Settings["unitframes-player-power-height"] + 1)
     	Portrait:SetPoint("RIGHT", self, "LEFT", -3, 0)
+        Portrait:CreateBorder()
 
 		Portrait.BG = self:CreateTexture(nil, "BACKGROUND")
 		Portrait.BG:SetPoint("TOPLEFT", Portrait, -1, 1)
@@ -203,6 +211,7 @@ YxUI.StyleFuncs["player"] = function(self, unit)
 		Power:SetHeight(Settings["unitframes-player-power-height"])
 		Power:SetStatusBarTexture(Assets:GetTexture(Settings.PlayerPowerTexture))
 		Power:SetReverseFill(Settings["unitframes-player-power-reverse"])
+        Power:CreateBorder()
 
 		local PowerBG = Power:CreateTexture(nil, "BORDER")
 		PowerBG:SetPoint("TOPLEFT", Power, 0, 0)

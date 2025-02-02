@@ -220,10 +220,7 @@ UF.PostCreateIcon = function(unit, button)
 		button:SetScript("OnMouseUp", CancelAuraOnMouseUp)
 	end
 
-	button.bg = button:CreateTexture(nil, "BACKGROUND")
-	button.bg:SetPoint("TOPLEFT", button, 0, 0)
-	button.bg:SetPoint("BOTTOMRIGHT", button, 0, 0)
-	button.bg:SetColorTexture(0, 0, 0)
+    button:CreateBorder()
 
 	button.cd.noOCC = true
 	button.cd.noCooldownCount = true
@@ -812,11 +809,11 @@ function UF:Load()
 
 	if Settings["tot-enable"] then
 		local TargetTarget = oUF:Spawn("targettarget", "YxUI Target Target")
-		TargetTarget:SetSize(Settings["unitframes-targettarget-width"], Settings["unitframes-targettarget-health-height"] + Settings["unitframes-targettarget-power-height"] + 3)
+		TargetTarget:SetSize(Settings["unitframes-targettarget-width"], Settings["unitframes-targettarget-health-height"] + Settings["unitframes-targettarget-power-height"] + 5)
 		TargetTarget:SetParent(YxUI.UIParent)
 
 		if Settings["target-enable"] then
-			TargetTarget:SetPoint("TOPRIGHT", YxUI.UnitFrames["target"], "BOTTOMRIGHT", 0, -2)
+			TargetTarget:SetPoint("TOPLEFT", YxUI.UnitFrames["target"], "BOTTOMRIGHT", 0, -2)
 		else
 			TargetTarget:SetPoint("TOPRIGHT", YxUI.UIParent, "CENTER", 68, -341)
 		end
@@ -827,7 +824,7 @@ function UF:Load()
 
 	if Settings["pet-enable"] then
 		local Pet = oUF:Spawn("pet", "YxUI Pet")
-		Pet:SetSize(Settings["unitframes-pet-width"], Settings["unitframes-pet-health-height"] + Settings["unitframes-pet-power-height"] + 3)
+		Pet:SetSize(Settings["unitframes-pet-width"], Settings["unitframes-pet-health-height"] + Settings["unitframes-pet-power-height"] + 10)
 		Pet:SetParent(YxUI.UIParent)
 
 		if Settings["player-enable"] then

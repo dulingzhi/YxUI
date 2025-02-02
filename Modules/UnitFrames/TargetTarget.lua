@@ -6,7 +6,7 @@ Defaults["unitframes-targettarget-health-reverse"] = false
 Defaults["unitframes-targettarget-health-color"] = "CLASS"
 Defaults["unitframes-targettarget-health-smooth"] = true
 Defaults["unitframes-targettarget-enable-power"] = true
-Defaults["unitframes-targettarget-power-height"] = 3
+Defaults["unitframes-targettarget-power-height"] = 10
 Defaults["unitframes-targettarget-power-reverse"] = false
 Defaults["unitframes-targettarget-power-color"] = "POWER"
 Defaults["unitframes-targettarget-power-smooth"] = true
@@ -48,6 +48,7 @@ YxUI.StyleFuncs["targettarget"] = function(self, unit)
 	Health:SetHeight(Settings["unitframes-targettarget-health-height"])
 	Health:SetStatusBarTexture(Assets:GetTexture(Settings.ToTHealthTexture))
 	Health:SetReverseFill(Settings["unitframes-targettarget-health-reverse"])
+    Health:CreateBorder()
 
 	local HealBar = CreateFrame("StatusBar", nil, Health)
 	HealBar:SetWidth(Settings["unitframes-targettarget-width"])
@@ -118,6 +119,7 @@ YxUI.StyleFuncs["targettarget"] = function(self, unit)
 	Power:SetHeight(Settings["unitframes-targettarget-power-height"])
 	Power:SetStatusBarTexture(Assets:GetTexture(Settings.ToTPowerTexture))
 	Power:SetReverseFill(Settings["unitframes-targettarget-power-reverse"])
+    Power:CreateBorder()
 
 	local PowerBG = Power:CreateTexture(nil, "BORDER")
 	PowerBG:SetPoint("TOPLEFT", Power, 0, 0)
