@@ -824,7 +824,7 @@ function UF:Load()
 
 	if Settings["pet-enable"] then
 		local Pet = oUF:Spawn("pet", "YxUI Pet")
-		Pet:SetSize(Settings["unitframes-pet-width"], Settings["unitframes-pet-health-height"] + Settings["unitframes-pet-power-height"] + 10)
+		Pet:SetSize(Settings["unitframes-pet-width"], Settings["unitframes-pet-health-height"] + Settings["unitframes-pet-power-height"] + 3)
 		Pet:SetParent(YxUI.UIParent)
 
 		if Settings["player-enable"] then
