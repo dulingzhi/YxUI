@@ -1,5 +1,5 @@
 ---@class YxUIGlobal
-local Namespace = select(2, ...)
+local AddOnName, Namespace = ...
 
 -- Data storage
 ---@class Assets
@@ -27,6 +27,7 @@ Y.UIParent:SetFrameLevel(UIParent:GetFrameLevel())
 local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
 local GetAddOnInfo = C_AddOns and C_AddOns.GetAddOnInfo or GetAddOnInfo
 
+Y.AddOnName = AddOnName
 Y.UIVersion = GetAddOnMetadata("YxUI", "Version")
 Y.UserName = UnitName("player")
 Y.UserClass = select(2, UnitClass("player"))
@@ -178,6 +179,12 @@ function Y:NewModule(name)
             end
         end
     end)
+    Module.After = function(self, delay, func, ...)
+        local data = SafePack(...)
+        C_Timer.After(delay, function()
+            func(self, SafeUnpack(data))
+        end)
+    end
 
     return Module
 end

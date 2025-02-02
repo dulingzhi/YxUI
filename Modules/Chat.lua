@@ -25,7 +25,7 @@ D["chat-enable-fading"] = false
 D["chat-fade-time"] = 15
 D["chat-link-tooltip"] = true
 D["chat-shorten-channels"] = true
-D["chat-log-max"] = 300
+D["chat-history-enable"] = true
 
 D["right-window-enable"] = false
 D["right-window-size"] = "SINGLE"
@@ -1161,8 +1161,6 @@ function Chat:Load()
     if ChatFrame1.ScrollBar then
         ChatFrame1.ScrollBar:SetParent(Hider)
     end
-
-    self:CreateChatHistory()
 end
 
 Y.FormatLinks = FormatLinks
@@ -1297,10 +1295,6 @@ local UpdateShortenChannels = function(value)
     end
 end
 
-local function UpdateChatLog(value)
-    Chat:UpdateChatHistory()
-end
-
 Y:GetModule("GUI"):AddWidgets(L["General"], L["Chat"], function(left, right)
     left:CreateHeader(L["Enable"])
     left:CreateSwitch("chat-enable", C["chat-enable"], L["Enable Chat Module"], L["Enable the YxUI chat module"], ReloadUI):RequiresReload(true)
@@ -1310,7 +1304,7 @@ Y:GetModule("GUI"):AddWidgets(L["General"], L["Chat"], function(left, right)
     left:CreateSwitch("chat-enable-fading", C["chat-enable-fading"], L["Enable Text Fading"], L["Set the text to fade after the set amount of time"], UpdateEnableFading)
     left:CreateSwitch("chat-link-tooltip", C["chat-link-tooltip"], L["Show Link Tooltips"], L["Display a tooltip when hovering over links in chat"], UpdateEnableLinks)
     left:CreateSwitch("chat-shorten-channels", C["chat-shorten-channels"], L["Shorten Channel Names"], L["Shorten chat channel names to their channel number"], UpdateShortenChannels)
-    left:CreateSlider("chat-log-max", C["chat-log-max"], 0, 2000, 1, L["Max Chat Log"], L["Set the max to chat logs"], UpdateChatLog)
+    left:CreateSwitch("chat-history-enable", C["chat-history-enable"], L["Enable Chat History"], L["Log chat history"]):RequiresReload(true)
 
     right:CreateHeader(L["Install"])
     right:CreateButton("", L["Install"], L["Install Chat Defaults"], L["Set default channels and settings related to chat"], RunChatInstall):RequiresReload(true)

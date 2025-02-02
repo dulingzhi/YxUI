@@ -562,7 +562,6 @@ function Tooltips:RegisterTooltips(addon, func)
 end
 
 local function addonStyled(self, _, addon)
-    print("addonStyled", addon)
     if tipTable[addon] then
         tipTable[addon]()
         tipTable[addon] = nil
