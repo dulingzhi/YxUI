@@ -124,10 +124,12 @@ function AB:Disable(object)
 end
 
 function AB:EnableBar(bar)
-    RegisterAttributeDriver(bar, "state-visibility", "[nopetbattle] show; hide")
+    if bar.frameVisibility then
+        RegisterAttributeDriver(bar, "state-visibility", bar.frameVisibility)
+    else
+        RegisterAttributeDriver(bar, "state-visibility", "[nopetbattle] show; hide")
+    end
     bar:Show()
-    self:UpdateStanceBarPosition()
-    self:UpdateTotemBarPosition()
 end
 
 function AB:DisableBar(bar)
@@ -625,29 +627,9 @@ function AB:CreateBar1()
 		end
 	]])
 
-    if Y.IsClassic then
+    if Y.IsClassic or Y.IsWrath then
         self.Bar1:SetAttribute("_onstate-page", [[
 			if GetOverrideBarIndex and HasOverrideActionBar() then
-				newstate = GetOverrideBarIndex() or newstate
-			elseif HasTempShapeshiftActionBar() then
-				newstate = GetTempShapeshiftBarIndex() or newstate
-			elseif HasBonusActionBar() and GetActionBarPage() == 1 then
-				newstate = GetBonusBarIndex() or newstate
-			else
-				newstate = GetActionBarPage() or newstate
-			end
-
-			for i = 1, 12 do
-				Buttons[i]:SetAttribute("actionpage", newstate)
-			end
-		]])
-
-        RegisterAttributeDriver(self.Bar1, "state-page", "[overridebar] 14; [shapeshift] 13; [possessbar] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6; [bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10; [bonusbar:5] 11; [form] 1; 1")
-    elseif Y.IsWrath then
-        self.Bar1:SetAttribute("_onstate-page", [[
-			if GetVehicleBarIndex and HasVehicleActionBar() then
-				newstate = GetVehicleBarIndex()
-			elseif HasOverrideActionBar and HasOverrideActionBar() then
 				newstate = GetOverrideBarIndex() or newstate
 			elseif HasTempShapeshiftActionBar() then
 				newstate = GetTempShapeshiftBarIndex() or newstate
@@ -1090,6 +1072,7 @@ function AB:CreatePetBar()
     if PetActionBar_Update then
         hooksecurefunc("PetActionBar_Update", AB.PetActionBar_Update)
     end
+	self.PetBar.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar][shapeshift] hide; [pet] show; hide"
 
     if C["ab-pet-enable"] then
         self:EnableBar(self.PetBar)
@@ -1207,6 +1190,8 @@ function AB:CreateStanceBar()
             end
         end
     end
+
+    self.StanceBar.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show"
 
     if C["ab-stance-enable"] then
         self:EnableBar(self.StanceBar)
@@ -1603,6 +1588,7 @@ function AB:StyleTotemBar()
     hooksecurefunc("MultiCastSummonSpellButton_Update", MultiCastSummonSpellButton_Update)
     hooksecurefunc("MultiCastRecallSpellButton_Update", MultiCastRecallSpellButton_Update)
     hooksecurefunc("MultiCastFlyoutFrame_ToggleFlyout", MultiCastFlyoutFrame_ToggleFlyout)
+	self.TotemBar.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show"
     if C["ab-totem-enable"] then
         self:EnableBar(self.TotemBar)
     else
@@ -1714,6 +1700,8 @@ local UpdateEnableBar1 = function(value)
     else
         AB:DisableBar(AB.Bar1)
     end
+    AB:UpdateStanceBarPosition()
+    AB:UpdateTotemBarPosition()
 end
 
 local UpdateEnableBar2 = function(value)
@@ -1722,6 +1710,8 @@ local UpdateEnableBar2 = function(value)
     else
         AB:DisableBar(AB.Bar2)
     end
+    AB:UpdateStanceBarPosition()
+    AB:UpdateTotemBarPosition()
 end
 
 local UpdateEnableBar3 = function(value)
@@ -1730,6 +1720,8 @@ local UpdateEnableBar3 = function(value)
     else
         AB:DisableBar(AB.Bar3)
     end
+    AB:UpdateStanceBarPosition()
+    AB:UpdateTotemBarPosition()
 end
 
 local UpdateEnableBar4 = function(value)

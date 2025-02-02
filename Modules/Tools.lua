@@ -23,6 +23,24 @@ function YxUI:RGBToHex(r, g, b)
 	return format("%02x%02x%02x", r * 255, g * 255, b * 255)
 end
 
+----------------------------------------------------------------------------------------
+--	Chat channel check
+----------------------------------------------------------------------------------------
+function YxUI:CheckChat(warning)
+	if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+		return "INSTANCE_CHAT"
+	elseif IsInRaid(LE_PARTY_CATEGORY_HOME) then
+		if warning and (UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") or IsEveryoneAssistant()) then
+			return "RAID_WARNING"
+		else
+			return "RAID"
+		end
+	elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
+		return "PARTY"
+	end
+	return "SAY"
+end
+
 function YxUI:FormatTime(seconds)
 	if (seconds > 86399) then
 		return format("%dd", ceil(seconds / 86400))

@@ -840,7 +840,7 @@ function UF:Load()
 	if Settings["focus-enable"] then
 		local Focus = oUF:Spawn("focus", "YxUI Focus")
 		Focus:SetSize(Settings["unitframes-focus-width"], Settings["unitframes-focus-health-height"] + Settings["unitframes-focus-power-height"] + 3)
-		Focus:SetPoint("RIGHT", YxUI.UIParent, "CENTER", -68, 304)
+		Focus:SetPoint("TOPRIGHT", YxUI.UIParent, "CENTER", -450, 0)
 		Focus:SetParent(YxUI.UIParent)
 
 		if Settings["focus-enable-buffs"] then

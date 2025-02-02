@@ -6,7 +6,7 @@ Defaults["unitframes-pet-health-reverse"] = false
 Defaults["unitframes-pet-health-color"] = "CLASS"
 Defaults["unitframes-pet-health-smooth"] = true
 Defaults["unitframes-pet-enable-power"] = true
-Defaults["unitframes-pet-power-height"] = 3
+Defaults["unitframes-pet-power-height"] = 10
 Defaults["unitframes-pet-power-reverse"] = false
 Defaults["unitframes-pet-power-color"] = "POWER"
 Defaults["unitframes-pet-power-smooth"] = true
@@ -55,6 +55,7 @@ YxUI.StyleFuncs["pet"] = function(self, unit)
 	Health:SetHeight(Settings["unitframes-pet-health-height"])
 	Health:SetStatusBarTexture(Assets:GetTexture(Settings.PetHealthTexture))
 	Health:SetReverseFill(Settings["unitframes-pet-health-reverse"])
+    Health:CreateBorder()
 
 	local HealBar = CreateFrame("StatusBar", nil, Health)
 	HealBar:SetWidth(Settings["unitframes-pet-width"])
@@ -120,6 +121,7 @@ YxUI.StyleFuncs["pet"] = function(self, unit)
 	Power:SetHeight(Settings["unitframes-pet-power-height"])
 	Power:SetStatusBarTexture(Assets:GetTexture(Settings.PetPowerTexture))
 	Power:SetReverseFill(Settings["unitframes-pet-power-reverse"])
+    Power:CreateBorder()
 
 	local PowerBG = Power:CreateTexture(nil, "BORDER")
 	PowerBG:SetPoint("TOPLEFT", Power, 0, 0)

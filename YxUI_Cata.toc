@@ -5,6 +5,7 @@
 ## Notes: Interface replacement for Cataclysm
 ## SavedVariables: YxUIProfileData, YxUIProfiles, YxUIData, YxUIGold
 
+TaintLess.xml
 Modules\Initialize.lua
 Libs\LibStub.lua
 Libs\CallbackHandler-1.0.lua

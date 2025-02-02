@@ -163,20 +163,37 @@ local function CreatePanel(f, t, w, h, a1, p, a2, x, y)
     f:SetBackdropBorderColor(borderr, borderg, borderb, bordera)
 end
 
-local function CreateBackdrop(f, t)
-    local f = (f.IsObjectType and f:IsObjectType("Texture") and f:GetParent()) or f
-    if f.backdrop then return end
+local function CreateBackdrop(bFrame, ...)
+	if not bFrame or type(bFrame) ~= "table" then
+		return nil, "Invalid frame provided"
+	end
 
-    local R, G, B = Y:HexToRGB(C["ui-window-main-color"])
-    local Border = C["ui-border-thickness"]
+	local bPointa, bPointb, bPointc, bPointd, bSubLevel, bLayer, bSize, bTexture, bOffset, bColor, bAlpha, bgTexture, bgSubLevel, bgLayer, bgPoint, bgColor = ...
 
-    local b = CreateFrame("Frame", nil, f, "BackdropTemplate")
-    b:SetPoint("TOPLEFT", f, "TOPLEFT", Border, Border)
-    b:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", Border, Border)
-    Y:AddBackdrop(b)
-    b.Outside:SetBackdropColor(R, G, B, (70 / 100))
-    b.Outside:SetFrameStrata("BACKGROUND")
-    f.backdrop = b
+	if not bFrame.YxUIBackground then
+		-- Assign default values if not provided
+		local BorderPoints = {
+			bPointa or 0,
+			bPointb or 0,
+			bPointc or 0,
+			bPointd or 0,
+		}
+
+		local backdrop = CreateFrame("Frame", "$parentBackdrop", bFrame)
+		backdrop:SetPoint("TOPLEFT", bFrame, "TOPLEFT", BorderPoints[1], BorderPoints[2])
+		backdrop:SetPoint("BOTTOMRIGHT", bFrame, "BOTTOMRIGHT", BorderPoints[3], BorderPoints[4])
+
+		-- Ensure CreateBorder function exists and is callable
+		if type(backdrop.CreateBorder) == "function" then
+			backdrop:CreateBorder(bSubLevel, bLayer, bSize, bTexture, bOffset, bColor, bAlpha, bgTexture, bgSubLevel, bgLayer, bgPoint, bgColor)
+		end
+
+		backdrop:SetFrameLevel(max(0, bFrame:GetFrameLevel() - 1))
+
+		bFrame.YxUIBackground = backdrop
+	end
+
+	return bFrame
 end
 
 local StripTexturesBlizzFrames = {

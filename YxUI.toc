@@ -6,6 +6,7 @@
 ## SavedVariables: YxUIProfileData, YxUIProfiles, YxUIData, YxUIGold
 ## IconTexture: Interface\AddOns\YxUI\Media\Textures\HydraUIBadgeCrisp
 
+TaintLess.xml
 Modules\Initialize.lua
 Libs\LibStub.lua
 Libs\CallbackHandler-1.0.lua
