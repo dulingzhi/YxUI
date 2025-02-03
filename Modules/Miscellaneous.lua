@@ -31,16 +31,23 @@ local C_Item_GetItemInfo = C_Item.GetItemInfo
 local GetLootRollItemInfo = GetLootRollItemInfo
 local GetLootRollItemLink = GetLootRollItemLink
 local RollOnLoot = RollOnLoot
+local NeedItems = {
+    ['冰冻宝珠'] = true,
+}
 
 local function SetupAutoGreed(_, _, id)
-    local _, _, _, quality, BoP, _, _, canDisenchant = GetLootRollItemInfo(id)
-    if id and quality == 2 and not BoP then
-        local link = GetLootRollItemLink(id)
-        local _, _, _, ilevel = C_Item_GetItemInfo(link)
-        if canDisenchant and ilevel > 270 then
-            RollOnLoot(id, 3)
-        else
-            RollOnLoot(id, 2)
+    local _, name, _, quality, BoP, _, _, canDisenchant = GetLootRollItemInfo(id)
+    if id then
+        if quality == 2 and not BoP then
+            local link = GetLootRollItemLink(id)
+            local _, _, _, ilevel = C_Item_GetItemInfo(link)
+            if canDisenchant and ilevel > 270 then
+                RollOnLoot(id, 3)
+            else
+                RollOnLoot(id, 2)
+            end
+        elseif NeedItems[name] then
+            RollOnLoot(id, 1)
         end
     end
 end

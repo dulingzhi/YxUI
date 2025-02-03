@@ -1178,7 +1178,7 @@ function AB:CreateStanceBar()
 
         self:PositionButtons(self.StanceBar, #self.StanceBar, C["ab-stance-per-row"], C["ab-stance-button-size"], C["ab-stance-button-gap"])
 
-        hooksecurefunc("StanceBar_UpdateState", self.StanceBar_UpdateState)
+        -- hooksecurefunc("StanceBar_UpdateState", self.StanceBar_UpdateState)
 
         if C["ab-stance-hover"] then
             self.StanceBar:SetAlpha(0)

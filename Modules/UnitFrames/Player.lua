@@ -1,6 +1,6 @@
 local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-Defaults["unitframes-player-width"] = 240
+Defaults["unitframes-player-width"] = 247
 Defaults["unitframes-player-health-height"] = 32
 Defaults["unitframes-player-health-reverse"] = false
 Defaults["unitframes-player-health-color"] = "CLASS"
@@ -839,18 +839,18 @@ YxUI.StyleFuncs["player"] = function(self, unit)
 
 	if Settings["player-move-resource"] then
 		if Settings["unitframes-show-player-buffs"] then
-			Buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 2)
+			Buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 2)
 			Debuffs:SetPoint("BOTTOM", Buffs, "TOP", 0, 2)
 
 		else
-			Debuffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 2)
+			Debuffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 2)
 		end
 	else
 		if Settings["unitframes-show-player-buffs"] then
-			Buffs:SetPoint("BOTTOMLEFT", self.AuraParent, "TOPLEFT", 0, 2)
+			Buffs:SetPoint("BOTTOMLEFT", self.AuraParent, "TOPLEFT", 1, 2)
 			Debuffs:SetPoint("BOTTOM", Buffs, "TOP", 0, 2)
 		else
-			Debuffs:SetPoint("BOTTOMLEFT", self.AuraParent, "TOPLEFT", 0, 2)
+			Debuffs:SetPoint("BOTTOMLEFT", self.AuraParent, "TOPLEFT", 1, 2)
 		end
 	end
 

@@ -1,6 +1,6 @@
 local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-Defaults["unitframes-target-width"] = 240
+Defaults["unitframes-target-width"] = 247
 Defaults["unitframes-target-health-height"] = 32
 Defaults["unitframes-target-health-reverse"] = false
 Defaults["unitframes-target-health-color"] = "CLASS"
@@ -200,7 +200,7 @@ YxUI.StyleFuncs["target"] = function(self, unit)
 	-- Auras
 	local Buffs = CreateFrame("Frame", self:GetName() .. "Buffs", self)
 	Buffs:SetSize(Settings["unitframes-player-width"], 28)
-	Buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 2)
+	Buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 2)
 	Buffs.size = Settings.TargetBuffSize
 	Buffs.spacing = Settings.TargetBuffSpacing
 	Buffs.num = 16
@@ -228,7 +228,7 @@ YxUI.StyleFuncs["target"] = function(self, unit)
 	if Settings["unitframes-show-player-buffs"] then
 		Debuffs:SetPoint("BOTTOM", Buffs, "TOP", 0, 2)
 	else
-		Debuffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 2)
+		Debuffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 2)
 	end
 
     -- Castbar

@@ -284,16 +284,12 @@ function Map:Style()
         MiniMapMailFrame:HookScript("OnEnter", MailOnEnter)
         MiniMapMailFrame:HookScript("OnLeave", MailOnLeave)
         MiniMapMailFrame:SetFrameLevel(10)
-
-        if (MiniMapTrackingFrame and MiniMapTrackingFrame:IsShown()) then
-            MiniMapMailFrame:SetPoint("TOPLEFT", MiniMapTrackingFrame, "BOTTOMLEFT", -7, 16)
-        else
-            MiniMapMailFrame:SetPoint("TOPLEFT", Minimap, 4, 12)
-        end
-
+        MiniMapMailFrame:SetPoint("TOPLEFT", Minimap, 0, 0)
+        MiniMapMailFrame:SetSize(32, 32)
         MiniMapMailIcon:SetSize(32, 32)
         MiniMapMailIcon:SetTexture(A:GetTexture("Mail 2"))
         MiniMapMailIcon:SetVertexColor(Y:HexToRGB("EEEEEE"))
+        MiniMapMailIcon:SetAllPoints(MiniMapMailFrame)
     end
 
     if MinimapNorthTag then

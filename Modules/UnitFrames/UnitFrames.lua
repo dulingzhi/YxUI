@@ -813,7 +813,7 @@ function UF:Load()
 		TargetTarget:SetParent(YxUI.UIParent)
 
 		if Settings["target-enable"] then
-			TargetTarget:SetPoint("TOPLEFT", YxUI.UnitFrames["target"], "BOTTOMRIGHT", 0, -2)
+			TargetTarget:SetPoint("TOPLEFT", YxUI.UnitFrames["target"], "BOTTOMRIGHT", 2, -2)
 		else
 			TargetTarget:SetPoint("TOPRIGHT", YxUI.UIParent, "CENTER", 68, -341)
 		end
@@ -959,7 +959,7 @@ function UF:Load()
 
 			self.PartyPetAnchor = CreateFrame("Frame", "YxUI Party Pet Anchor", YxUI.UIParent)
 			self.PartyPetAnchor:SetSize((5 * Settings["party-width"] + (4 * Settings["party-spacing"])), Settings["party-pets-health-height"] + 2)
-			self.PartyPetAnchor:SetPoint("TOPLEFT", self.PartyAnchor, "BOTTOMLEFT", 0, -2)
+			self.PartyPetAnchor:SetPoint("BOTTOMLEFT", self.PartyAnchor, "TOPLEFT", 0, 5)
 
 			PartyPet:SetPoint("TOPLEFT", self.PartyPetAnchor, 0, 0)
 			PartyPet:SetParent(YxUI.UIParent)
@@ -1046,11 +1046,11 @@ function UF:Load()
 			self.RaidPetAnchor = CreateFrame("Frame", "YxUI Raid Pet Anchor", YxUI.UIParent)
 			self.RaidPetAnchor:SetWidth((floor(40 / Settings["raid-max-columns"]) * Settings["raid-width"] + (floor(40 / Settings["raid-max-columns"]) * Settings["raid-x-offset"] - 2)))
 			self.RaidPetAnchor:SetHeight(Settings["raid-pets-health-height"] * (Settings["raid-max-columns"] + (Settings["raid-y-offset"])) - 1)
-			self.RaidPetAnchor:SetPoint("BOTTOMLEFT", self.RaidAnchor, "TOPLEFT", 0, 0)
+			self.RaidPetAnchor:SetPoint("BOTTOMLEFT", YxUI.UnitFrames["raid"], "TOPLEFT", 0, 5)
 
 			YxUI:CreateMover(self.RaidPetAnchor)
 
-			RaidPet:SetPoint("TOPLEFT", self.RaidPetAnchor, 0, 0)
+			RaidPet:SetPoint("BOTTOMLEFT", self.RaidPetAnchor, 0, 0)
 			RaidPet:SetParent(YxUI.UIParent)
 
 			YxUI.UnitFrames["raid-pets"] = RaidPet
