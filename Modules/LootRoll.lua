@@ -131,13 +131,12 @@ end
 
 local function CreateRollFrame()
     local frame = CreateFrame("Frame", nil, UIParent)
-    frame:CreateBackdrop("Default")
+    frame:CreateBackdrop()
     frame:SetSize(280, 22)
     frame:SetFrameStrata("MEDIUM")
     frame:SetFrameLevel(10)
     frame:SetScript("OnEvent", OnEvent)
     frame:RegisterEvent("CANCEL_LOOT_ROLL")
-    frame:CreateBorder()
     if Y.IsMainline then
         frame:RegisterEvent("CANCEL_ALL_LOOT_ROLLS")
         frame:RegisterEvent("MAIN_SPEC_NEED_ROLL")
@@ -147,12 +146,11 @@ local function CreateRollFrame()
     local button = CreateFrame("Button", nil, frame)
     button:SetPoint("RIGHT", frame, 'LEFT', -5, 0)
     button:SetSize(22, 22)
-    button:CreateBackdrop("Default")
+    button:CreateBackdrop()
     button:SetScript("OnEnter", SetItemTip)
     button:SetScript("OnLeave", HideTip2)
     button:SetScript("OnUpdate", ItemOnUpdate)
     button:SetScript("OnClick", LootClick)
-    button:CreateBorder()
     frame.button = button
 
     button.icon = button:CreateTexture(nil, "OVERLAY")
@@ -363,8 +361,8 @@ local function START_LOOT_ROLL(rollID, time)
     f.status:SetStatusBarColor(color.r, color.g, color.b, 0.7)
     f.status.bg:SetColorTexture(color.r, color.g, color.b)
 
-    f.backdrop:SetBackdropBorderColor(color.r, color.g, color.b, 0.7)
-    f.button.backdrop:SetBackdropBorderColor(color.r, color.g, color.b, 0.7)
+    f.YxUIBackground:SetBackdropBorderColor(color.r, color.g, color.b, 0.7)
+    f.button.YxUIBackground:SetBackdropBorderColor(color.r, color.g, color.b, 0.7)
 
     f.status:SetMinMaxValues(0, time)
     f.status:SetValue(time)
@@ -397,8 +395,8 @@ local function testRoll(f)
     f.status:SetStatusBarColor(r, g, b, 0.7)
     f.status.bg:SetColorTexture(r, g, b)
 
-    f.backdrop:SetBackdropBorderColor(r, g, b, 0.7)
-    f.button.backdrop:SetBackdropBorderColor(r, g, b, 0.7)
+    f.YxUIBackground:SetBackdropBorderColor(r, g, b, 0.7)
+    f.button.YxUIBackground:SetBackdropBorderColor(r, g, b, 0.7)
     f.test = true
 
     if not Y.IsMainline then

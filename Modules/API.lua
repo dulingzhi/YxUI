@@ -179,7 +179,7 @@ local function CreateBackdrop(bFrame, ...)
 			bPointd or 0,
 		}
 
-		local backdrop = CreateFrame("Frame", "$parentBackdrop", bFrame)
+		local backdrop = CreateFrame("Frame", "$parentBackdrop", bFrame, 'BackdropTemplate')
 		backdrop:SetPoint("TOPLEFT", bFrame, "TOPLEFT", BorderPoints[1], BorderPoints[2])
 		backdrop:SetPoint("BOTTOMRIGHT", bFrame, "BOTTOMRIGHT", BorderPoints[3], BorderPoints[4])
 
