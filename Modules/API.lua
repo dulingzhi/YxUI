@@ -58,7 +58,7 @@ local function CreateOverlay(f)
 
     local overlay = f:CreateTexture("$parentOverlay", "BORDER")
     overlay:SetInside()
-    overlay:SetTexture(C.media.blank)
+    overlay:SetTexture([[Interface\AddOns\YxUI\Media\Textures\YxUIBlank.tga]])
     overlay:SetVertexColor(0.1, 0.1, 0.1, 1)
     f.overlay = overlay
 end
@@ -109,11 +109,11 @@ end
 
 local function GetTemplate(t)
     if t == "ClassColor" then
-        borderr, borderg, borderb, bordera = unpack(C.media.classborder_color)
-        backdropr, backdropg, backdropb, backdropa = unpack(C.media.backdrop_color)
+        borderr, borderg, borderb, bordera = Y.UserColor.r, Y.UserColor.g, Y.UserColor.b, 1
+        backdropr, backdropg, backdropb, backdropa = 0, 0, 0, 1
     else
-        borderr, borderg, borderb, bordera = unpack(C.media.border_color)
-        backdropr, backdropg, backdropb, backdropa = unpack(C.media.backdrop_color)
+        borderr, borderg, borderb, bordera = 0.1, 0.1, 0.1, 1
+        backdropr, backdropg, backdropb, backdropa = 0, 0, 0, 1
     end
 end
 
@@ -122,20 +122,20 @@ local function SetTemplate(f, t)
     GetTemplate(t)
 
     f:SetBackdrop({
-        bgFile = C.media.blank,
-        edgeFile = C.media.blank,
+        bgFile = [[Interface\AddOns\YxUI\Media\Textures\YxUIBlank.tga]],
+        edgeFile = [[Interface\AddOns\YxUI\Media\Textures\YxUIBlank.tga]],
         edgeSize = Mult,
         insets = { left = -Mult, right = -Mult, top = -Mult, bottom = -Mult }
     })
 
     if t == "Transparent" then
-        backdropa = C.media.backdrop_alpha
+        backdropa = 0.7
         f:CreateBorder(true, true)
     elseif t == "Overlay" then
         backdropa = 1
         f:CreateOverlay()
     else
-        backdropa = C.media.backdrop_color[4]
+        backdropa = 1
     end
 
     f:SetBackdropColor(backdropr, backdropg, backdropb, backdropa)
@@ -1120,6 +1120,22 @@ end
 
 local function hideCollapseTexture(self)
     self.bg:Hide()
+end
+
+Y.SetModifiedBackdrop = function(self)
+	if not self.IsEnabled or self:IsEnabled() then
+		self:SetBackdropBorderColor(Y.UserColor.r, Y.UserColor.g, Y.UserColor.b)
+		if self.overlay then
+			self.overlay:SetVertexColor(Y.UserColor.r * 0.3, Y.UserColor.g * 0.3, Y.UserColor.b * 0.3, 1)
+		end
+	end
+end
+
+Y.SetOriginalBackdrop = function(self)
+	self:SetBackdropBorderColor(Y.UserColor.r, Y.UserColor.g, Y.UserColor.b)
+	if self.overlay then
+		self.overlay:SetVertexColor(0.1, 0.1, 0.1, 1)
+	end
 end
 
 function Y.SkinExpandOrCollapse(f, isAtlas)

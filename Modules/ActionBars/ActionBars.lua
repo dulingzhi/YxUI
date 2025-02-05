@@ -129,8 +129,6 @@ end
 function AB:DisableBar(bar)
     UnregisterAttributeDriver(bar, "state-visibility")
     bar:Hide()
-    self:UpdateStanceBarPosition()
-    self:UpdateTotemBarPosition()
 end
 
 local keyButton = gsub(KEY_BUTTON4, "%d", "")
@@ -1017,14 +1015,28 @@ local PetBarUpdateGridLayout = function()
     AB:PositionButtons(AB.PetBar, NUM_PET_ACTION_SLOTS, C["ab-pet-per-row"], C["ab-pet-button-size"], C["ab-pet-button-gap"])
 end
 
+function AB:UpdatePetBarPosition()
+    if not self.PetBar then
+        return
+    end
+    self.PetBar:ClearAllPoints()
+    if C["ab-bar5-enable"] then
+        self.PetBar:SetPoint("RIGHT", self.Bar5, "LEFT", -C["ab-pet-button-gap"], 0)
+    elseif C["ab-bar4-enable"] then
+        self.PetBar:SetPoint("RIGHT", self.Bar4, "LEFT", -C["ab-pet-button-gap"], 0)
+    else
+        self.PetBar:SetPoint("RIGHT", Y.UIParent, -C["ab-pet-button-gap"], 0)
+    end
+end
+
 -- Pet
 function AB:CreatePetBar()
     self.PetBar = CreateFrame("Frame", "YxUI Pet Bar", Y.UIParent, "SecureHandlerStateTemplate")
-    self.PetBar:SetPoint("RIGHT", self.Bar5, "LEFT", -C["ab-pet-button-gap"], 0)
     self.PetBar:SetAlpha(C["ab-pet-alpha"] / 100)
     self.PetBar.ButtonParent = PetActionBar or PetActionBarFrame
     self.PetBar.ShouldFade = C["ab-pet-hover"]
     self.PetBar.MaxAlpha = C["ab-pet-alpha"]
+    self:UpdatePetBarPosition()
 
     self.PetBar.Fader = LibMotion:CreateAnimation(self.PetBar, "Fade")
     self.PetBar.Fader:SetDuration(0.15)
@@ -1732,6 +1744,7 @@ local UpdateEnableBar4 = function(value)
     else
         AB:DisableBar(AB.Bar4)
     end
+    AB:UpdatePetBarPosition()
 end
 
 local UpdateEnableBar5 = function(value)
@@ -1740,6 +1753,7 @@ local UpdateEnableBar5 = function(value)
     else
         AB:DisableBar(AB.Bar5)
     end
+    AB:UpdatePetBarPosition()
 end
 
 local UpdateEnableBar6 = function(value)
