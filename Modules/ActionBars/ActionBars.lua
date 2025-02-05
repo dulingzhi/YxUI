@@ -6,12 +6,6 @@ local GUI = Y:GetModule("GUI")
 local IsUsableAction = IsUsableAction
 local NUM_PET_ACTION_SLOTS = NUM_PET_ACTION_SLOTS
 
-local NumPad = KEY_NUMPAD1:gsub("%s%S$", "")
-local WheelUp = KEY_MOUSEWHEELUP
-local WheelDown = KEY_MOUSEWHEELDOWN
-local MouseButton = KEY_BUTTON4:gsub("%s%S$", "")
-local MiddleButton = KEY_BUTTON3
-
 -- Defaults
 D["ab-enable"] = true
 
@@ -21,9 +15,9 @@ D["ab-show-macro"] = true
 D["ab-show-empty"] = true
 
 D["ab-font"] = "PT Sans"
-D["ab-font-size"] = 12
+D["ab-font-size"] = 13
 D["ab-cd-size"] = 18
-D["ab-font-flags"] = ""
+D["ab-font-flags"] = "OUTLINE"
 
 D["ab-bar1-enable"] = true
 D["ab-bar1-hover"] = false
@@ -139,21 +133,47 @@ function AB:DisableBar(bar)
     self:UpdateTotemBarPosition()
 end
 
+local keyButton = gsub(KEY_BUTTON4, "%d", "")
+local keyNumpad = gsub(KEY_NUMPAD1, "%d", "")
+
+local replaces = {
+    { "(" .. keyButton .. ")", "M" },
+    { "(" .. keyNumpad .. ")", "N" },
+    { "(a%-)",                 "a" },
+    { "(c%-)",                 "c" },
+    { "(s%-)",                 "s" },
+    { KEY_BUTTON3,             "M3" },
+    { KEY_MOUSEWHEELUP,        "MU" },
+    { KEY_MOUSEWHEELDOWN,      "MD" },
+    { KEY_SPACE,               "Sp" },
+    { "CAPSLOCK",              "CL" },
+    { "Capslock",              "CL" },
+    { "BUTTON",                "M" },
+    { "NUMPAD",                "N" },
+    { "(META%-)",              "m" },
+    { "(Meta%-)",              "m" },
+    { "(ALT%-)",               "a" },
+    { "(CTRL%-)",              "c" },
+    { "(SHIFT%-)",             "s" },
+    { "MOUSEWHEELUP",          "MU" },
+    { "MOUSEWHEELDOWN",        "MD" },
+    { "SPACE",                 "Sp" },
+}
+
 function AB:UpdateHotKeyText()
-    local Text = self.HotKey:GetText()
-
-    if Text then
-        Text = Text:gsub(NumPad, "N")
-        Text = Text:gsub(WheelUp, "MWU")
-        Text = Text:gsub(WheelDown, "MWD")
-        Text = Text:gsub(MouseButton, "MB")
-        Text = Text:gsub(MiddleButton, "MMB")
-        Text = Text:gsub(CTRL_KEY_TEXT, "c")
-        Text = Text:gsub(SHIFT_KEY_TEXT, "s")
-        Text = Text:gsub(ALT_KEY_TEXT, "a")
-
-        self.HotKey:SetText("|cFFFFFFFF" .. Text .. "|r")
+    local text = self.HotKey:GetText()
+    if not text then
+        return
     end
+
+    if text == RANGE_INDICATOR then
+        text = ""
+    else
+        for _, value in pairs(replaces) do
+            text = gsub(text, value[1], value[2])
+        end
+    end
+    self.HotKey:SetFormattedText("%s", text)
 end
 
 function AB:PositionButtons(bar, numbuttons, perrow, size, spacing)
@@ -238,31 +258,13 @@ function AB:StyleActionButton(button)
 
     if button.HotKey then
         button.HotKey:ClearAllPoints()
-        button.HotKey:SetPoint("TOPLEFT", button, 2, -3)
+        button.HotKey:SetPoint("TOPRIGHT", button, -2, -4)
         Y:SetFontInfo(button.HotKey, C["ab-font"], C["ab-font-size"], C["ab-font-flags"])
-        button.HotKey:SetJustifyH("LEFT")
-        button.HotKey:SetTextColor(1, 1, 1)
+        button.HotKey:SetJustifyH("RIGHT")
+        button.HotKey:SetTextColor(0.75, 0.75, 0.75)
         button.HotKey.SetTextColor = function() end
 
-        local Text = button.HotKey:GetText()
-
-        if Text then
-            Text = Text:gsub(NumPad, "N")
-            Text = Text:gsub(WheelUp, "MWU")
-            Text = Text:gsub(WheelDown, "MWD")
-            Text = Text:gsub(MouseButton, "MB")
-            Text = Text:gsub(MiddleButton, "MMB")
-            Text = Text:gsub(CTRL_KEY_TEXT, "c")
-            Text = Text:gsub(SHIFT_KEY_TEXT, "s")
-            Text = Text:gsub(ALT_KEY_TEXT, "a")
-
-            button.HotKey:SetText("|cFFFFFFFF" .. Text .. "|r")
-        end
-
-        button.HotKey.OST = button.HotKey.SetText
-        button.HotKey.SetText = function(self, text)
-            self:OST("|cFFFFFFFF" .. text .. "|r")
-        end
+        AB.UpdateHotKeyText(button)
 
         if (not C["ab-show-hotkey"]) then
             button.HotKey:SetAlpha(0)
@@ -1072,7 +1074,7 @@ function AB:CreatePetBar()
     if PetActionBar_Update then
         hooksecurefunc("PetActionBar_Update", AB.PetActionBar_Update)
     end
-	self.PetBar.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar][shapeshift] hide; [pet] show; hide"
+    self.PetBar.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar][shapeshift] hide; [pet] show; hide"
 
     if C["ab-pet-enable"] then
         self:EnableBar(self.PetBar)
@@ -1588,7 +1590,7 @@ function AB:StyleTotemBar()
     hooksecurefunc("MultiCastSummonSpellButton_Update", MultiCastSummonSpellButton_Update)
     hooksecurefunc("MultiCastRecallSpellButton_Update", MultiCastRecallSpellButton_Update)
     hooksecurefunc("MultiCastFlyoutFrame_ToggleFlyout", MultiCastFlyoutFrame_ToggleFlyout)
-	self.TotemBar.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show"
+    self.TotemBar.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show"
     if C["ab-totem-enable"] then
         self:EnableBar(self.TotemBar)
     else

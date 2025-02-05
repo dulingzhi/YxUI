@@ -735,7 +735,7 @@ function UF:Load()
 			Player:SetSize(Settings["unitframes-player-width"], Settings["unitframes-player-health-height"] + 2)
 		end
 
-		Player:SetPoint("TOPRIGHT", YxUI.UIParent, "CENTER", -68, -281)
+		Player:SetPoint("BOTTOM", YxUI.UIParent, "BOTTOM", -260, 320)
 		Player:SetParent(YxUI.UIParent)
 
 		if Settings["player-enable-portrait"] then
@@ -762,7 +762,7 @@ function UF:Load()
 		end
 
 		if Settings["unitframes-player-enable-castbar"] then
-			Player.CastAnchor:SetPoint("BOTTOM", YxUI.UIParent, 0, 118)
+			Player.CastAnchor:SetPoint("BOTTOM", YxUI.UIParent, 0, 200)
 			YxUI:CreateMover(Player.CastAnchor, 2)
 		end
 
@@ -775,7 +775,7 @@ function UF:Load()
 	if Settings["target-enable"] then
 		local Target = oUF:Spawn("target", "YxUI Target")
 		Target:SetSize(Settings["unitframes-target-width"], Settings["unitframes-target-health-height"] + Settings["unitframes-target-power-height"] + 3)
-		Target:SetPoint("TOPLEFT", YxUI.UIParent, "CENTER", 68, -281)
+		Target:SetPoint("BOTTOM", YxUI.UIParent, "BOTTOM", 260, 320)
 		Target:SetParent(YxUI.UIParent)
 
 		if Settings["target-enable-portrait"] then
@@ -797,7 +797,7 @@ function UF:Load()
 		end
 
 		if Settings["unitframes-target-enable-castbar"] then
-			Target.CastAnchor:SetPoint("BOTTOM", YxUI.UIParent, 0, 146)
+			Target.CastAnchor:SetPoint("BOTTOM", YxUI.UIParent, 0, 338)
 			YxUI:CreateMover(Target.CastAnchor, 2)
 		end
 

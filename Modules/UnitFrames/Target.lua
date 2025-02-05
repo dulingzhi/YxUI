@@ -1,11 +1,11 @@
 local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-Defaults["unitframes-target-width"] = 247
-Defaults["unitframes-target-health-height"] = 32
+Defaults["unitframes-target-width"] = 200
+Defaults["unitframes-target-health-height"] = 34
 Defaults["unitframes-target-health-reverse"] = false
 Defaults["unitframes-target-health-color"] = "CLASS"
 Defaults["unitframes-target-health-smooth"] = true
-Defaults["unitframes-target-power-height"] = 15
+Defaults["unitframes-target-power-height"] = 16
 Defaults["unitframes-target-power-reverse"] = false
 Defaults["unitframes-target-power-color"] = "POWER"
 Defaults["unitframes-target-power-smooth"] = true
@@ -13,18 +13,19 @@ Defaults["unitframes-target-health-left"] = "[LevelColor][Level][Plus][ColorStop
 Defaults["unitframes-target-health-right"] = "[HealthPercent]"
 Defaults["unitframes-target-power-left"] = "[HealthValues:Short]"
 Defaults["unitframes-target-power-right"] = "[PowerValues:Short]"
-Defaults["unitframes-target-cast-width"] = 250
-Defaults["unitframes-target-cast-height"] = 24
+Defaults["unitframes-target-cast-width"] = 268
+Defaults["unitframes-target-cast-height"] = 34
 Defaults["unitframes-target-cast-classcolor"] = true
 Defaults["unitframes-target-enable-castbar"] = true
 Defaults["target-enable-portrait"] = false
-Defaults["target-portrait-style"] = "3D"
+Defaults["target-portrait-style"] = "2D"
 Defaults["target-overlay-alpha"] = 30
 Defaults["target-enable"] = true
-Defaults.TargetBuffSize = 28
-Defaults.TargetBuffSpacing = 3
-Defaults.TargetDebuffSize = 28
-Defaults.TargetDebuffSpacing = 3
+Defaults.TargetBuffPerLine = 6
+Defaults.TargetBuffSpacing = 6
+Defaults.TargetBuffSize = (Defaults["unitframes-target-width"] - (Defaults.TargetBuffPerLine - 1) * Defaults.TargetBuffSpacing) / Defaults.TargetBuffPerLine
+Defaults.TargetDebuffSize = Defaults.TargetBuffSize
+Defaults.TargetDebuffSpacing = Defaults.TargetBuffSpacing
 Defaults.TargetHealthTexture = "YxUI 4"
 Defaults.TargetPowerTexture = "YxUI 4"
 
@@ -200,7 +201,7 @@ YxUI.StyleFuncs["target"] = function(self, unit)
 	-- Auras
 	local Buffs = CreateFrame("Frame", self:GetName() .. "Buffs", self)
 	Buffs:SetSize(Settings["unitframes-player-width"], 28)
-	Buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 2)
+	Buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 5)
 	Buffs.size = Settings.TargetBuffSize
 	Buffs.spacing = Settings.TargetBuffSpacing
 	Buffs.num = 16
@@ -226,9 +227,9 @@ YxUI.StyleFuncs["target"] = function(self, unit)
 	Debuffs.showStealableBuffs = true
 
 	if Settings["unitframes-show-player-buffs"] then
-		Debuffs:SetPoint("BOTTOM", Buffs, "TOP", 0, 2)
+		Debuffs:SetPoint("BOTTOM", Buffs, "TOP", 0, 3)
 	else
-		Debuffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 2)
+		Debuffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 3)
 	end
 
     -- Castbar
@@ -240,6 +241,7 @@ YxUI.StyleFuncs["target"] = function(self, unit)
 		Castbar:SetSize(Settings["unitframes-target-cast-width"] - Settings["unitframes-target-cast-height"] - 1, Settings["unitframes-target-cast-height"])
 		Castbar:SetPoint("RIGHT", Anchor, 0, 0)
 		Castbar:SetStatusBarTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
+        Castbar:CreateBorder()
 
 		local CastbarBG = Castbar:CreateTexture(nil, "ARTWORK")
 		CastbarBG:SetPoint("TOPLEFT", Castbar, 0, 0)
@@ -266,8 +268,13 @@ YxUI.StyleFuncs["target"] = function(self, unit)
 
 		local Icon = Castbar:CreateTexture(nil, "OVERLAY")
 		Icon:SetSize(Settings["unitframes-target-cast-height"], Settings["unitframes-target-cast-height"])
-		Icon:SetPoint("TOPRIGHT", Castbar, "TOPLEFT", -1, 0)
+		Icon:SetPoint("TOPRIGHT", Castbar, "TOPLEFT", -6, 0)
 		Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+
+		local Button = CreateFrame("Frame", nil, Castbar)
+		Button:CreateBorder()
+		Button:SetAllPoints(Icon)
+		Button:SetFrameLevel(Castbar:GetFrameLevel())
 
 		Castbar.bg = CastbarBG
 		Castbar.Time = Time
@@ -534,12 +541,12 @@ YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Target"], Langua
 	left:CreateHeader(Language["Buffs"])
 	left:CreateSwitch("unitframes-show-target-buffs", Settings["unitframes-show-target-buffs"], Language["Show Buffs"], Language["Show auras above the target unit frame"], UpdateDisplayedAuras)
 	left:CreateSlider("TargetBuffSize", Settings.TargetBuffSize, 26, 50, 2, "Set Size", "Set the size of the auras", UpdateBuffSize)
-	left:CreateSlider("TargetBuffSpacing", Settings.TargetBuffSpacing, -1, 4, 1, "Set Spacing", "Set the spacing between the auras", UpdateBuffSpacing)
+	left:CreateSlider("TargetBuffSpacing", Settings.TargetBuffSpacing, -1, 10, 1, "Set Spacing", "Set the spacing between the auras", UpdateBuffSpacing)
 
 	left:CreateHeader(Language["Debuffs"])
 	left:CreateSwitch("unitframes-show-target-debuffs", Settings["unitframes-show-target-debuffs"], Language["Show Debuffs"], Language["Show your debuff auras above the target unit frame"], UpdateDisplayedAuras)
 	left:CreateSlider("TargetDebuffSize", Settings.TargetDebuffSize, 26, 50, 2, "Set Size", "Set the size of the auras", UpdateDebuffSize)
-	left:CreateSlider("TargetDebuffSpacing", Settings.TargetDebuffSpacing, -1, 4, 1, "Set Spacing", "Set the spacing between the auras", UpdateDebuffSpacing)
+	left:CreateSlider("TargetDebuffSpacing", Settings.TargetDebuffSpacing, -1, 10, 1, "Set Spacing", "Set the spacing between the auras", UpdateDebuffSpacing)
 
 	right:CreateHeader(Language["Power"])
 	right:CreateSwitch("unitframes-target-power-reverse", Settings["unitframes-target-power-reverse"], Language["Reverse Power Fill"], Language["Reverse the fill of the power bar"], UpdateTargetPowerFill)

@@ -9,6 +9,18 @@ if Y.ScreenHeight > 1200 then
     Mult = Y.Scale(1)
 end
 
+-- Set Border Color
+do
+    function Y.SetBorderColor(self)
+        -- Prevent issues related to invalid inputs or configurations
+        if not self or type(self) ~= "table" or not self.SetVertexColor then
+            return
+        end
+
+        self:SetVertexColor(1, 1, 1) -- Default color
+    end
+end
+
 ----------------------------------------------------------------------------------------
 --	Position functions
 ----------------------------------------------------------------------------------------
@@ -164,36 +176,36 @@ local function CreatePanel(f, t, w, h, a1, p, a2, x, y)
 end
 
 local function CreateBackdrop(bFrame, ...)
-	if not bFrame or type(bFrame) ~= "table" then
-		return nil, "Invalid frame provided"
-	end
+    if not bFrame or type(bFrame) ~= "table" then
+        return nil, "Invalid frame provided"
+    end
 
-	local bPointa, bPointb, bPointc, bPointd, bSubLevel, bLayer, bSize, bTexture, bOffset, bColor, bAlpha, bgTexture, bgSubLevel, bgLayer, bgPoint, bgColor = ...
+    local bPointa, bPointb, bPointc, bPointd, bSubLevel, bLayer, bSize, bTexture, bOffset, bColor, bAlpha, bgTexture, bgSubLevel, bgLayer, bgPoint, bgColor = ...
 
-	if not bFrame.YxUIBackground then
-		-- Assign default values if not provided
-		local BorderPoints = {
-			bPointa or 0,
-			bPointb or 0,
-			bPointc or 0,
-			bPointd or 0,
-		}
+    if not bFrame.YxUIBackground then
+        -- Assign default values if not provided
+        local BorderPoints = {
+            bPointa or 0,
+            bPointb or 0,
+            bPointc or 0,
+            bPointd or 0,
+        }
 
-		local backdrop = CreateFrame("Frame", "$parentBackdrop", bFrame, 'BackdropTemplate')
-		backdrop:SetPoint("TOPLEFT", bFrame, "TOPLEFT", BorderPoints[1], BorderPoints[2])
-		backdrop:SetPoint("BOTTOMRIGHT", bFrame, "BOTTOMRIGHT", BorderPoints[3], BorderPoints[4])
+        local backdrop = CreateFrame("Frame", "$parentBackdrop", bFrame, 'BackdropTemplate')
+        backdrop:SetPoint("TOPLEFT", bFrame, "TOPLEFT", BorderPoints[1], BorderPoints[2])
+        backdrop:SetPoint("BOTTOMRIGHT", bFrame, "BOTTOMRIGHT", BorderPoints[3], BorderPoints[4])
 
-		-- Ensure CreateBorder function exists and is callable
-		if type(backdrop.CreateBorder) == "function" then
-			backdrop:CreateBorder(bSubLevel, bLayer, bSize, bTexture, bOffset, bColor, bAlpha, bgTexture, bgSubLevel, bgLayer, bgPoint, bgColor)
-		end
+        -- Ensure CreateBorder function exists and is callable
+        if type(backdrop.CreateBorder) == "function" then
+            backdrop:CreateBorder(bSubLevel, bLayer, bSize, bTexture, bOffset, bColor, bAlpha, bgTexture, bgSubLevel, bgLayer, bgPoint, bgColor)
+        end
 
-		backdrop:SetFrameLevel(max(0, bFrame:GetFrameLevel() - 1))
+        backdrop:SetFrameLevel(max(0, bFrame:GetFrameLevel() - 1))
 
-		bFrame.YxUIBackground = backdrop
-	end
+        bFrame.YxUIBackground = backdrop
+    end
 
-	return bFrame
+    return bFrame
 end
 
 local StripTexturesBlizzFrames = {
@@ -319,46 +331,65 @@ end
 ----------------------------------------------------------------------------------------
 --	Style buttons function
 ----------------------------------------------------------------------------------------
-Y.SetModifiedBackdrop = function(self)
-    if self.YxUIBorder and (not self.IsEnabled or self:IsEnabled()) then
-        self.YxUIBorder:SetVertexColor(102 / 255, 157 / 255, 255 / 255)
+local function Button_OnEnter(self)
+    if not self:IsEnabled() then
+        return
     end
+
+    self.YxUIBorder:SetVertexColor(102 / 255, 157 / 255, 255 / 255)
 end
 
-Y.SetOriginalBackdrop = function(self)
-    if self.YxUIBorder then
-        self.YxUIBorder:SetVertexColor(1, 1, 1)
-    end
+local function Button_OnLeave(self)
+    Y.SetBorderColor(self.YxUIBorder)
 end
 
-local function SkinButton(f, strip)
-    if strip then f:StripTextures() end
+-- Skin Button
+local blizzRegions = {
+    "Left",
+    "Middle",
+    "Right",
+    "TopLeft",
+    "TopRight",
+    "BottomLeft",
+    "BottomRight",
+    "Background",
+    "Border",
+    "Center",
+}
 
-    if f.SetNormalTexture then f:SetNormalTexture(0) end
-    if f.SetHighlightTexture then f:SetHighlightTexture(0) end
-    if f.SetPushedTexture then f:SetPushedTexture(0) end
-    if f.SetDisabledTexture then f:SetDisabledTexture(0) end
+local function SkinButton(self, override, ...)
+    local bSubLevel, bLayer, bSize, bTexture, bOffset, bColor, bgTexture, bgSubLevel, bgLayer, bgPoint, bgColor = ...
+    -- Remove the normal, highlight, pushed and disabled textures
+    if self.SetNormalTexture and not override then
+        self:SetNormalTexture(0)
+    end
 
-    if f.Left then f.Left:SetAlpha(0) end
-    if f.Right then f.Right:SetAlpha(0) end
-    if f.Middle then f.Middle:SetAlpha(0) end
-    if f.LeftSeparator then f.LeftSeparator:SetAlpha(0) end
-    if f.RightSeparator then f.RightSeparator:SetAlpha(0) end
-    if f.Flash then f.Flash:SetAlpha(0) end
+    if self.SetHighlightTexture then
+        self:SetHighlightTexture(0)
+    end
 
-    if f.TopLeft then f.TopLeft:Hide() end
-    if f.TopRight then f.TopRight:Hide() end
-    if f.BottomLeft then f.BottomLeft:Hide() end
-    if f.BottomRight then f.BottomRight:Hide() end
-    if f.TopMiddle then f.TopMiddle:Hide() end
-    if f.MiddleLeft then f.MiddleLeft:Hide() end
-    if f.MiddleRight then f.MiddleRight:Hide() end
-    if f.BottomMiddle then f.BottomMiddle:Hide() end
-    if f.MiddleMiddle then f.MiddleMiddle:Hide() end
+    if self.SetPushedTexture then
+        self:SetPushedTexture(0)
+    end
 
-    f:CreateBorder()
-    f:HookScript("OnEnter", Y.SetModifiedBackdrop)
-    f:HookScript("OnLeave", Y.SetOriginalBackdrop)
+    if self.SetDisabledTexture then
+        self:SetDisabledTexture(0)
+    end
+
+    -- Hide all regions defined in the blizzRegions table
+    for _, region in pairs(blizzRegions) do
+        if self[region] then
+            self[region]:SetAlpha(0)
+            self[region]:Hide()
+        end
+    end
+
+    -- Do not apply custom border if the override argument is true
+    self:CreateBorder(bSubLevel, bLayer, bSize, bTexture, bOffset, bColor, bgTexture, bgSubLevel, bgLayer, bgPoint, bgColor)
+
+    -- Hook the OnEnter and OnLeave events
+    self:HookScript("OnEnter", Button_OnEnter)
+    self:HookScript("OnLeave", Button_OnLeave)
 end
 
 ----------------------------------------------------------------------------------------

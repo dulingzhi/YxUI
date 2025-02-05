@@ -1,4 +1,4 @@
-local YxUI, Language, Assets, Settings = select(2, ...):get()
+local YxUI, Language, Assets, Settings = YxUIGlobal:get()
 
 local Vehicle = YxUI:NewModule("Vehicle")
 
@@ -68,6 +68,7 @@ function Vehicle:Load()
 	self:SetScript("OnEnter", self.OnEnter)
 	self:SetScript("OnLeave", self.OnLeave)
 	self:SetScript("OnEvent", self.OnEvent)
+	self:CreateBorder()
 
 	self.Texture = self:CreateTexture(nil, "ARTWORK")
 	self.Texture:SetPoint("TOPLEFT", self, 1, -1)
@@ -98,7 +99,7 @@ function Vehicle:Load()
 	end
 
 	if Settings["minimap-enable"] then
-		self:SetPoint("TOP", _G["YxUI Minimap"], "BOTTOM", 0, -2)
+		self:SetPoint("TOP", _G["YxUI Minimap"], "BOTTOM", 0, -6)
 	else
 		self:SetPoint("TOP", YxUI.UIParent, 0, -120)
 	end

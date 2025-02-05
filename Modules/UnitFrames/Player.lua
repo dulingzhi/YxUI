@@ -1,11 +1,11 @@
 local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-Defaults["unitframes-player-width"] = 247
-Defaults["unitframes-player-health-height"] = 32
+Defaults["unitframes-player-width"] = 200
+Defaults["unitframes-player-health-height"] = 34
 Defaults["unitframes-player-health-reverse"] = false
 Defaults["unitframes-player-health-color"] = "CLASS"
 Defaults["unitframes-player-health-smooth"] = true
-Defaults["unitframes-player-power-height"] = 15
+Defaults["unitframes-player-power-height"] = 16
 Defaults["unitframes-player-power-reverse"] = false
 Defaults["unitframes-player-power-color"] = "POWER"
 Defaults["unitframes-player-power-smooth"] = true
@@ -15,24 +15,25 @@ Defaults["unitframes-player-power-left"] = "[HealthValues:Short]"
 Defaults["unitframes-player-power-right"] = "[PowerValues:Short]"
 Defaults["unitframes-player-enable-power"] = true
 Defaults["unitframes-player-enable-resource"] = true
-Defaults["unitframes-player-cast-width"] = 250
-Defaults["unitframes-player-cast-height"] = 24
+Defaults["unitframes-player-cast-width"] = 268
+Defaults["unitframes-player-cast-height"] = 28
 Defaults["unitframes-player-cast-classcolor"] = true
 Defaults["unitframes-player-enable-castbar"] = true
 Defaults["unitframes-show-mana-timer"] = true
 Defaults["unitframes-show-energy-timer"] = true
 Defaults["player-enable-portrait"] = false
-Defaults["player-portrait-style"] = "3D"
+Defaults["player-portrait-style"] = "2D"
 Defaults["player-overlay-alpha"] = 30
 Defaults["player-enable-pvp"] = true
 Defaults["player-resource-height"] = 8
 Defaults["player-move-resource"] = false
 Defaults["player-move-power"] = false
 Defaults["player-enable"] = true
-Defaults.PlayerBuffSize = 28
-Defaults.PlayerBuffSpacing = 3
-Defaults.PlayerDebuffSize = 28
-Defaults.PlayerDebuffSpacing = 3
+Defaults.PlayerBuffPerLine = 6
+Defaults.PlayerBuffSpacing = 6
+Defaults.PlayerBuffSize = (Defaults["unitframes-player-width"] - (Defaults.PlayerBuffPerLine - 1) * Defaults.PlayerBuffSpacing) / Defaults.PlayerBuffPerLine
+Defaults.PlayerDebuffSize = Defaults.PlayerBuffSize
+Defaults.PlayerDebuffSpacing = Defaults.PlayerBuffSpacing
 Defaults.PlayerHealthTexture = "YxUI 4"
 Defaults.PlayerPowerTexture = "YxUI 4"
 Defaults.PlayerResourceTexture = "YxUI 4"
@@ -328,6 +329,7 @@ YxUI.StyleFuncs["player"] = function(self, unit)
 		Castbar:SetSize(Settings["unitframes-player-cast-width"] - Settings["unitframes-player-cast-height"] - 1, Settings["unitframes-player-cast-height"])
 		Castbar:SetPoint("RIGHT", Anchor, 0, 0)
 		Castbar:SetStatusBarTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
+        Castbar:CreateBorder()
 
 		local CastbarBG = Castbar:CreateTexture(nil, "ARTWORK")
 		CastbarBG:SetPoint("TOPLEFT", Castbar, 0, 0)
@@ -354,8 +356,13 @@ YxUI.StyleFuncs["player"] = function(self, unit)
 
 		local Icon = Castbar:CreateTexture(nil, "OVERLAY")
 		Icon:SetSize(Settings["unitframes-player-cast-height"], Settings["unitframes-player-cast-height"])
-		Icon:SetPoint("TOPRIGHT", Castbar, "TOPLEFT", -1, 0)
+		Icon:SetPoint("TOPRIGHT", Castbar, "TOPLEFT", -6, 0)
 		Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+
+		local Button = CreateFrame("Frame", nil, Castbar)
+		Button:CreateBorder()
+		Button:SetAllPoints(Icon)
+		Button:SetFrameLevel(Castbar:GetFrameLevel())
 
 		local SafeZone = Castbar:CreateTexture(nil, "ARTWORK")
 		SafeZone:SetTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
@@ -1430,12 +1437,12 @@ YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Player"], Langua
 	left:CreateHeader(Language["Buffs"])
 	left:CreateSwitch("unitframes-show-player-buffs", Settings["unitframes-show-player-buffs"], Language["Show Player Buffs"], Language["Show your auras above the player unit frame"], UpdateDisplayedAuras)
 	left:CreateSlider("PlayerBuffSize", Settings.PlayerBuffSize, 26, 50, 2, "Set Size", "Set the size of the auras", UpdateBuffSize)
-	left:CreateSlider("PlayerBuffSpacing", Settings.PlayerBuffSpacing, -1, 4, 1, "Set Spacing", "Set the spacing between the auras", UpdateBuffSpacing)
+	left:CreateSlider("PlayerBuffSpacing", Settings.PlayerBuffSpacing, -1, 10, 1, "Set Spacing", "Set the spacing between the auras", UpdateBuffSpacing)
 
 	left:CreateHeader(Language["Debuffs"])
 	left:CreateSwitch("unitframes-show-player-debuffs", Settings["unitframes-show-player-debuffs"], Language["Show Player Debuffs"], Language["Show your debuff auras above the player unit frame"], UpdateDisplayedAuras)
 	left:CreateSlider("PlayerDebuffSize", Settings.PlayerDebuffSize, 26, 50, 2, "Set Size", "Set the size of the auras", UpdateDebuffSize)
-	left:CreateSlider("PlayerDebuffSpacing", Settings.PlayerDebuffSpacing, -1, 4, 1, "Set Spacing", "Set the spacing between the auras", UpdateDebuffSpacing)
+	left:CreateSlider("PlayerDebuffSpacing", Settings.PlayerDebuffSpacing, -1, 10, 1, "Set Spacing", "Set the spacing between the auras", UpdateDebuffSpacing)
 
 	right:CreateHeader(Language["Power"])
 	right:CreateSwitch("unitframes-player-enable-power", Settings["unitframes-player-enable-power"], Language["Enable Power Bar"], Language["Enable the player power bar"], ReloadUI):RequiresReload(true)

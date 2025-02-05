@@ -53,7 +53,7 @@ local function SetupAutoGreed(_, _, id)
 end
 
 function Module:AutoGreed()
-    if C["misc-auto-greed"] and Y.UserLevel == GetMaxLevelForExpansionLevel(GetExpansionLevel()) then
+    if C["misc-auto-greed"] and Y.IsMaxLevel then
         self:Event("START_LOOT_ROLL", SetupAutoGreed)
     else
         self:UnEvent("START_LOOT_ROLL", SetupAutoGreed)

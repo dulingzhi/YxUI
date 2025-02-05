@@ -186,6 +186,7 @@ end
 function MinimapButtons:CreatePanel()
     local Frame = CreateFrame("Frame", "YxUI Minimap Buttons", Y.UIParent, "BackdropTemplate")
     Frame:SetFrameStrata("LOW")
+    Frame:SetAlpha(0)
     self.Panel = Frame
 end
 
