@@ -24,6 +24,10 @@ YxUI.StyleFuncs["focus"] = function(self, unit)
 	self:RegisterForClicks("AnyUp")
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
 	self:SetScript("OnLeave", UnitFrame_OnLeave)
+    if not YxUI.IsClassic then
+        self:SetAttribute('alt-type1', 'macro')
+        self:SetAttribute('alt-macrotext1', '/clearfocus')
+    end
 
 	local Backdrop = self:CreateTexture(nil, "BACKGROUND")
 	Backdrop:SetAllPoints()
@@ -129,6 +133,7 @@ YxUI.StyleFuncs["focus"] = function(self, unit)
 		Castbar:SetSize(Settings["unitframes-focus-width"] - 30, 24)
 		Castbar:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", -1, -3)
 		Castbar:SetStatusBarTexture(Assets:GetTexture(Settings["ui-widget-texture"]))
+        Castbar:CreateBorder()
 
 		local CastbarBG = Castbar:CreateTexture(nil, "ARTWORK")
 		CastbarBG:SetPoint("TOPLEFT", Castbar, 0, 0)
@@ -158,11 +163,10 @@ YxUI.StyleFuncs["focus"] = function(self, unit)
 		Icon:SetPoint("TOPRIGHT", Castbar, "TOPLEFT", -4, 0)
 		Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 
-		local IconBG = Castbar:CreateTexture(nil, "BACKGROUND")
-		IconBG:SetPoint("TOPLEFT", Icon, -1, 1)
-		IconBG:SetPoint("BOTTOMRIGHT", Icon, 1, -1)
-		IconBG:SetTexture(Assets:GetTexture("Blank"))
-		IconBG:SetVertexColor(0, 0, 0)
+		local Button = CreateFrame("Frame", nil, Castbar)
+		Button:CreateBorder()
+		Button:SetAllPoints(Icon)
+		Button:SetFrameLevel(Castbar:GetFrameLevel())
 
 		-- Register it with oUF
 		Castbar.bg = CastbarBG

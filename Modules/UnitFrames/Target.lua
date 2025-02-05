@@ -36,6 +36,9 @@ YxUI.StyleFuncs["target"] = function(self, unit)
 	self:RegisterForClicks("AnyUp")
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
 	self:SetScript("OnLeave", UnitFrame_OnLeave)
+    if not YxUI.IsClassic then
+        self:SetAttribute('alt-type1', 'focus')
+    end
 
 	self.colors.debuff = YxUI.DebuffColors
 

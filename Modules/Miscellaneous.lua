@@ -5,11 +5,13 @@ local Module = Y:NewModule("Miscellaneous")
 D["misc-auto-greed"] = true
 D["misc-interrupts-announce"] = true
 D["misc-auto-confirm"] = true
+D["misc-ab-esc-main"] = true
 
 function Module:Load()
     self:AutoGreed()
     self:Interrupts()
     self:AutoConfirm()
+    self:AutoJumpPageOne()
 end
 
 Y:GetModule("GUI"):AddWidgets(L["General"], L["Miscellaneous"], function(left, right)
@@ -22,6 +24,9 @@ Y:GetModule("GUI"):AddWidgets(L["General"], L["Miscellaneous"], function(left, r
     end)
     left:CreateSwitch("misc-auto-confirm", C["misc-auto-confirm"], L["Auto Confirm Loot Bind"], L["Auto confirm loot/roll binds"], function()
         Module:AutoConfirm()
+    end)
+    left:CreateSwitch("misc-ab-esc-main", C["misc-ab-esc-main"], L["Actionbar Quickly to Page 1"], L["Press ESC Actionbar to Page 1"], function()
+        Module:AutoJumpPageOne()
     end)
 end)
 
@@ -133,5 +138,31 @@ function Module:AutoConfirm()
         end
         self:UnEvent("CONFIRM_LOOT_ROLL", AutoConfirm)
         self:UnEvent("LOOT_BIND_CONFIRM", AutoConfirm)
+    end
+end
+
+----------------------------------------------------------------------------------------
+--- ActionBar ESC Jump to page 1
+----------------------------------------------------------------------------------------
+local ReturnPageButton
+function Module:AutoJumpPageOne()
+    if C["misc-ab-esc-main"] then
+        if not ReturnPageButton then
+            ReturnPageButton = CreateFrame('Button', 'YxUIReturnPageButton', Y.UIParent, 'SecureActionButtonTemplate,SecureHandlerStateTemplate')
+
+            ReturnPageButton:SetAttribute('type', 'macro')
+            ReturnPageButton:SetAttribute('macrotext', '/changeactionbar 1')
+            ReturnPageButton:SetAttribute('_onstate-usable', [[
+if newstate == 1 then
+self:SetBindingClick(true, 'Escape', 'YxUIReturnPageButton')
+else
+self:ClearBindings()
+end
+]])
+            RegisterStateDriver(ReturnPageButton, 'usable', '[noactionbar:1]1;0')
+        end
+        ReturnPageButton:Show()
+    elseif ReturnPageButton then
+        ReturnPageButton:Hide()
     end
 end
