@@ -114,7 +114,7 @@ YxUI.StyleFuncs["target"] = function(self, unit)
 	if (Settings["target-portrait-style"] == "2D") then
 		Portrait = self:CreateTexture(nil, "OVERLAY")
 		Portrait:SetTexCoord(0.12, 0.88, 0.12, 0.88)
-		Portrait:SetSize(55, Settings["unitframes-target-health-height"] + Settings["unitframes-target-power-height"] + 1)
+		Portrait:SetSize(Settings["unitframes-target-health-height"] + Settings["unitframes-target-power-height"] + 1, Settings["unitframes-target-health-height"] + Settings["unitframes-target-power-height"] + 1)
 		Portrait:SetPoint("LEFT", self, "RIGHT", 3, 0)
 
         Portrait.Border = CreateFrame("Frame", nil, self)
@@ -134,7 +134,7 @@ YxUI.StyleFuncs["target"] = function(self, unit)
 		Portrait:SetAlpha(0.3)
 	else
 		Portrait = CreateFrame("PlayerModel", nil, self)
-	    Portrait:SetSize(55, Settings["unitframes-target-health-height"] + Settings["unitframes-target-power-height"] + 1)
+	    Portrait:SetSize(Settings["unitframes-target-health-height"] + Settings["unitframes-target-power-height"] + 1, Settings["unitframes-target-health-height"] + Settings["unitframes-target-power-height"] + 1)
 		Portrait:SetPoint("LEFT", self, "RIGHT", 3, 0)
         Portrait:CreateBorder()
 
