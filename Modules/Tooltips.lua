@@ -741,7 +741,7 @@ function Tooltips:Load()
 
         self:SetPoint("BOTTOMLEFT", Mod.TopLeft or Mod.Top, "TOPLEFT", 0, 1 > Offset and -1 or -(Offset + 2))
     else
-        self:SetPoint("BOTTOMRIGHT", Y.UIParent, -195, 50)
+        self:SetPoint("BOTTOMRIGHT", Y.UIParent, -185, 38)
     end
 
     self:AddHooks()
