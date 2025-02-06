@@ -627,43 +627,89 @@ function AB:CreateBar1()
 		end
 	]])
 
-    if Y.IsClassic or Y.IsWrath then
-        self.Bar1:SetAttribute("_onstate-page", [[
-			if GetOverrideBarIndex and HasOverrideActionBar() then
-				newstate = GetOverrideBarIndex() or newstate
-			elseif HasTempShapeshiftActionBar() then
-				newstate = GetTempShapeshiftBarIndex() or newstate
-			elseif HasBonusActionBar() and GetActionBarPage() == 1 then
-				newstate = GetBonusBarIndex() or newstate
-			else
-				newstate = GetActionBarPage() or newstate
-			end
-
-			for i = 1, 12 do
-				Buttons[i]:SetAttribute("actionpage", newstate)
-			end
-		]])
-
-        RegisterAttributeDriver(self.Bar1, "state-page", "[overridebar] 14; [shapeshift] 13; [possessbar] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6; [bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10; [bonusbar:5] 11; [form] 1; 1")
+    local Page = {}
+    if not Y.IsMainline then
+        Page = {
+            ["DRUID"] = "[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10;",
+            ["WARRIOR"] = "[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9;",
+            ["PRIEST"] = "[bonusbar:1] 7;",
+            ["ROGUE"] = "[bonusbar:1] 7; [form:3] 7;",
+            ["WARLOCK"] = "[form:2] 10;",
+            ["DEFAULT"] = "[possessbar] 16; [shapeshift] 17; [overridebar] 18; [vehicleui] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6; [bonusbar: 5] 11;",
+        }
     else
-        self.Bar1:SetAttribute("_onstate-page", [[
-			if GetVehicleBarIndex and HasVehicleActionBar() then
-				newstate = GetVehicleBarIndex()
-			elseif HasOverrideActionBar and HasOverrideActionBar() then
-				newstate = GetOverrideBarIndex()
-			elseif HasTempShapeshiftActionBar() then
-				newstate = GetTempShapeshiftBarIndex()
-			elseif HasBonusActionBar() then
-				newstate = GetBonusBarIndex()
-			end
-
-			for i = 1, 12 do
-				Buttons[i]:SetAttribute("actionpage", newstate)
-			end
-		]])
-
-        RegisterAttributeDriver(self.Bar1, "state-page", "[overridebar] 14; [shapeshift] 13; [possessbar] 16; [vehicleui] 12; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6; [bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10; [bonusbar:5] 11; [form] 1; 1")
+        Page = {
+            ["DRUID"] = "[bonusbar:1,nostealth] 7; [bonusbar:1,stealth] 8; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10;",
+            ["EVOKER"] = "[bonusbar:1] 7;",
+            ["ROGUE"] = "[bonusbar:1] 7;",
+            ["DEFAULT"] = "[possessbar] 16; [shapeshift] 17; [overridebar] 18; [vehicleui] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6; [bonusbar:5] 11;",
+        }
     end
+    local function GetBar()
+        local condition = Page["DEFAULT"]
+        local class = Y.UserClass
+        local page = Page[class]
+        if page then
+            condition = condition.." "..page
+        end
+        condition = condition.." 1"
+        return condition
+    end
+
+    self.Bar1:Execute([[
+        buttons = table.new()
+        for i = 1, 12 do
+            table.insert(buttons, self:GetFrameRef("ActionButton"..i))
+        end
+    ]])
+
+    self.Bar1:SetAttribute("_onstate-page", [[
+        for i, button in ipairs(buttons) do
+            button:SetAttribute("actionpage", tonumber(newstate))
+        end
+    ]])
+
+    RegisterStateDriver(self.Bar1, "page", GetBar())
+
+    -- if Y.IsClassic or Y.IsWrath then
+    --     self.Bar1:SetAttribute("_onstate-page", [[
+	-- 		if GetVehicleBarIndex and HasVehicleActionBar() then
+	-- 			newstate = GetVehicleBarIndex()
+	-- 		elseif GetOverrideBarIndex and HasOverrideActionBar() then
+	-- 			newstate = GetOverrideBarIndex() or newstate
+	-- 		elseif HasTempShapeshiftActionBar() then
+	-- 			newstate = GetTempShapeshiftBarIndex() or newstate
+	-- 		elseif HasBonusActionBar() and GetActionBarPage() == 1 then
+	-- 			newstate = GetBonusBarIndex() or newstate
+	-- 		else
+	-- 			newstate = GetActionBarPage() or newstate
+	-- 		end
+
+	-- 		for i = 1, 12 do
+	-- 			Buttons[i]:SetAttribute("actionpage", newstate)
+	-- 		end
+	-- 	]])
+
+    --     RegisterAttributeDriver(self.Bar1, "state-page", "[overridebar] 18; [shapeshift] 17; [possessbar] 16; [vehicleui] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6; [bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10; [bonusbar:5] 11; [form] 1; 1")
+    -- else
+    --     self.Bar1:SetAttribute("_onstate-page", [[
+	-- 		if GetVehicleBarIndex and HasVehicleActionBar() then
+	-- 			newstate = GetVehicleBarIndex()
+	-- 		elseif HasOverrideActionBar and HasOverrideActionBar() then
+	-- 			newstate = GetOverrideBarIndex()
+	-- 		elseif HasTempShapeshiftActionBar() then
+	-- 			newstate = GetTempShapeshiftBarIndex()
+	-- 		elseif HasBonusActionBar() then
+	-- 			newstate = GetBonusBarIndex()
+	-- 		end
+
+	-- 		for i = 1, 12 do
+	-- 			Buttons[i]:SetAttribute("actionpage", newstate)
+	-- 		end
+	-- 	]])
+
+    --     RegisterAttributeDriver(self.Bar1, "state-page", "[overridebar] 18; [shapeshift] 17; [possessbar] 16; [vehicleui] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6; [bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10; [bonusbar:5] 11; [form] 1; 1")
+    -- end
 
     self:PositionButtons(self.Bar1, C["ab-bar1-button-max"], C["ab-bar1-per-row"], C["ab-bar1-button-size"], C["ab-bar1-button-gap"])
 

@@ -23,7 +23,7 @@ Defaults["target-overlay-alpha"] = 30
 Defaults["target-enable"] = true
 Defaults.TargetBuffPerLine = 6
 Defaults.TargetBuffSpacing = 6
-Defaults.TargetBuffSize = (Defaults["unitframes-target-width"] - (Defaults.TargetBuffPerLine - 1) * Defaults.TargetBuffSpacing) / Defaults.TargetBuffPerLine
+Defaults.TargetBuffSize = (Defaults["unitframes-target-width"] - (Defaults.TargetBuffPerLine - 1) * Defaults.TargetBuffSpacing) / Defaults.TargetBuffPerLine - 0.3
 Defaults.TargetDebuffSize = Defaults.TargetBuffSize
 Defaults.TargetDebuffSpacing = Defaults.TargetBuffSpacing
 Defaults.TargetHealthTexture = "YxUI 4"
@@ -204,7 +204,7 @@ YxUI.StyleFuncs["target"] = function(self, unit)
 	-- Auras
 	local Buffs = CreateFrame("Frame", self:GetName() .. "Buffs", self)
 	Buffs:SetSize(Settings["unitframes-player-width"], 28)
-	Buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 5)
+	Buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 4)
 	Buffs.size = Settings.TargetBuffSize
 	Buffs.spacing = Settings.TargetBuffSpacing
 	Buffs.num = 16
@@ -232,7 +232,7 @@ YxUI.StyleFuncs["target"] = function(self, unit)
 	if Settings["unitframes-show-player-buffs"] then
 		Debuffs:SetPoint("BOTTOM", Buffs, "TOP", 0, 3)
 	else
-		Debuffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 3)
+		Debuffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 4)
 	end
 
     -- Castbar

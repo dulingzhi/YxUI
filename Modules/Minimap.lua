@@ -64,6 +64,9 @@ function Map:Style()
     Minimap:SetParent(self)
     Minimap:ClearAllPoints()
     Minimap:SetSize(C["minimap-size"], C["minimap-size"])
+    Minimap:SetZoom(Minimap:GetZoom() + 1)
+    Minimap:SetZoom(Minimap:GetZoom() - 1)
+    Minimap:UpdateBlips()
     Minimap:SetAllPoints(self)
     Minimap:EnableMouseWheel(true)
     Minimap:SetScript("OnMouseWheel", OnMouseWheel)
@@ -83,10 +86,9 @@ function Map:Style()
         end
     end)
 
-    local minimapBorder = CreateFrame("Frame", "KKUI_MinimapBorder", Minimap)
+    local minimapBorder = CreateFrame("Frame", nil, Minimap)
     minimapBorder:SetAllPoints(Minimap)
     minimapBorder:SetFrameLevel(Minimap:GetFrameLevel())
-    minimapBorder:SetFrameStrata("LOW")
     minimapBorder:CreateBorder()
 
     if C["minimap-mail-pulse"] then
@@ -316,6 +318,13 @@ function Map:Style()
             MiniMapTrackingBorder:Hide()
             MiniMapTrackingBorder.Show = function() end
         end
+    end
+
+    if MiniMapInstanceDifficulty then
+        MiniMapInstanceDifficulty:SetParent(Minimap)
+        MiniMapInstanceDifficulty:SetScale(0.9)
+        MiniMapInstanceDifficulty:ClearAllPoints()
+        MiniMapInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", -2, 0, true)
     end
 
     self:Disable(MinimapCluster)

@@ -31,7 +31,7 @@ Defaults["player-move-power"] = false
 Defaults["player-enable"] = true
 Defaults.PlayerBuffPerLine = 6
 Defaults.PlayerBuffSpacing = 6
-Defaults.PlayerBuffSize = (Defaults["unitframes-player-width"] - (Defaults.PlayerBuffPerLine - 1) * Defaults.PlayerBuffSpacing) / Defaults.PlayerBuffPerLine
+Defaults.PlayerBuffSize = (Defaults["unitframes-player-width"] - (Defaults.PlayerBuffPerLine - 1) * Defaults.PlayerBuffSpacing) / Defaults.PlayerBuffPerLine - 0.3
 Defaults.PlayerDebuffSize = Defaults.PlayerBuffSize
 Defaults.PlayerDebuffSpacing = Defaults.PlayerBuffSpacing
 Defaults.PlayerHealthTexture = "YxUI 4"
@@ -846,18 +846,18 @@ YxUI.StyleFuncs["player"] = function(self, unit)
 
 	if Settings["player-move-resource"] then
 		if Settings["unitframes-show-player-buffs"] then
-			Buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 2)
+			Buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 4)
 			Debuffs:SetPoint("BOTTOM", Buffs, "TOP", 0, 2)
 
 		else
-			Debuffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 2)
+			Debuffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 1, 4)
 		end
 	else
 		if Settings["unitframes-show-player-buffs"] then
-			Buffs:SetPoint("BOTTOMLEFT", self.AuraParent, "TOPLEFT", 1, 2)
+			Buffs:SetPoint("BOTTOMLEFT", self.AuraParent, "TOPLEFT", 1, 4)
 			Debuffs:SetPoint("BOTTOM", Buffs, "TOP", 0, 2)
 		else
-			Debuffs:SetPoint("BOTTOMLEFT", self.AuraParent, "TOPLEFT", 1, 2)
+			Debuffs:SetPoint("BOTTOMLEFT", self.AuraParent, "TOPLEFT", 1, 4)
 		end
 	end
 
