@@ -659,7 +659,7 @@ function AB:CreateBar1()
     self.Bar1:Execute([[
         buttons = table.new()
         for i = 1, 12 do
-            table.insert(buttons, self:GetFrameRef("ActionButton"..i))
+            table.insert(buttons, self:GetFrameRef("Button"..i))
         end
     ]])
 
