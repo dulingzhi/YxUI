@@ -204,11 +204,12 @@ end
 if Y.UserLocale ~= "zhCN" then
 	A:SetFont("PT Sans", "Interface\\Addons\\YxUI\\Media\\Fonts\\PTSans.ttf")
 	A:SetFont("Roboto", "Interface\\Addons\\YxUI\\Media\\Fonts\\Roboto.ttf")
+    A:SetFont("Prototype", "Interface\\Addons\\YxUI\\Media\\Fonts\\Prototype.ttf")
 else
 	A:SetFont("PT Sans", "Fonts\\ARHei.ttf")
 	A:SetFont("Roboto", "Fonts\\ARKai_C.ttf")
+    A:SetFont("Prototype", "Fonts\\ARHei.ttf")
 end
-A:SetFont("Prototype", "Interface\\Addons\\YxUI\\Media\\Fonts\\Prototype.ttf")
 A:SetFont("Mosk", "Interface\\Addons\\YxUI\\Media\\Fonts\\MoskBold.ttf")
 A:SetFont("Matthan", "Interface\\Addons\\YxUI\\Media\\Fonts\\MatthanSans.ttf")
 A:SetFont("Expressway", "Interface\\Addons\\YxUI\\Media\\Fonts\\Expressway.ttf")

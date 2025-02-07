@@ -104,8 +104,8 @@ Defaults["color-totem-water"] = "45B0E5"
 Defaults["color-totem-air"] = "B3E5FC"
 
 -- Other
-Defaults["color-tapped"] = "A6A6A6"
-Defaults["color-disconnected"] = "A6A6A6"
+Defaults["color-tapped"] = "999999"
+Defaults["color-disconnected"] = "999999"
 
 YxUI.ClassColors = {}
 YxUI.ReactionColors = {}
