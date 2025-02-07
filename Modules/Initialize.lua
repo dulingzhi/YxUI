@@ -118,14 +118,21 @@ end
 setmetatable(L, { __index = Index, __newindex = NewIndex })
 
 -- Modules and plugins
-function Y:NewModule(name)
+function Y:NewModule(name, ...)
     local Module = self:GetModule(name)
 
     if Module then
         return Module
     end
 
-    Module = CreateFrame("Frame", "YxUI " .. name, self.UIParent, "BackdropTemplate")
+    local tpl = {'BackdropTemplate'}
+    for i = 1, select("#", ...) do
+        local n = select(i, ...)
+        if type(n) == 'string' and n ~= 'BackdropTemplate' then
+            table.insert(tpl, n)
+        end
+    end
+    Module = CreateFrame("Frame", "YxUI " .. name, self.UIParent, table.concat(tpl, ", "))
     Module.Name = name
 
     Modules[name] = Module
