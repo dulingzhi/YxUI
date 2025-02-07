@@ -12,15 +12,14 @@ local function SetupInstance(instance)
     end
 
     -- reset texture if using Details default texture
-    -- print(instance.row_info.texture)
-    local needReset = instance.row_info.texture == "You Are the Best!" or instance.row_info.texture == "Details Hyanda"
-    instance:ChangeSkin("Minimalistic")
+    instance:ChangeSkin("Safe Skin Legion Beta")
     instance:InstanceWallpaper(false)
     instance:DesaturateMenu(true)
     instance:HideMainIcon(false)
     instance:SetBackdropTexture("None") -- if block window from resizing, then back to "Details Ground", needs review
     instance:MenuAnchor(16, 3)
     instance:ToolbarMenuButtonsSize(1)
+    local needReset = instance.row_info.texture == "Blizzard Raid Bar"
     instance:AttributeMenu(true, 0, 3, needReset and A:GetFont(C["ui-widget-font"]), needReset and 13, { 1, 1, 1 }, 1, false)
     instance:SetBarSettings(needReset and 20, needReset and "YxUI 1")
     instance:SetBarTextSettings(needReset and 12, A:GetFont(C["ui-widget-font"]), nil, nil, nil, false, false, nil, nil, nil, nil, nil, nil, true, { 0.04, 0.04, 0.04, 0.9 }, true, { 0.04, 0.04, 0.04, 0.9 })
@@ -63,12 +62,11 @@ local function ResetDetailsAnchor(force)
         return
     end
 
-    local height = 126
+    local height = 102
     local instance1 = Details:GetInstance(1)
     local instance2 = Details:GetInstance(2)
     if instance1 and (force or IsDefaultAnchor(instance1)) then
         if instance2 then
-            height = 112
             EmbedWindow(instance2, -5, 120 + height, 260, height)
         end
         EmbedWindow(instance1, -5, 100, 260, height)
