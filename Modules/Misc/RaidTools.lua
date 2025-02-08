@@ -3,6 +3,53 @@ local Y, L, A, C, D = YxUIGlobal:get()
 
 local Module = Y:GetModule('Miscellaneous')
 
+----------------------------------------------------------------------------------------
+--	Disband party or raid(by Monolit)
+----------------------------------------------------------------------------------------
+local function DisbandRaidGroup()
+    if InCombatLockdown() then
+        return
+    end
+    if UnitInRaid('player') then
+        SendChatMessage(L['Disbanding group...'], 'RAID')
+        for i = 1, GetNumGroupMembers() do
+            local name, _, _, _, _, _, _, online = GetRaidRosterInfo(i)
+            if online and name ~= Y.UserName then
+                UninviteUnit(name)
+            end
+        end
+    else
+        SendChatMessage(L['Disbanding group...'], 'PARTY')
+        for i = MAX_PARTY_MEMBERS, 1, -1 do
+            local token = 'party' .. i
+            if UnitExists(token) then
+                UninviteUnit(UnitName(token))
+            end
+        end
+    end
+    if not Y.IsMainline then
+        LeaveParty()
+    else
+        C_PartyInfo.LeaveParty()
+    end
+end
+
+StaticPopupDialogs.DISBAND_RAID = {
+    text = L['Are you sure you want to disband the group?'],
+    button1 = ACCEPT,
+    button2 = CANCEL,
+    OnAccept = DisbandRaidGroup,
+    timeout = 0,
+    whileDead = 1,
+    hideOnEscape = true,
+    preferredIndex = 5
+}
+
+SlashCmdList.GROUPDISBAND = function()
+    StaticPopup_Show('DISBAND_RAID')
+end
+SLASH_GROUPDISBAND1 = '/rd'
+
 local function load()
     ----------------------------------------------------------------------------------------
     --	Raid Utility(by Elv22)
@@ -12,7 +59,9 @@ local function load()
     RaidUtilityPanel:SetSize(170, 145)
     RaidUtilityPanel:CreateBorder()
     if GetCVarBool('watchFrameWidth') then
-        RaidUtilityPanel:SetPoint("TOP", Y.UIParent, "TOP", -180, 1)
+        RaidUtilityPanel:SetPoint('TOP', Y.UIParent, 'TOP', -180, -2)
+    else
+        RaidUtilityPanel:SetPoint('TOP', Y.UIParent, 'TOP', -280, -2)
     end
     RaidUtilityPanel.toggled = false
     Y:CreateMover(RaidUtilityPanel)
@@ -27,28 +76,42 @@ local function load()
         end
     end
 
+    -- Buttons
+    local ButtonOnEnter = function(self)
+        self.Highlight:SetAlpha(0.25)
+    end
+
+    local ButtonOnLeave = function(self)
+        self.Highlight:SetAlpha(0)
+    end
+
     -- Function to create buttons in this module
-    local function CreateButton(name, parent, template, width, height, point, relativeto, point2, xOfs, yOfs, text)
-        local b = CreateFrame('Button', name, parent, template)
+    local function CreateButton(parent, template, width, height, point, relativeto, point2, xOfs, yOfs, text)
+        local b = CreateFrame('Button', nil, parent, template)
         b:SetWidth(width)
         b:SetHeight(height)
         b:SetPoint(point, relativeto, point2, xOfs, yOfs)
-        b:EnableMouse(true)
-        b:StyleButton()
+        b:CreateBorder()
+        b:SetScript('OnEnter', ButtonOnEnter)
+        b:SetScript('OnLeave', ButtonOnLeave)
+        b.Highlight = b:CreateTexture(nil, 'OVERLAY')
+        b.Highlight:SetAllPoints()
+        b.Highlight:SetTexture(A:GetTexture(C['ui-widget-texture']))
+        b.Highlight:SetVertexColor(123 / 255, 132 / 255, 137 / 255)
+        b.Highlight:SetAlpha(0)
         if text then
             b.t = b:CreateFontString(nil, 'OVERLAY')
-            b.t:SetFont(C['ui-button-font'], C['ui-font-size'], "")
+            b.t:SetFont(A:GetFont(C['ui-button-font']), C['ui-font-size'], '')
             b.t:SetPoint('CENTER')
             b.t:SetJustifyH('CENTER')
             b.t:SetText(text)
             b.t:SetWidth(width - 2)
-            b.t:SetHeight(C['ui-font-size'])
         end
         return b
     end
 
     -- Show button
-    CreateButton('RaidUtilityShowButton', Y.UIParent, 'UIPanelButtonTemplate, SecureHandlerClickTemplate', RaidUtilityPanel:GetWidth() / 1.5, 18, 'TOP', RaidUtilityPanel, 'TOP', 0, 0, RAID_CONTROL)
+    local RaidUtilityShowButton = CreateButton(Y.UIParent, 'SecureHandlerClickTemplate', RaidUtilityPanel:GetWidth() / 1.5, 18, 'TOP', RaidUtilityPanel, 'TOP', 0, 0, RAID_CONTROL)
     RaidUtilityShowButton:SetFrameRef('RaidUtilityPanel', RaidUtilityPanel)
     RaidUtilityShowButton:SetAttribute('_onclick', [=[self:Hide(); self:GetFrameRef("RaidUtilityPanel"):Show();]=])
     RaidUtilityShowButton:SetScript('OnMouseUp', function(_, button)
@@ -66,7 +129,7 @@ local function load()
     end)
 
     -- Close button
-    CreateButton('RaidUtilityCloseButton', RaidUtilityPanel, 'UIPanelButtonTemplate, SecureHandlerClickTemplate', RaidUtilityPanel:GetWidth() / 1.5, 18, 'TOP', RaidUtilityPanel, 'BOTTOM', 0, -1, CLOSE)
+    local RaidUtilityCloseButton = CreateButton(RaidUtilityPanel, 'SecureHandlerClickTemplate', RaidUtilityPanel:GetWidth() / 1.5, 18, 'TOP', RaidUtilityPanel, 'BOTTOM', 0, -4, CLOSE)
     RaidUtilityCloseButton:SetFrameRef('RaidUtilityShowButton', RaidUtilityShowButton)
     RaidUtilityCloseButton:SetAttribute('_onclick', [=[self:GetParent():Hide(); self:GetFrameRef("RaidUtilityShowButton"):Show();]=])
     RaidUtilityCloseButton:SetScript('OnMouseUp', function()
@@ -74,13 +137,13 @@ local function load()
     end)
 
     -- Disband Group button
-    CreateButton('RaidUtilityDisbandButton', RaidUtilityPanel, 'UIPanelButtonTemplate', RaidUtilityPanel:GetWidth() * 0.8, 18, 'TOP', RaidUtilityPanel, 'TOP', 0, -5, L_RAID_UTIL_DISBAND)
+    local RaidUtilityDisbandButton = CreateButton(RaidUtilityPanel, nil, RaidUtilityPanel:GetWidth() * 0.8, 18, 'TOP', RaidUtilityPanel, 'TOP', 0, -5, L['Disband Group'])
     RaidUtilityDisbandButton:SetScript('OnMouseUp', function()
         StaticPopup_Show('DISBAND_RAID')
     end)
 
     -- Convert Group button
-    CreateButton('RaidUtilityConvertButton', RaidUtilityPanel, 'UIPanelButtonTemplate', RaidUtilityPanel:GetWidth() * 0.8, 18, 'TOP', RaidUtilityDisbandButton, 'BOTTOM', 0, -5, UnitInRaid('player') and CONVERT_TO_PARTY or CONVERT_TO_RAID)
+    local RaidUtilityConvertButton = CreateButton(RaidUtilityPanel, nil, RaidUtilityPanel:GetWidth() * 0.8, 18, 'TOP', RaidUtilityDisbandButton, 'BOTTOM', 0, -5, UnitInRaid('player') and CONVERT_TO_PARTY or CONVERT_TO_RAID)
     RaidUtilityConvertButton:SetScript('OnMouseUp', function()
         if UnitInRaid('player') then
             if not Y.IsMainline then
@@ -88,41 +151,44 @@ local function load()
             else
                 C_PartyInfo.ConvertToParty()
             end
-            RaidUtilityConvertButton.t:SetText(CONVERT_TO_RAID)
+            RaidUtilityConvertb.t:SetText(CONVERT_TO_RAID)
         elseif UnitInParty('player') then
             if not Y.IsMainline then
                 ConvertToRaid()
             else
                 C_PartyInfo.ConvertToRaid()
             end
-            RaidUtilityConvertButton.t:SetText(CONVERT_TO_PARTY)
+            RaidUtilityConvertb.t:SetText(CONVERT_TO_PARTY)
         end
     end)
 
     -- Role Check button
+    local RaidUtilityRoleButton
     if Y.IsMainline then
-        CreateButton('RaidUtilityRoleButton', RaidUtilityPanel, 'UIPanelButtonTemplate', RaidUtilityPanel:GetWidth() * 0.8, 18, 'TOP', RaidUtilityConvertButton, 'BOTTOM', 0, -5, ROLE_POLL)
+        RaidUtilityRoleButton = CreateButton(RaidUtilityPanel, nil, RaidUtilityPanel:GetWidth() * 0.8, 18, 'TOP', RaidUtilityConvertButton, 'BOTTOM', 0, -5, ROLE_POLL)
         RaidUtilityRoleButton:SetScript('OnMouseUp', function()
             InitiateRolePoll()
         end)
+    else
+        RaidUtilityPanel:SetHeight(RaidUtilityPanel:GetHeight() - 23)
     end
 
     -- MainTank button
-    CreateButton('RaidUtilityMainTankButton', RaidUtilityPanel, 'UIPanelButtonTemplate, SecureActionButtonTemplate', (RaidUtilityDisbandButton:GetWidth() / 2) - 2, 18, 'TOPLEFT', RaidUtilityRoleButton or RaidUtilityConvertButton,
-        'BOTTOMLEFT', 0, -5, TANK)
+    local RaidUtilityMainTankButton = CreateButton(RaidUtilityPanel, 'SecureActionButtonTemplate', (RaidUtilityDisbandButton:GetWidth() / 2) - 2, 18, 'TOPLEFT', RaidUtilityRoleButton or RaidUtilityConvertButton, 'BOTTOMLEFT', 0, -5, TANK)
     RaidUtilityMainTankButton:SetAttribute('type', 'maintank')
     RaidUtilityMainTankButton:SetAttribute('unit', 'target')
     RaidUtilityMainTankButton:SetAttribute('action', 'toggle')
 
     -- MainAssist button
-    CreateButton('RaidUtilityMainAssistButton', RaidUtilityPanel, 'UIPanelButtonTemplate, SecureActionButtonTemplate', (RaidUtilityDisbandButton:GetWidth() / 2) - 2, 18, 'TOPRIGHT', RaidUtilityRoleButton or RaidUtilityConvertButton,
-        'BOTTOMRIGHT', 0, -5, MAINASSIST)
+    local RaidUtilityMainAssistButton = CreateButton(RaidUtilityPanel, 'SecureActionButtonTemplate', (RaidUtilityDisbandButton:GetWidth() / 2) - 2, 18, 'TOPRIGHT', RaidUtilityRoleButton or RaidUtilityConvertButton, 'BOTTOMRIGHT', 0, -5,
+        MAINASSIST)
     RaidUtilityMainAssistButton:SetAttribute('type', 'mainassist')
     RaidUtilityMainAssistButton:SetAttribute('unit', 'target')
     RaidUtilityMainAssistButton:SetAttribute('action', 'toggle')
 
     -- Ready Check button
-    CreateButton('RaidUtilityReadyCheckButton', RaidUtilityPanel, 'UIPanelButtonTemplate', (RaidUtilityPanel:GetWidth() * 0.8) * 0.75, 18, 'TOPLEFT', RaidUtilityMainTankButton, 'BOTTOMLEFT', 0, -5, READY_CHECK)
+    local RaidUtilityReadyCheckButton = CreateButton(RaidUtilityPanel, nil, (RaidUtilityPanel:GetWidth() * 0.8) * (CompactRaidFrameManagerDisplayFrameLeaderOptionsRaidWorldMarkerButton and 0.75 or 1), 18, 'TOPLEFT',
+        RaidUtilityMainTankButton, 'BOTTOMLEFT', 0, -5, READY_CHECK)
     RaidUtilityReadyCheckButton:SetScript('OnMouseUp', function()
         DoReadyCheck()
     end)
@@ -142,7 +208,7 @@ local function load()
     end
 
     -- Raid Control Panel
-    CreateButton('RaidUtilityRaidControlButton', RaidUtilityPanel, 'UIPanelButtonTemplate', (RaidUtilityPanel:GetWidth() * 0.8), 18, 'TOPLEFT', RaidUtilityReadyCheckButton, 'BOTTOMLEFT', 0, -5, RAID_CONTROL)
+    local RaidUtilityRaidControlButton = CreateButton(RaidUtilityPanel, nil, (RaidUtilityPanel:GetWidth() * 0.8), 18, 'TOPLEFT', RaidUtilityReadyCheckButton, 'BOTTOMLEFT', 0, -5, RAID_CONTROL)
     RaidUtilityRaidControlButton:SetScript('OnMouseUp', function()
         if Y.IsCata then
             ToggleFriendsFrame(3)
@@ -177,7 +243,6 @@ local function load()
 
     -- Automatically show/hide the frame if we have Raid Leader or Raid Officer
     local LeadershipCheck = CreateFrame('Frame')
-    LeadershipCheck:RegisterEvent('PLAYER_ENTERING_WORLD')
     LeadershipCheck:RegisterEvent('GROUP_ROSTER_UPDATE')
     LeadershipCheck:SetScript('OnEvent', ToggleRaidUtil)
 
@@ -190,6 +255,8 @@ local function load()
         RaidUtilityPanelOuterBorder:SetBackdropBorderColor(0, 0, 0, 0)
         F.CreateBD(RaidUtilityPanel)
     end
+
+    ToggleRaidUtil(LeadershipCheck)
 end
 
 Module:Add('misc-raid-tools', true, L['Raid Tools'], L['Button at the top of the screen for ready check (Left-click), checking roles (Middle-click), setting marks, etc. (for leader and assistants)'], function(self, enable)
