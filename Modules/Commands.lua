@@ -92,14 +92,20 @@ button:SetScript('OnClick', function()
 end)
 if GameMenuFrame.Layout then
 else
+    GameMenuFrame:SetWidth(230)
     button:SetPoint('TOP', GameMenuButtonAddons, 'BOTTOM', 0, -1)
     local buttons = {}
-    for _, button in next, {GameMenuFrame:GetChildren()} do
-        if button and button.IsObjectType and button:IsObjectType('Button') then
-            button:SkinButton()
-            local A1, P, A2, X, Y = button:GetPoint()
-            button:SetPoint(A1, P, A2, X, Y - 3)
-            table.insert(buttons, button)
+    for _, btn in next, {GameMenuFrame:GetChildren()} do
+        if btn and btn.IsObjectType and btn:IsObjectType('Button') then
+            btn:SkinButton()
+            btn:SetSize(180, 26)
+            local A1, P, A2, X, Y = btn:GetPoint()
+            if btn == GameMenuButtonHelp then
+                btn:SetPoint(A1, P, A2, X, Y - 20)
+            else
+                btn:SetPoint(A1, P, A2, X, Y - 10)
+            end
+            table.insert(buttons, btn)
         end
     end
     GameMenuFrame:StripTextures()
@@ -113,7 +119,7 @@ else
     end
     GameMenuFrame:HookScript('OnShow', function(self)
         GameMenuButtonLogout:ClearAllPoints()
-        GameMenuButtonLogout:SetPoint('TOP', button, 'BOTTOM', 0, -16)
-        self:SetHeight(self:GetHeight() + #buttons * 3 + 10)
+        GameMenuButtonLogout:SetPoint('TOP', button, 'BOTTOM', 0, -26)
+        self:SetHeight(#buttons * (button:GetHeight() + 10) + 90)
     end)
 end
