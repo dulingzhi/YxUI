@@ -28,7 +28,8 @@ local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetad
 local GetAddOnInfo = C_AddOns and C_AddOns.GetAddOnInfo or GetAddOnInfo
 
 Y.AddOnName = AddOnName
-Y.UIVersion = GetAddOnMetadata("YxUI", "Version")
+Y.UITitle = GetAddOnMetadata(AddOnName, "Title")
+Y.UIVersion = GetAddOnMetadata(AddOnName, "Version")
 Y.UserName = UnitName("player")
 Y.UserClass = select(2, UnitClass("player"))
 Y.UserRace = UnitRace("player")

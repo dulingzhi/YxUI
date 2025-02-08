@@ -1,7 +1,7 @@
 ## Interface: 40401
 ## Author: Jai
 ## Version: 1.0.0
-## Title: |cFFFFC44DYx|r|cFFFFFFFFUI|r
+## Title: |cff5C8BCFYxUI|r
 ## Notes: Interface replacement for Cataclysm
 ## SavedVariables: YxUIProfileData, YxUIProfiles, YxUIData, YxUIGold
 

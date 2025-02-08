@@ -176,7 +176,8 @@ function MinimapButtons:SkinButtons()
 
                 Child:SetFrameLevel(Minimap:GetFrameLevel() + 10)
                 Child:SetFrameStrata(Minimap:GetFrameStrata())
-                Child:SkinButton()
+                Child:CreateBorder()
+                Child:StyleButton()
                 tinsert(self.Items, Child)
             end
         end

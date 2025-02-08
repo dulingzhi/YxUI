@@ -1,7 +1,7 @@
 ## Interface: 110007
 ## Author: Jai
 ## Version: 1.0.0
-## Title: |cFFFFC44DYx|r|cFFFFFFFFUI|r
+## Title: |cff5C8BCFYxUI|r
 ## Notes: Interface replacement for Shadowlands
 ## SavedVariables: YxUIProfileData, YxUIProfiles, YxUIData, YxUIGold
 ## IconTexture: Interface\AddOns\YxUI\Media\Textures\HydraUIBadgeCrisp
