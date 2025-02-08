@@ -671,46 +671,6 @@ function AB:CreateBar1()
 
     RegisterStateDriver(self.Bar1, "page", GetBar())
 
-    -- if Y.IsClassic or Y.IsWrath then
-    --     self.Bar1:SetAttribute("_onstate-page", [[
-	-- 		if GetVehicleBarIndex and HasVehicleActionBar() then
-	-- 			newstate = GetVehicleBarIndex()
-	-- 		elseif GetOverrideBarIndex and HasOverrideActionBar() then
-	-- 			newstate = GetOverrideBarIndex() or newstate
-	-- 		elseif HasTempShapeshiftActionBar() then
-	-- 			newstate = GetTempShapeshiftBarIndex() or newstate
-	-- 		elseif HasBonusActionBar() and GetActionBarPage() == 1 then
-	-- 			newstate = GetBonusBarIndex() or newstate
-	-- 		else
-	-- 			newstate = GetActionBarPage() or newstate
-	-- 		end
-
-	-- 		for i = 1, 12 do
-	-- 			Buttons[i]:SetAttribute("actionpage", newstate)
-	-- 		end
-	-- 	]])
-
-    --     RegisterAttributeDriver(self.Bar1, "state-page", "[overridebar] 18; [shapeshift] 17; [possessbar] 16; [vehicleui] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6; [bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10; [bonusbar:5] 11; [form] 1; 1")
-    -- else
-    --     self.Bar1:SetAttribute("_onstate-page", [[
-	-- 		if GetVehicleBarIndex and HasVehicleActionBar() then
-	-- 			newstate = GetVehicleBarIndex()
-	-- 		elseif HasOverrideActionBar and HasOverrideActionBar() then
-	-- 			newstate = GetOverrideBarIndex()
-	-- 		elseif HasTempShapeshiftActionBar() then
-	-- 			newstate = GetTempShapeshiftBarIndex()
-	-- 		elseif HasBonusActionBar() then
-	-- 			newstate = GetBonusBarIndex()
-	-- 		end
-
-	-- 		for i = 1, 12 do
-	-- 			Buttons[i]:SetAttribute("actionpage", newstate)
-	-- 		end
-	-- 	]])
-
-    --     RegisterAttributeDriver(self.Bar1, "state-page", "[overridebar] 18; [shapeshift] 17; [possessbar] 16; [vehicleui] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6; [bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10; [bonusbar:5] 11; [form] 1; 1")
-    -- end
-
     self:PositionButtons(self.Bar1, C["ab-bar1-button-max"], C["ab-bar1-per-row"], C["ab-bar1-button-size"], C["ab-bar1-button-gap"])
 
     if OverrideActionBar then
@@ -1374,6 +1334,10 @@ function AB:CreateBars()
         --MultiCastActionBarFrame:ClearAllPoints()
         --MultiCastActionBarFrame:SetPoint("BOTTOMLEFT", UIParent, 300, 20)
     end
+end
+
+if MultiCastActionBarFrame then
+    MultiCastActionBarFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 -- Black magic, the movers won't budge if a secure frame is positioned on it
