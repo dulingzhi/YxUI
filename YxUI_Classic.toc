@@ -123,4 +123,4 @@ Modules\Credit.lua
 Modules\Debug.lua
 Modules\Skin.lua
 Modules\Skins\Load.xml
-Modules\Miscellaneous.lua
+Modules\Misc\Load.xml

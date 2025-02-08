@@ -1,0 +1,29 @@
+-- Disenchant confirmation(tekKrush by Tekkub)
+local Y, L, A, C, D = YxUIGlobal:get()
+
+local Module = Y:GetModule('Miscellaneous')
+
+local function AutoConfirm()
+    for i = 1, STATICPOPUP_NUMDIALOGS do
+        local frame = _G['StaticPopup' .. i]
+        if (frame.which == 'CONFIRM_LOOT_ROLL' or frame.which == 'LOOT_BIND') and frame:IsVisible() then
+            StaticPopup_OnClick(frame, 1)
+        end
+    end
+end
+
+Module:Add('misc-auto-confirm', true, L['Auto Confirm Loot Bind'], L['Auto confirm loot/roll binds'], function(self, enable)
+    if enable then
+        if Y.IsMainline then
+            self:Event('CONFIRM_DISENCHANT_ROLL', AutoConfirm)
+        end
+        self:Event('CONFIRM_LOOT_ROLL', AutoConfirm)
+        self:Event('LOOT_BIND_CONFIRM', AutoConfirm)
+    else
+        if Y.IsMainline then
+            self:UnEvent('CONFIRM_DISENCHANT_ROLL', AutoConfirm)
+        end
+        self:UnEvent('CONFIRM_LOOT_ROLL', AutoConfirm)
+        self:UnEvent('LOOT_BIND_CONFIRM', AutoConfirm)
+    end
+end)
