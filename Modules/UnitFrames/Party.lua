@@ -299,8 +299,8 @@ YxUI.StyleFuncs["party"] = function(self, unit)
 	-- Role
 	if Settings["party-show-role"] then
 		local RoleIndicator = Health:CreateTexture(nil, "OVERLAY")
-		RoleIndicator:SetSize(16, 16)
-		RoleIndicator:SetPoint("LEFT", Health, 2, 0)
+		RoleIndicator:SetSize(12, 12)
+		RoleIndicator:SetPoint("TOPLEFT", Health, 17, 5)
 
 		self.GroupRoleIndicator = RoleIndicator
 	end

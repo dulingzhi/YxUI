@@ -24,6 +24,7 @@ A default texture will be applied if the widget is a Texture and doesn't have a 
 
 local _, ns = ...
 local oUF = ns.oUF
+local YxUI = ns:get()
 
 local function Update(self, event)
 	local element = self.GroupRoleIndicator
@@ -39,7 +40,7 @@ local function Update(self, event)
 
 	local role = UnitGroupRolesAssigned(self.unit)
 	if(role == 'TANK' or role == 'HEALER' or role == 'DAMAGER') then
-		element:SetTexCoord(GetTexCoordsForRoleSmallCircle(role))
+		element:SetTexture(YxUI:GetRoleIcon(role))
 		element:Show()
 	else
 		element:Hide()

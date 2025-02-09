@@ -33,12 +33,15 @@ function YxUI:CheckChat(warning)
 		if warning and (UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") or IsEveryoneAssistant()) then
 			return "RAID_WARNING"
 		else
-			return "RAID"
+        return "EMOTE"
 		end
 	elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
-		return "PARTY"
+        if UnitIsGroupLeader("player") then
+		    return "PARTY"
+        end
+        return "EMOTE"
 	end
-	return "SAY"
+    return "EMOTE"
 end
 
 function YxUI:FormatTime(seconds)
@@ -312,4 +315,8 @@ function YxUI:SetCVars()
 	C_CVar.SetCVar("NameplatePersonalShowAlways", 0)
 	C_CVar.SetCVar("NameplatePersonalShowInCombat", 0)
 	C_CVar.SetCVar("NameplatePersonalShowWithTarget", 0)
+end
+
+function YxUI:GetRoleIcon(role)
+    return format([[Interface\AddOns\YxUI\Media\Textures\Icon\%s.tga]], role)
 end
