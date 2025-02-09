@@ -47,8 +47,8 @@ local function skin(self)
         end
     end)
 
-    -- T.SkinEditBox(self.SearchBox)
-    self.SearchBox:SetHeight(20)
+    self.SearchBox:SkinEditBox()
+    self.SearchBox:SetHeight(24)
 
     hooksecurefunc(self, 'PlaceSearchBox', function()
         if self.SearchBox:IsShown() then
