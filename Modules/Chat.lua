@@ -396,7 +396,7 @@ function Chat:CreateCopyWindow()
     -- Close button
     Window.CloseButton = CreateFrame('Button', nil, Window, 'UIPanelCloseButton')
     Window.CloseButton:SetPoint('TOPRIGHT')
-    Y.SkinCloseButton(Window.CloseButton)
+    Window.CloseButton:SkinCloseButton()
     Window.CloseButton:SetScript('OnClick', function(self)
         self:GetParent().FadeOut:Play()
     end)

@@ -414,91 +414,6 @@ local function FontString(parent, name, fontName, fontHeight, fontStyle)
 end
 
 ----------------------------------------------------------------------------------------
---	Inject API functions into Blizzard frames
-----------------------------------------------------------------------------------------
-local function FadeIn(f)
-    UIFrameFadeIn(f, 0.4, f:GetAlpha(), 1)
-end
-
-local function FadeOut(f)
-    UIFrameFadeOut(f, 0.8, f:GetAlpha(), 0)
-end
-
-local function attachAPI(object)
-    local mt = getmetatable(object).__index
-    if not object.SetOutside then
-        mt.SetOutside = SetOutside
-    end
-    if not object.SetInside then
-        mt.SetInside = SetInside
-    end
-    if not object.CreateOverlay then
-        mt.CreateOverlay = CreateOverlay
-    end
-    if not object.CreateBorder then
-        mt.CreateBorder = CreateBorder
-    end
-    if not object.SetTemplate then
-        mt.SetTemplate = SetTemplate
-    end
-    if not object.CreatePanel then
-        mt.CreatePanel = CreatePanel
-    end
-    if not object.CreateBackdrop then
-        mt.CreateBackdrop = CreateBackdrop
-    end
-    if not object.StripTextures then
-        mt.StripTextures = StripTextures
-    end
-    if not object.Kill then
-        mt.Kill = Kill
-    end
-    if not object.StyleButton then
-        mt.StyleButton = StyleButton
-    end
-    if not object.SkinButton then
-        mt.SkinButton = SkinButton
-    end
-    if not object.SkinIcon then
-        mt.SkinIcon = SkinIcon
-    end
-    if not object.CropIcon then
-        mt.CropIcon = CropIcon
-    end
-    if not object.FontString then
-        mt.FontString = FontString
-    end
-    if not object.FadeIn then
-        mt.FadeIn = FadeIn
-    end
-    if not object.FadeOut then
-        mt.FadeOut = FadeOut
-    end
-end
-
-local handled = {
-    ['Frame'] = true
-}
-local object = CreateFrame('Frame')
-attachAPI(object)
-attachAPI(object:CreateTexture())
-attachAPI(object:CreateFontString())
-
-object = EnumerateFrames()
-while object do
-    if not object:IsForbidden() and not handled[object:GetObjectType()] then
-        attachAPI(object)
-        handled[object:GetObjectType()] = true
-    end
-
-    object = EnumerateFrames(object)
-end
-
--- Hacky fix for issue on 7.1 PTR where scroll frames no longer seem to inherit the methods from the "Frame" widget
-local scrollFrame = CreateFrame('ScrollFrame')
-attachAPI(scrollFrame)
-
-----------------------------------------------------------------------------------------
 --	Style functions
 ----------------------------------------------------------------------------------------
 -- Setup Arrow
@@ -735,19 +650,19 @@ function Y.SkinRotateButton(btn)
     btn:GetHighlightTexture():SetAllPoints(btn:GetNormalTexture())
 end
 
-function Y.SkinEditBox(frame, width, height)
+local function SkinEditBox(frame, width, height)
     frame:DisableDrawLayer('BACKGROUND')
 
-    frame:CreateBackdrop('Overlay')
+	frame:CreateBackdrop()
 
     local frameName = frame.GetName and frame:GetName()
     if frameName and (frameName:find('Gold') or frameName:find('Silver') or frameName:find('Copper')) then
         if frameName:find('Gold') then
-            frame.backdrop:SetPoint('TOPLEFT', -3, 1)
-            frame.backdrop:SetPoint('BOTTOMRIGHT', -3, 0)
+            frame.YxUIBackground:SetPoint('TOPLEFT', -3, 1)
+            frame.YxUIBackground:SetPoint('BOTTOMRIGHT', -3, 0)
         else
-            frame.backdrop:SetPoint('TOPLEFT', -3, 1)
-            frame.backdrop:SetPoint('BOTTOMRIGHT', -13, 0)
+            frame.YxUIBackground:SetPoint('TOPLEFT', -3, 1)
+            frame.YxUIBackground:SetPoint('BOTTOMRIGHT', -13, 0)
         end
     end
 
@@ -978,7 +893,7 @@ function Y.SkinIconSelectionFrame(frame, numIcons, buttonNameTemplate, frameName
     cancelButton:SetPoint('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', -5, 5)
 
     editBox:DisableDrawLayer('BACKGROUND')
-    Y.SkinEditBox(editBox)
+    SkinEditBox(editBox)
 
     if Y.Classic then
         if buttonNameTemplate then
@@ -1263,3 +1178,94 @@ function Y.ReplaceIconString(frame, text)
         frame:SetFormattedText('%s', newText)
     end
 end
+
+----------------------------------------------------------------------------------------
+--	Inject API functions into Blizzard frames
+----------------------------------------------------------------------------------------
+local function FadeIn(f)
+    UIFrameFadeIn(f, 0.4, f:GetAlpha(), 1)
+end
+
+local function FadeOut(f)
+    UIFrameFadeOut(f, 0.8, f:GetAlpha(), 0)
+end
+
+local function attachAPI(object)
+    local mt = getmetatable(object).__index
+    if not mt.SetOutside then
+        mt.SetOutside = SetOutside
+    end
+    if not mt.SetInside then
+        mt.SetInside = SetInside
+    end
+    if not mt.CreateOverlay then
+        mt.CreateOverlay = CreateOverlay
+    end
+    if not mt.CreateBorder then
+        mt.CreateBorder = CreateBorder
+    end
+    if not mt.SetTemplate then
+        mt.SetTemplate = SetTemplate
+    end
+    if not mt.CreatePanel then
+        mt.CreatePanel = CreatePanel
+    end
+    if not mt.CreateBackdrop then
+        mt.CreateBackdrop = CreateBackdrop
+    end
+    if not mt.StripTextures then
+        mt.StripTextures = StripTextures
+    end
+    if not mt.Kill then
+        mt.Kill = Kill
+    end
+    if not mt.StyleButton then
+        mt.StyleButton = StyleButton
+    end
+    if not mt.SkinButton then
+        mt.SkinButton = SkinButton
+    end
+	if not mt.SkinEditBox then
+		mt.SkinEditBox = SkinEditBox
+	end
+    if not mt.SkinIcon then
+        mt.SkinIcon = SkinIcon
+    end
+    if not mt.SkinCloseButton then
+        mt.SkinCloseButton = Y.SkinCloseButton
+    end
+    if not mt.CropIcon then
+        mt.CropIcon = CropIcon
+    end
+    if not mt.FontString then
+        mt.FontString = FontString
+    end
+    if not mt.FadeIn then
+        mt.FadeIn = FadeIn
+    end
+    if not mt.FadeOut then
+        mt.FadeOut = FadeOut
+    end
+end
+
+local handled = {
+    ['Frame'] = true
+}
+local object = CreateFrame('Frame')
+attachAPI(object)
+attachAPI(object:CreateTexture())
+attachAPI(object:CreateFontString())
+attachAPI(object:CreateMaskTexture())
+
+object = EnumerateFrames()
+while object do
+    if not object:IsForbidden() and not handled[object:GetObjectType()] then
+        attachAPI(object)
+        handled[object:GetObjectType()] = true
+    end
+
+    object = EnumerateFrames(object)
+end
+
+attachAPI(_G.GameFontNormal)
+attachAPI(CreateFrame('ScrollFrame'))

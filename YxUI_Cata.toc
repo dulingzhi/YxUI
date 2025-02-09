@@ -7,6 +7,7 @@
 
 TaintLess.xml
 Modules\Initialize.lua
+Modules\API.lua
 Libs\LibStub.lua
 Libs\CallbackHandler-1.0.lua
 Libs\LibSharedMedia-3.0.lua
@@ -119,6 +120,5 @@ Modules\PVPObjectives.lua
 Modules\DeathStrikePrediction.lua
 Modules\Credit.lua
 Modules\Debug.lua
-Modules\Skin.lua
 Modules\Skins\Load.xml
 Modules\Misc\Load.xml

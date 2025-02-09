@@ -708,9 +708,9 @@ end
 
 function Tooltips:SkinItemRef()
     if Y.IsMainline then
-        Y.SkinCloseButton(ItemRefTooltip.CloseButton, ItemRefTooltip)
+        ItemRefTooltip.CloseButton:SkinCloseButton(ItemRefTooltip)
     else
-        Y.SkinCloseButton(ItemRefCloseButton, ItemRefTooltip)
+        ItemRefCloseButton:SkinCloseButton(ItemRefTooltip)
     end
 end
 

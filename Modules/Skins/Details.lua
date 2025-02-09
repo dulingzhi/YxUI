@@ -42,7 +42,6 @@ local function EmbedWindow(instance, x, y, width, height)
 end
 
 local function isDefaultOffset(offset)
-    print(offset)
     return offset and abs(offset) < 10
 end
 

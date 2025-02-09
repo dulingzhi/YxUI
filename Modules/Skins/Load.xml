@@ -1,4 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Skin.lua"/>
 	<Script file="tdBag2.lua"/>
 	<Script file="Details.lua"/>
+
+  <Include file="Blizzard/Load.xml"/>
 </Ui>
