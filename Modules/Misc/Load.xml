@@ -5,4 +5,5 @@
   <Script file="AutoConfirm.lua"/>
   <Script file="ActionBarPager.lua"/>
   <Script file="RaidTools.lua"/>
+  <Script file="Gossip.lua"/>
 </Ui>
