@@ -111,7 +111,7 @@ function Update:CHAT_MSG_ADDON(prefix, message, channel, sender)
 		self:QueueChannel(channel)
 	elseif (message > AddOnNum) then -- We're behind!
 		YxUI:print(Language["You can get an updated version of YxUI at https://www.curseforge.com/wow/addons/hydraui"])
-		print(Language["Join the Discord community for support and feedback https://discord.gg/XefDFa6nJR"])
+		print(Language["Join the NetEase DD community for support and feedback https://dd.163.com/i/zY5l3huBtM"])
 
 		YxUI:GetModule("GUI"):CreateUpdateAlert()
 

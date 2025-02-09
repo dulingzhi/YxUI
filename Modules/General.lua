@@ -10,7 +10,7 @@ function YxUI:WelcomeMessage()
 
 	local Color = Settings["ui-widget-color"]
 
-	print(format(Language["Welcome to |cFF%sHydra|r|cFFEFFFFFUI|r version |cFF%s%s|r - https://discord.gg/XefDFa6nJR"], Color, Settings["ui-header-font-color"], YxUI.UIVersion))
+	print(format(Language["Welcome to |cFF%sYx|r|cFFEFFFFFUI|r version |cFF%s%s|r - https://dd.163.com/i/zY5l3huBtM"], Color, Settings["ui-header-font-color"], YxUI.UIVersion))
 	print(format(Language["Type |cFF%s/yxui|r to access the settings window, or click |cFF%s|Hcommand:/yxui|h[here]|h|r."], Color, Color))
 end
 
@@ -20,7 +20,7 @@ end
 
 local GetDiscordLink = function()
 	if (not Throttle:IsThrottled("discord-request")) then
-		YxUI:print(Language["Join the Discord community for support and feedback https://discord.gg/XefDFa6nJR"])
+		YxUI:print(Language["Join the NetEase DD community for support and feedback https://dd.163.com/i/zY5l3huBtM"])
 
 		Throttle:Start("discord-request", 10)
 	end
@@ -57,7 +57,7 @@ GUI:AddWidgets(Language["General"], Language["General"], function(left, right)
 	left:CreateHeader(Language["Welcome"])
 	left:CreateSwitch("ui-display-welcome", Settings["ui-display-welcome"], Language["Display Welcome Message"], Language["Display a welcome message on login with UI information"])
 	--left:CreateSwitch("ui-display-whats-new", Settings["ui-display-whats-new"], Language[ [[Display "What's New" Pop-ups]] ], "")
-	left:CreateButton("", Language["Get Link"], Language["Join Discord"], Language["Get a link to join the YxUI Discord community"], GetDiscordLink)
+	left:CreateButton("", Language["Get Link"], Language["Join NetEase DD"], Language["Get a link to join the YxUI NetEase DD community"], GetDiscordLink)
 	left:CreateButton("", Language["Get Link"], Language["Watch YouTube"], Language["Get a link for the YxUI YouTube channel"], GetYouTubeLink)
 
 	left:CreateHeader(Language["Move UI"])

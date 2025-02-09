@@ -133,6 +133,7 @@ end
 YxUISkinAura = function(button)
 	button:RegisterForClicks("RightButtonUp")
     button:CreateBorder()
+    button:StyleButton()
 
 	local Backdrop = CreateFrame("Frame", nil, button, "BackdropTemplate")
 	Backdrop:SetAllPoints(button)

@@ -221,6 +221,7 @@ UF.PostCreateIcon = function(unit, button)
 	end
 
     button:CreateBorder()
+    button:StyleButton()
 
 	button.cd.noOCC = true
 	button.cd.noCooldownCount = true
