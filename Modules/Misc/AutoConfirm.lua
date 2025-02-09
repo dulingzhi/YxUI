@@ -19,6 +19,17 @@ Module:Add('misc-auto-confirm', true, L['Auto Confirm Loot Bind'], L['Auto confi
         end
         self:Event('CONFIRM_LOOT_ROLL', AutoConfirm)
         self:Event('LOOT_BIND_CONFIRM', AutoConfirm)
+        ----------------------------------------------------------------------------------------
+        --	Easy delete good items
+        ----------------------------------------------------------------------------------------
+        local deleteDialog = StaticPopupDialogs['DELETE_GOOD_ITEM']
+        if deleteDialog.OnShow then
+            hooksecurefunc(deleteDialog, 'OnShow', function(s)
+                s.editBox:SetText(DELETE_ITEM_CONFIRM_STRING)
+                s.editBox:SetAutoFocus(false)
+                s.editBox:ClearFocus()
+            end)
+        end
     else
         if Y.IsMainline then
             self:UnEvent('CONFIRM_DISENCHANT_ROLL', AutoConfirm)

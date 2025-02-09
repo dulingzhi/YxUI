@@ -23,6 +23,6 @@ function Module:Add(name, loader)
 end
 
 Y:GetModule('GUI'):AddWidgets(L['General'], L['Skins'], function(left, right)
-    right:CreateHeader(L['Miscellaneous'])
+    right:CreateHeader(L['Blizzard Frames'])
     right:CreateSwitch('skin-blizzard-enable', C['skin-blizzard-enable'], L['Blizzard Frame Skin'], L['Skin some blizzard frames & objects']):RequiresReload(true)
 end)
