@@ -49,10 +49,12 @@ local UnitIsDead = UnitIsDead
 local UnitClassification = UnitClassification
 local GetMouseFocus = GetMouseFocus
 local GetItemInfo = GetItemInfo
+local GetItemIcon = GetItemIcon
 local InCombatLockdown = InCombatLockdown
 local UnitPlayerControlled = UnitPlayerControlled
 local UnitCanAttack = UnitCanAttack
 local UnitIsPVP = UnitIsPVP
+local GetSpellInfo = GetSpellInfo
 local GetHappiness
 
 local GameTooltipStatusBar = GameTooltipStatusBar
@@ -507,9 +509,11 @@ local OnTooltipSetItem = function(self)
 
     if C['tooltips-show-id'] then
         local id = match(Link, ':(%w+)')
+        local icon = GetItemIcon(Link)
 
         self:AddLine(' ')
         self:AddLine(format('%s |cFFFFFFFF%d|r', ID, id))
+        self:AddLine(format('Icon |cFFFFFFFF%d|r', icon))
     end
     if C['tooltips-show-ilevel'] then
         local itemLevel = select(4, GetItemInfo(Link))
@@ -543,9 +547,11 @@ local OnItemRefTooltipSetItem = function(self)
 
     if C['tooltips-show-id'] then
         local id = match(Link, ':(%w+)')
+        local icon = GetItemIcon(Link)
 
         self:AddLine(' ')
         self:AddLine(format('%s |cFFFFFFFF%d|r', ID, id))
+        self:AddLine(format('Icon |cFFFFFFFF%d|r', icon))
     end
     if C['tooltips-show-ilevel'] then
         local itemLevel = select(4, GetItemInfo(Link))
@@ -568,9 +574,11 @@ local OnTooltipSetSpell = function(self)
     end
 
     local id = select(2, self:GetSpell())
+    local icon = select(3, GetSpellInfo(id))
 
     self:AddLine(' ')
     self:AddLine(format('%s |cFFFFFFFF%d|r', ID, id))
+    self:AddLine(format('Icon |cFFFFFFFF%d|r', icon))
 end
 
 local SetDefaultAnchor = function(self, parent)
@@ -617,6 +625,8 @@ local OnTooltipSetAura = function(self, unit, index, filter)
         self:AddLine(' ')
         self:AddLine(format('%s |cFFFFFFFF%d|r', ID, id))
     end
+    local icon = select(3,  GetSpellInfo(id))
+    self:AddLine(format('Icon |cFFFFFFFF%d|r', icon))
 
     self:Show()
 end
