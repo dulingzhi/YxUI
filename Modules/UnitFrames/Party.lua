@@ -260,7 +260,7 @@ YxUI.StyleFuncs["party"] = function(self, unit)
 	-- Leader
     local Leader = Health:CreateTexture(nil, "OVERLAY")
     Leader:SetSize(16, 16)
-    Leader:SetPoint("LEFT", Health, "TOPLEFT", 0, 0)
+    Leader:SetPoint("LEFT", Health, "TOPLEFT", 3, 0)
     Leader:SetTexture(Assets:GetTexture("Leader"))
     Leader:SetVertexColor(YxUI:HexToRGB("FFEB3B"))
     Leader:Hide()
@@ -300,7 +300,17 @@ YxUI.StyleFuncs["party"] = function(self, unit)
 	if Settings["party-show-role"] then
 		local RoleIndicator = Health:CreateTexture(nil, "OVERLAY")
 		RoleIndicator:SetSize(12, 12)
-		RoleIndicator:SetPoint("TOPLEFT", Health, 17, 5)
+        RoleIndicator:SetPoint("TOPLEFT", Health, 3, 5)
+        RoleIndicator.PostUpdate = function(self)
+            self:ClearAllPoints()
+            if Leader:IsShown() then
+                RoleIndicator:SetPoint("LEFT", Leader, "RIGHT", 3, 0)
+            elseif  Assist:IsShown() then
+                self:SetPoint("LEFT",  Assist, "RIGHT", 3, 0)
+            else
+                RoleIndicator:SetPoint("TOPLEFT", Health, 3, 5)
+            end
+        end
 
 		self.GroupRoleIndicator = RoleIndicator
 	end

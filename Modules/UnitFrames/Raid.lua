@@ -294,7 +294,17 @@ YxUI.StyleFuncs["raid"] = function(self, unit)
 	-- Role
 	local RoleIndicator = Health:CreateTexture(nil, "OVERLAY")
     RoleIndicator:SetSize(12, 12)
-    RoleIndicator:SetPoint("TOPLEFT", Health, 17, 5)
+    RoleIndicator:SetPoint("TOPLEFT", Health, 3, 5)
+    RoleIndicator.PostUpdate = function(self)
+        self:ClearAllPoints()
+        if Leader:IsShown() then
+            RoleIndicator:SetPoint("LEFT", Leader, "RIGHT", 3, 0)
+        elseif  Assist:IsShown() then
+            self:SetPoint("LEFT",  Assist, "RIGHT", 3, 0)
+        else
+            RoleIndicator:SetPoint("TOPLEFT", Health, 3, 5)
+        end
+    end
 
 	-- Dispels
 	local Dispel = CreateFrame("Frame", nil, Health, "BackdropTemplate")
