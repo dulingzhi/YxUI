@@ -55,6 +55,12 @@ local UnitPlayerControlled = UnitPlayerControlled
 local UnitCanAttack = UnitCanAttack
 local UnitIsPVP = UnitIsPVP
 local GetSpellInfo = GetSpellInfo
+local GetNumGroupMembers = GetNumGroupMembers
+local UnitIsUnit = UnitIsUnit
+local table = table
+local RAID_CLASS_COLORS = RAID_CLASS_COLORS
+local GetQuestDifficultyColor = GetQuestDifficultyColor
+local IsInRaid = IsInRaid
 local GetHappiness
 
 local GameTooltipStatusBar = GameTooltipStatusBar
@@ -415,7 +421,7 @@ local OnTooltipSetUnit = function(self)
         if C['tooltips-show-target-by'] then
             local TargetBy = GetTargetBy(UnitID)
             if TargetBy and #TargetBy > 0 then
-                self:AddLine(L['Targeted By (|cffffffff%d|r): %s'], #TargetBy, table.concat(TargetBy, ', ', 1, math.min(3, #TargetBy)))
+                self:AddLine(format(L['Targeted By (|cffffffff%d|r): %s'], #TargetBy, table.concat(TargetBy, ', ', 1, math.min(3, #TargetBy))))
             end
         end
 
