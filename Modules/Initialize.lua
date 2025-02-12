@@ -15,11 +15,11 @@ local PluginQueue = {}
 
 -- Core functions and data
 ---@class YxUI
-local Y = CreateFrame("Frame", nil, UIParent)
+local Y = CreateFrame('Frame', nil, UIParent)
 Y.Modules = Modules
 Y.Plugins = Plugins
 
-Y.UIParent = CreateFrame("Frame", "YxUIParent", UIParent, "SecureHandlerStateTemplate")
+Y.UIParent = CreateFrame('Frame', 'YxUIParent', UIParent, 'SecureHandlerStateTemplate')
 Y.UIParent:SetAllPoints(UIParent)
 Y.UIParent:SetFrameLevel(UIParent:GetFrameLevel())
 
@@ -28,16 +28,16 @@ local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetad
 local GetAddOnInfo = C_AddOns and C_AddOns.GetAddOnInfo or GetAddOnInfo
 
 Y.AddOnName = AddOnName
-Y.UITitle = GetAddOnMetadata(AddOnName, "Title")
-Y.UIVersion = GetAddOnMetadata(AddOnName, "Version")
-Y.UserName = UnitName("player")
-Y.UserClass = select(2, UnitClass("player"))
-Y.UserRace = UnitRace("player")
+Y.UITitle = GetAddOnMetadata(AddOnName, 'Title')
+Y.UIVersion = GetAddOnMetadata(AddOnName, 'Version')
+Y.UserName = UnitName('player')
+Y.UserClass = select(2, UnitClass('player'))
+Y.UserRace = UnitRace('player')
 Y.UserRealm = GetRealmName()
 Y.UserLocale = GetLocale()
-Y.UserProfileKey = format("%s:%s", Y.UserName, Y.UserRealm)
+Y.UserProfileKey = format('%s:%s', Y.UserName, Y.UserRealm)
 Y.UserColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[Y.UserClass]
-Y.UserLevel = UnitLevel("player")
+Y.UserLevel = UnitLevel('player')
 Y.IsMaxLevel = Y.UserLevel == GetMaxLevelForExpansionLevel(GetExpansionLevel())
 Y.ClientVersion = select(4, GetBuildInfo())
 Y.IsClassic = Y.ClientVersion > 10000 and Y.ClientVersion < 20000
@@ -45,11 +45,12 @@ Y.IsTBC = Y.ClientVersion > 20000 and Y.ClientVersion < 30000
 Y.IsWrath = Y.ClientVersion > 30000 and Y.ClientVersion < 40000
 Y.IsCata = Y.ClientVersion > 40000 and Y.ClientVersion < 50000
 Y.IsMainline = Y.ClientVersion > 90000
-Y.Dummy = function() end
+Y.Dummy = function()
+end
 
 Y.ScreenWidth, Y.ScreenHeight = GetPhysicalScreenSize()
 Y.HiDPI = GetScreenHeight() / Y.ScreenHeight < 0.75
-Y.UiScale = tonumber(C_CVar.GetCVar("uiScale"))
+Y.UiScale = tonumber(C_CVar.GetCVar('uiScale'))
 Y.Mult = 768 / Y.ScreenHeight / Y.UiScale
 Y.NoScaleMult = Y.Mult * Y.UiScale
 if Y.HiDPI then
@@ -59,10 +60,10 @@ function Y.Scale(x)
     return Y.Mult * math.floor(x / Y.Mult + 0.5)
 end
 
-Y.TexCoords = { 0.08, 0.92, 0.08, 0.92 }
+Y.TexCoords = {0.08, 0.92, 0.08, 0.92}
 
-if (Y.UserLocale == "enGB") then
-    Y.UserLocale = "enUS"
+if (Y.UserLocale == 'enGB') then
+    Y.UserLocale = 'enUS'
 end
 
 -- Lists
@@ -91,16 +92,42 @@ end
 
 -- Get the player's class color
 Y.r, Y.g, Y.b = Y.ClassColors[Y.UserClass].r, Y.ClassColors[Y.UserClass].g, Y.ClassColors[Y.UserClass].b
-Y.MyClassColor = string.format("|cff%02x%02x%02x", Y.r * 255, Y.g * 255, Y.b * 255)
+Y.MyClassColor = string.format('|cff%02x%02x%02x', Y.r * 255, Y.g * 255, Y.b * 255)
 
 -- Populate the QualityColors table with the colors of each item quality
 local qualityColors = BAG_ITEM_QUALITY_COLORS
 for index, value in pairs(qualityColors) do
-    Y.QualityColors[index] = { r = value.r, g = value.g, b = value.b }
+    Y.QualityColors[index] = {
+        r = value.r,
+        g = value.g,
+        b = value.b
+    }
 end
-Y.QualityColors[-1] = { r = 1, g = 1, b = 1 }
-Y.QualityColors[LE_ITEM_QUALITY_POOR or Enum.ItemQuality.Poor] = { r = 0.61, g = 0.61, b = 0.61 }
-Y.QualityColors[LE_ITEM_QUALITY_COMMON or Enum.ItemQuality.Common] = { r = 1, g = 1, b = 1 } -- This is the default color, but it's included here for completeness.
+Y.QualityColors[-1] = {
+    r = 1,
+    g = 1,
+    b = 1
+}
+Y.QualityColors[LE_ITEM_QUALITY_POOR or Enum.ItemQuality.Poor] = {
+    r = 0.61,
+    g = 0.61,
+    b = 0.61
+}
+Y.QualityColors[LE_ITEM_QUALITY_COMMON or Enum.ItemQuality.Common] = {
+    r = 1,
+    g = 1,
+    b = 1
+} -- This is the default color, but it's included here for completeness.
+
+-- Color Info
+Y.GreyColor = "|CFFC0C0C0" -- Soft gray
+Y.InfoColor = "|CFF5C8BCF" -- Soft blue
+Y.InfoColorTint = "|CFF93BAFF" -- Softened tint
+Y.SystemColor = "|CFFFFCC66" -- Soft gold
+
+Y.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
+Y.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:410|t "
+Y.ScrollButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:127:204|t "
 
 -- Language
 ---@class Language
@@ -116,10 +143,78 @@ local NewIndex = function(self, key, value)
     L.Raw[value] = key
 end
 
-setmetatable(L, { __index = Index, __newindex = NewIndex })
+setmetatable(L, {
+    __index = Index,
+    __newindex = NewIndex
+})
+
+local ModuleEvent = function(self, event, func, unit1, unit2)
+    if event == 'CLEU' then
+        event = 'COMBAT_LOG_EVENT_UNFILTERED'
+    end
+    -- Check if the event is already registered with the function
+    if self.events[event] and self.events[event][func] then
+        return
+    end
+    if not self.events[event] then
+        self.events[event] = {}
+        if unit1 then
+            self:RegisterUnitEvent(event, unit1, unit2)
+        else
+            self:RegisterEvent(event)
+        end
+    end
+    self.events[event][func] = true
+end
+
+local ModuleUnEvent = function(self, event, func)
+    if event == 'CLEU' then
+        event = 'COMBAT_LOG_EVENT_UNFILTERED'
+    end
+
+    local funcs = self.events[event]
+    if funcs and funcs[func] then
+        funcs[func] = nil
+
+        if not next(funcs) then
+            self.events[event] = nil
+            self:UnregisterEvent(event)
+        end
+    end
+end
+
+local ModuleOnEvent = function(self, event, ...)
+    local eventFuncs = self.events[event]
+    if eventFuncs then
+        for func in pairs(eventFuncs) do
+            local success, err
+            if event == 'COMBAT_LOG_EVENT_UNFILTERED' then
+                success, err = pcall(func, self, event, CombatLogGetCurrentEventInfo())
+            else
+                success, err = pcall(func, self, event, ...)
+            end
+            if not success then
+                print('Error in event handler for event:', event, '-', err)
+            end
+        end
+    end
+end
+
+local ModuleDelay = function(self, delay, func, ...)
+    local data = SafePack(...)
+    C_Timer.After(delay, function()
+        func(self, SafeUnpack(data))
+    end)
+end
 
 -- Modules and plugins
 function Y:NewModule(name, ...)
+    local T, N = ('.'):split(name)
+    if not N then
+        T = 'Frame'
+    else
+        name = N
+    end
     local Module = self:GetModule(name)
 
     if Module then
@@ -127,74 +222,23 @@ function Y:NewModule(name, ...)
     end
 
     local tpl = {'BackdropTemplate'}
-    for i = 1, select("#", ...) do
+    for i = 1, select('#', ...) do
         local n = select(i, ...)
         if type(n) == 'string' and n ~= 'BackdropTemplate' then
             table.insert(tpl, n)
         end
     end
-    Module = CreateFrame("Frame", "YxUI " .. name, self.UIParent, table.concat(tpl, ", "))
+    Module = CreateFrame(T, 'YxUI ' .. name, self.UIParent, table.concat(tpl, ', '))
     Module.Name = name
 
     Modules[name] = Module
     ModuleQueue[#ModuleQueue + 1] = Module
     self[name] = Module
     Module.events = {}
-    Module.Event = function(self, event, func, unit1, unit2)
-        if event == "CLEU" then
-            event = "COMBAT_LOG_EVENT_UNFILTERED"
-        end
-        -- Check if the event is already registered with the function
-        if self.events[event] and self.events[event][func] then
-            return
-        end
-        if not self.events[event] then
-            self.events[event] = {}
-            if unit1 then
-                self:RegisterUnitEvent(event, unit1, unit2)
-            else
-                self:RegisterEvent(event)
-            end
-        end
-        self.events[event][func] = true
-    end
-    Module.UnEvent = function(self, event, func)
-        if event == "CLEU" then
-            event = "COMBAT_LOG_EVENT_UNFILTERED"
-        end
-
-        local funcs = self.events[event]
-        if funcs and funcs[func] then
-            funcs[func] = nil
-
-            if not next(funcs) then
-                self.events[event] = nil
-                self:UnregisterEvent(event)
-            end
-        end
-    end
-    Module:SetScript('OnEvent', function(self, event, ...)
-        local eventFuncs = self.events[event]
-        if eventFuncs then
-            for func in pairs(eventFuncs) do
-                local success, err
-                if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-                    success, err = pcall(func, self, event, CombatLogGetCurrentEventInfo())
-                else
-                    success, err = pcall(func, self, event, ...)
-                end
-                if not success then
-                    print("Error in event handler for event:", event, "-", err)
-                end
-            end
-        end
-    end)
-    Module.After = function(self, delay, func, ...)
-        local data = SafePack(...)
-        C_Timer.After(delay, function()
-            func(self, SafeUnpack(data))
-        end)
-    end
+    Module.Event = ModuleEvent
+    Module.UnEvent = ModuleUnEvent
+    Module:SetScript('OnEvent', ModuleOnEvent)
+    Module.Delay = ModuleDelay
 
     return Module
 end
@@ -224,10 +268,10 @@ function Y:NewPlugin(name)
     end
 
     local Name, Title, Notes = GetAddOnInfo(name)
-    local Author = GetAddOnMetadata(name, "Author")
-    local Version = GetAddOnMetadata(name, "Version")
+    local Author = GetAddOnMetadata(name, 'Author')
+    local Version = GetAddOnMetadata(name, 'Version')
 
-    Plugin = CreateFrame("Frame", name, self.UIParent, "BackdropTemplate")
+    Plugin = CreateFrame('Frame', name, self.UIParent, 'BackdropTemplate')
     Plugin.Name = Name
     Plugin.Title = Title
     Plugin.Notes = Notes
@@ -257,7 +301,7 @@ function Y:LoadPlugins()
         end
     end
 
-    self:GetModule("GUI"):AddWidgets(L["Info"], L["Plugins"], function(left, right)
+    self:GetModule('GUI'):AddWidgets(L['Info'], L['Plugins'], function(left, right)
         local Anchor
 
         for i = 1, #PluginQueue do
@@ -268,9 +312,9 @@ function Y:LoadPlugins()
             end
 
             Anchor:CreateHeader(PluginQueue[i].Title)
-            Anchor:CreateDoubleLine("", L["Author"], PluginQueue[i].Author)
-            Anchor:CreateDoubleLine("", L["Version"], PluginQueue[i].Version)
-            Anchor:CreateMessage("", PluginQueue[i].Notes)
+            Anchor:CreateDoubleLine('', L['Author'], PluginQueue[i].Author)
+            Anchor:CreateDoubleLine('', L['Version'], PluginQueue[i].Version)
+            Anchor:CreateMessage('', PluginQueue[i].Notes)
         end
     end)
 end
@@ -293,16 +337,16 @@ function Y:OnEvent(event)
     self:LoadPlugins()
 
     -- Set the UI scale
-    if Settings["enable-scale"] and Settings["ui-scale"] and Settings["ui-scale"] ~= Y.UiScale then
-        C_CVar.SetCVar("uiScale", Settings["ui-scale"])
-        Y.UiScale = Settings["ui-scale"]
+    if Settings['enable-scale'] and Settings['ui-scale'] and Settings['ui-scale'] ~= Y.UiScale then
+        C_CVar.SetCVar('uiScale', Settings['ui-scale'])
+        Y.UiScale = Settings['ui-scale']
     end
 
     self:UnregisterEvent(event)
 end
 
-Y:RegisterEvent("PLAYER_ENTERING_WORLD")
-Y:SetScript("OnEvent", Y.OnEvent)
+Y:RegisterEvent('PLAYER_ENTERING_WORLD')
+Y:SetScript('OnEvent', Y.OnEvent)
 
 -- Access data tables
 function Namespace:get()

@@ -11,7 +11,7 @@ end
 
 -- Utility Functions
 local function rad(degrees)
-	return degrees * math.pi / 180
+    return degrees * math.pi / 180
 end
 
 -- Set Border Color
@@ -425,7 +425,7 @@ local arrowDegree = {
 }
 
 function Y.SetupArrow(self, direction)
-    self:SetTexture(A:GetTexture("Arrow Up"))
+    self:SetTexture(A:GetTexture('Arrow Up'))
     self:SetRotation(rad(arrowDegree[direction]))
 end
 
@@ -653,7 +653,7 @@ end
 local function SkinEditBox(frame, width, height)
     frame:DisableDrawLayer('BACKGROUND')
 
-	frame:CreateBackdrop()
+    frame:CreateBackdrop()
 
     local frameName = frame.GetName and frame:GetName()
     if frameName and (frameName:find('Gold') or frameName:find('Silver') or frameName:find('Copper')) then
@@ -1179,6 +1179,74 @@ function Y.ReplaceIconString(frame, text)
     end
 end
 
+function Y.TogglePanel(self)
+    if self:IsShown() then
+        self:Hide()
+    else
+        self:Show()
+    end
+end
+
+-- Role Icons
+local GroupRoleTex = {
+    TANK = 'roleicon-tiny-tank',
+    HEALER = 'roleicon-tiny-healer',
+    DAMAGER = 'roleicon-tiny-dps',
+    DPS = 'roleicon-tiny-dps'
+}
+
+function Y.ReskinSmallRole(self, role)
+    self:SetTexCoord(0, 1, 0, 1)
+    self:SetTexture(Y:GetRoleIcon(role))
+end
+
+function Y.CreateFontString(self, size, text, textstyle, classcolor, anchor, x, y)
+    if not self then
+        return
+    end
+
+    local fs = self:CreateFontString(nil, 'OVERLAY')
+
+    -- check if fontstring is created or not
+    if not fs then
+        return
+    end
+
+    if not textstyle or textstyle == '' then
+        fs:SetFont(A:GetFont(C['ui-widget-font']), size, '')
+        fs:SetShadowOffset(1, -1 / 2)
+    else
+        fs:SetFont(A:GetFont(C['ui-widget-font']), size, 'OUTLINE')
+        fs:SetShadowOffset(0, 0)
+    end
+    fs:SetText(text)
+    fs:SetWordWrap(false)
+
+    if classcolor and type(classcolor) == 'boolean' then
+        fs:SetTextColor(Y.r, Y.g, Y.b)
+    elseif classcolor == 'system' then
+        fs:SetTextColor(1, 0.8, 0)
+    else
+        fs:SetTextColor(1, 1, 1)
+    end
+
+    -- check if position is set
+    if anchor and x and y then
+        fs:SetPoint(anchor, x, y)
+    else
+        fs:SetPoint('CENTER', 1, 0)
+    end
+
+    return fs
+end
+
+function Y.HideTooltip()
+    if GameTooltip:IsForbidden() then
+        return
+    end
+
+    GameTooltip:Hide()
+end
 ----------------------------------------------------------------------------------------
 --	Inject API functions into Blizzard frames
 ----------------------------------------------------------------------------------------
@@ -1225,9 +1293,9 @@ local function attachAPI(object)
     if not mt.SkinButton then
         mt.SkinButton = SkinButton
     end
-	if not mt.SkinEditBox then
-		mt.SkinEditBox = SkinEditBox
-	end
+    if not mt.SkinEditBox then
+        mt.SkinEditBox = SkinEditBox
+    end
     if not mt.SkinIcon then
         mt.SkinIcon = SkinIcon
     end
