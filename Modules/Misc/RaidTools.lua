@@ -76,6 +76,27 @@ function Module:CreatePanel()
     end)
 end
 
+function Module:GetRaidMaxGroup()
+    local _, instType, difficulty = GetInstanceInfo()
+    if (instType == 'party' or instType == 'scenario') and not IsInRaid() then
+        return 1
+    elseif instType ~= 'raid' then
+        return 8
+    elseif difficulty == 8 or difficulty == 1 or difficulty == 2 then
+        return 1
+    elseif difficulty == 14 or difficulty == 15 or (difficulty == 24 and instType == 'raid') then
+        return 6
+    elseif difficulty == 16 then
+        return 4
+    elseif difficulty == 3 or difficulty == 5 then
+        return 2
+    elseif difficulty == 9 then
+        return 8
+    else
+        return 5
+    end
+end
+
 function Module:CreateRoleCount()
     local roleIndex = {'TANK', 'HEALER', 'DAMAGER'}
     local frame = CreateFrame('Frame', nil, self)
@@ -102,7 +123,7 @@ function Module:CreateRoleCount()
             raidCounts[k] = 0
         end
 
-        local maxgroup = Module:GetRaidMaxGroup()
+        local maxgroup = self:GetRaidMaxGroup()
         for i = 1, GetNumGroupMembers() do
             local name, _, subgroup, _, _, _, _, online, isDead, _, _, assignedRole = GetRaidRosterInfo(i)
             if name and online and subgroup <= maxgroup and not isDead and assignedRole ~= 'NONE' then
@@ -468,7 +489,7 @@ function Module:CreateCountDown()
         GameTooltip:AddLine('Raid Tool', 0, 0.6, 1)
         GameTooltip:AddLine(' ')
         GameTooltip:AddDoubleLine(Y.LeftButton .. Y.InfoColor .. READY_CHECK)
-        GameTooltip:AddDoubleLine(Y.RightButton .. Y.InfoColor .. 'Count Down')
+        GameTooltip:AddDoubleLine(Y.RightButton .. Y.InfoColor .. L['Count Down'])
         GameTooltip:Show()
     end)
     frame:HookScript('OnLeave', Y.HideTooltip)

@@ -471,7 +471,7 @@ local OnTooltipSetItem = function(self)
         return
     end
 
-    if (MerchantFrame and MerchantFrame:IsShown()) or (not self.GetItem) then
+    if not self.GetItem then
         return
     end
 

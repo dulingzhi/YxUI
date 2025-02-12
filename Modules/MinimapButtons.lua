@@ -6,6 +6,7 @@ local MinimapButtons = Y:NewModule("Minimap Buttons")
 
 local lower = string.lower
 local find = string.find
+local MouseIsOver = MouseIsOver
 
 MinimapButtons.Items = {}
 
@@ -138,7 +139,9 @@ function MinimapButtons:SkinButtons()
 
                 if (Child:HasScript("OnClick")) then
                     Child:HookScript("OnClick", function()
-                        self:Hide(true)
+                        if not MouseIsOver(self.Panel) then
+                            self:Hide(true)
+                        end
                     end)
                 end
 
