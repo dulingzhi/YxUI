@@ -731,7 +731,7 @@ function UF:Load()
 		local Player = oUF:Spawn("player", "YxUI Player")
 
 		if Settings["unitframes-player-enable-power"] and (not Settings["player-move-power"]) then
-			Player:SetSize(Settings["unitframes-player-width"], Settings["unitframes-player-health-height"] + Settings["unitframes-player-power-height"] + 3)
+			Player:SetSize(Settings["unitframes-player-width"], Settings["unitframes-player-health-height"] + Settings["unitframes-player-power-height"] + 5)
 		else
 			Player:SetSize(Settings["unitframes-player-width"], Settings["unitframes-player-health-height"] + 2)
 		end
@@ -775,7 +775,7 @@ function UF:Load()
 
 	if Settings["target-enable"] then
 		local Target = oUF:Spawn("target", "YxUI Target")
-		Target:SetSize(Settings["unitframes-target-width"], Settings["unitframes-target-health-height"] + Settings["unitframes-target-power-height"] + 3)
+		Target:SetSize(Settings["unitframes-target-width"], Settings["unitframes-target-health-height"] + Settings["unitframes-target-power-height"] + 5)
 		Target:SetPoint("BOTTOM", YxUI.UIParent, "BOTTOM", 260, 320)
 		Target:SetParent(YxUI.UIParent)
 
@@ -840,7 +840,7 @@ function UF:Load()
 
 	if Settings["focus-enable"] then
 		local Focus = oUF:Spawn("focus", "YxUI Focus")
-		Focus:SetSize(Settings["unitframes-focus-width"], Settings["unitframes-focus-health-height"] + Settings["unitframes-focus-power-height"] + 3)
+		Focus:SetSize(Settings["unitframes-focus-width"], Settings["unitframes-focus-health-height"] + Settings["unitframes-focus-power-height"] + 5)
 		Focus:SetPoint("TOPRIGHT", YxUI.UIParent, "CENTER", -450, 0)
 		Focus:SetParent(YxUI.UIParent)
 
