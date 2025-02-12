@@ -1,13 +1,13 @@
 local Y, L, A, C, D = select(2, ...):get()
 
-local Skin = Y:NewModule("Skin")
+local Skin = Y:NewModule('Skin')
 local IsAddOnLoaded = IsAddOnLoaded or C_AddOn.IsAddOnLoaded
 
 Skin.Configs = {}
 
 function Skin:Enable()
-    self:RegisterEvent("ADDON_LOADED")
-    self:SetScript("OnEvent", self.OnEvent)
+    self:RegisterEvent('ADDON_LOADED')
+    self:SetScript('OnEvent', self.OnEvent)
     for AddOn, setup in pairs(self.Configs) do
         if IsAddOnLoaded(AddOn) and type(setup) == 'function' then
             setup()
@@ -18,7 +18,7 @@ end
 
 function Skin:Disable()
     self:UnregisterAllEvents()
-    self:SetScript("OnEvent", nil)
+    self:SetScript('OnEvent', nil)
     self:Hide()
 end
 
@@ -40,6 +40,6 @@ function Skin:ADDON_LOADED(AddOn)
 end
 
 function Skin:Add(name, func)
-    assert(not self.Configs[name], "Skin: %s already exists.")
+    assert(not self.Configs[name], L['Skin: %s already exists.'])
     self.Configs[name] = func
 end

@@ -11,9 +11,9 @@ local function skin(self)
         self.OwnerSelector:StyleButton()
         self.OwnerSelector:SetSize(20, 20)
         self.OwnerSelector:SetPoint('TOPLEFT', 2, -2)
-        local icon = self.OwnerSelector:CreateTexture(nil, "ARTWORK")
+        local icon = self.OwnerSelector:CreateTexture(nil, 'ARTWORK')
         icon:SetAllPoints()
-        hooksecurefunc(self.OwnerSelector, "UpdateIcon", function()
+        hooksecurefunc(self.OwnerSelector, 'UpdateIcon', function()
             icon:SetTexture(self.portrait:GetTexture())
             icon:SetTexCoord(self.portrait:GetTexCoord())
         end)
@@ -25,12 +25,12 @@ local function skin(self)
 
     self.BagFrame:SetPoint('TOPLEFT', 2, -29)
     hooksecurefunc(self.BagFrame, 'Update', function()
-        for _, button in ipairs({ self.BagFrame:GetChildren() }) do
+        for _, button in ipairs({self.BagFrame:GetChildren()}) do
             local obj = button.Icon or button:GetNormalTexture()
             local tex = obj and obj:GetTexture()
             button:CreateBorder()
             button:StyleButton()
-            local icon = button:CreateTexture(nil, "ARTWORK")
+            local icon = button:CreateTexture(nil, 'ARTWORK')
             icon:SetPoint('CENTER')
             icon:SetTexture(tex)
             icon:SetSize(button:GetWidth() - 4, button:GetHeight() - 4)
@@ -73,7 +73,7 @@ local function skin(self)
         button:CreateBorder()
         button:StyleButton(false, false, true)
         button:SetNormalTexture(0)
-        local icon = button:CreateTexture(nil, "ARTWORK")
+        local icon = button:CreateTexture(nil, 'ARTWORK')
         icon:SetAllPoints()
         icon:SetTexture(plugin.icon)
     end)
@@ -98,11 +98,11 @@ local function skin(self)
 end
 
 local function SetupUi()
-    hooksecurefunc(_G.tdBag2, "CreateFrame", function(self, bagId)
-        if bagId == "bag" or bagId == "bank" then
+    hooksecurefunc(_G.tdBag2, 'CreateFrame', function(self, bagId)
+        if bagId == 'bag' or bagId == 'bank' then
             skin(self.frames[bagId])
         end
     end)
 end
 
-Y.Skin:Add("tdBag2", SetupUi)
+Y.Skin:Add('tdBag2', SetupUi)

@@ -12,7 +12,7 @@ function Module:Load()
 end
 
 function Module:Add(configKey, default, name, desc, toggle, requireReload)
-    assert(not self.widgets[name], 'The name of the widget is already in use.')
+    assert(not self.widgets[name], L['The name of the widget is already in use.'])
     self.widgets[name] = true
     table.insert(self.widgets, {
         configKey = configKey,

@@ -5,23 +5,14 @@ local GUI = YxUI:GetModule("GUI")
 local Tiers = {"FF8000", "A335EE", "0070DD", "1EFF00", "FFFFFF"}
 
 local Patrons = {
-	{"Dragonhawk", "Halven"},
 	{},
-	{"deck"},
-	{"JDoubleU00", "sylvester", "thurin"},
-	{"Paul D."},
+	{},
+	{},
+	{},
+	{},
 }
 
-local Previous = {
-	{"SwoopCrown", "Cheeso_76", "Erieeroot", "last"},
-	{"Smelly", "Trix", "wolimazo", "Ari", "MrPoundsign"},
-	{"Euphoria", "Mitooshin", "MisseFar", "FrankPatten", "Dillan", "Quiet"},
-	{"Maski", "Raze", "Ingrimmosch", "Chris B.", "Suppabad", "Aaron B.", "Steve R.", "Angel", "Jeor", "Mcbooze", "stko", "Syn", "Rytok", "Ryex", "Blom", "Innie", "Cyber", "protocol7", "Dellamaik"},
-	{"Akab00m", "OzzFreak", "madmaddy", "Uzify", "Erthelmi", "silence", "momzzze", "Oxymorphone"},
-}
-
-local Donors = [[Innie Brightsides Erthelmi Gene JDoubleU00 Duds Shazlen Shawna W Dillan Bruce N last Wrynn Ryxân Andrei B Anthony M AtticaOnline Hawksworth WingZero
-Elizabeth T Quadra Brandon W Richard S Andreas M Morgana N LeeMcMurtry]]
+local Donors = [[]]
 
 GUI:AddWidgets(Language["Info"], Language["Credits"], function(left, right)
 	left:CreateHeader(Language["Scripting Help & Inspiration"])
@@ -42,8 +33,11 @@ GUI:AddWidgets(Language["Info"], Language["Credits"], function(left, right)
 	right:CreateHeader("LibDeflate")
 	right:CreateLine("", "yoursafety")
 
+	left:CreateHeader("HydraUI")
+	left:CreateLine("", "Hydra")
+
 	left:CreateHeader("YxUI")
-	left:CreateLine("", "Yx")
+	left:CreateLine("", "Jai")
 end)
 
 GUI:AddWidgets(Language["Info"], Language["Supporters"], function(left, right)
@@ -76,20 +70,9 @@ GUI:AddWidgets(Language["Info"], Language["Supporters"], function(left, right)
 		end
 	end
 
-	local ExPatrons = ""
-
-	for i = 1, #Previous do
-		for n = 1, #Previous[i] do
-			ExPatrons = ExPatrons .. "|cFF" .. Tiers[i] .. Previous[i][n] .. "|r "
-		end
-	end
-
-	left:CreateHeader(Language["Former Patreon Supporters"])
-	left:CreateMessage("", ExPatrons)
-
 	right:CreateHeader(Language["Donors"])
 	right:CreateMessage("", Donors)
 
-	right:CreateHeader("Thank you so much!")
-	right:CreateMessage("", "Thank you to all of these amazing people for their support, through donations and Patreon pledges! This generosity allows me to spend so much of my time developing the interface for everyone.")
+	right:CreateHeader(Language["Thank you so much!"])
+	right:CreateMessage("", Language["Your support is greatly appreciated!"])
 end)
