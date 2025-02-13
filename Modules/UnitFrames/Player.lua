@@ -29,8 +29,8 @@ D["player-resource-height"] = 8
 D["player-move-resource"] = false
 D["player-move-power"] = false
 D["player-enable"] = true
-D["unitframes-player-swing-width"] = 268
-D["unitframes-player-swing-height"] = 16
+D["unitframes-player-swing-width"] = 273
+D["unitframes-player-swing-height"] = 10
 D["unitframes-player-enable-swingbar"] = true
 D.PlayerBuffPerLine = 6
 D.PlayerBuffSpacing = 6
@@ -389,25 +389,36 @@ Y.StyleFuncs["player"] = function(self, unit)
 	end
 
     if C["unitframes-player-enable-swingbar"] then
-		local Anchor = CreateFrame("Frame", "YxUI Casting Bar", self)
-		Anchor:SetSize(C["unitframes-player-swing-width"], C["unitframes-player-swing-height"])
+		local SwingTimer = CreateFrame("Frame", "YxUI Casting Bar", self)
+		SwingTimer:SetSize(C["unitframes-player-swing-width"], C["unitframes-player-swing-height"])
 
-        local Swingbar = CreateFrame("StatusBar", nil, self)
-		Swingbar:SetSize(C["unitframes-player-swing-width"] - C["unitframes-player-swing-height"] - 1, C["unitframes-player-swing-height"])
-		Swingbar:SetPoint("RIGHT", Anchor, 0, 0)
-		Swingbar:SetStatusBarTexture(A:GetTexture(C["ui-widget-texture"]))
-        Swingbar:CreateBorder()
+        local MainHand = CreateFrame("StatusBar", nil, SwingTimer) do
+            MainHand:SetSize(C["unitframes-player-swing-width"], (C["unitframes-player-swing-height"] - 2) / 2)
+            MainHand:SetPoint("RIGHT", SwingTimer, 0, 0)
+            MainHand:SetStatusBarTexture(A:GetTexture(C["ui-widget-texture"]))
+            -- MainHand:CreateBorder()
+            local bg = MainHand:CreateTexture(nil, "ARTWORK")
+            bg:SetAllPoints()
+            bg:SetTexture(A:GetTexture(C["ui-widget-texture"]))
+            bg.multiplier = 0.15
+            MainHand.bg = bg
+        end
 
-		local CastbarBG = Swingbar:CreateTexture(nil, "ARTWORK")
-		CastbarBG:SetPoint("TOPLEFT", Swingbar, 0, 0)
-		CastbarBG:SetPoint("BOTTOMRIGHT", Swingbar, 0, 0)
-		CastbarBG:SetTexture(A:GetTexture(C["ui-widget-texture"]))
-		CastbarBG:SetAlpha(0.2)
+        local OffHand = CreateFrame("StatusBar", nil, SwingTimer) do
+            OffHand:SetSize(C["unitframes-player-swing-width"], (C["unitframes-player-swing-height"] - 2) / 2)
+            OffHand:SetPoint("TOP", MainHand, "BOTTOM", 0, -1)
+            OffHand:SetStatusBarTexture(A:GetTexture(C["ui-widget-texture"]))
+            -- OffHand:CreateBorder()
+            local bg = OffHand:CreateTexture(nil, "ARTWORK")
+            bg:SetAllPoints()
+            bg:SetTexture(A:GetTexture(C["ui-widget-texture"]))
+            bg.multiplier = 0.15
+            OffHand.bg = bg
+        end
 
-		CastbarBG.bg = CastbarBG
-
-        self.Swingbar = Swingbar
-		self.SwingAnchor = Anchor
+        self.SwingTimer = SwingTimer
+        self.SwingTimer.MainHand = MainHand
+        self.SwingTimer.OffHand = OffHand
     end
 
 	if C["unitframes-player-enable-resource"] then

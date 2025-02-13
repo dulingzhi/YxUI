@@ -768,8 +768,8 @@ function UF:Load()
 		end
 
         if Settings["unitframes-player-enable-swingbar"] then
-            Player.SwingAnchor:SetPoint("BOTTOM", YxUI.UIParent, 0, 170)
-            YxUI:CreateMover(Player.SwingAnchor, 2)
+            Player.SwingTimer:SetPoint("BOTTOM", YxUI.UIParent, -2, 188)
+            YxUI:CreateMover(Player.SwingTimer, 2)
 			Player:EnableElement("SwingTimer")
         else
             Player:DisableElement("SwingTimer")

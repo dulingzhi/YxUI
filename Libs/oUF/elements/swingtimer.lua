@@ -66,53 +66,51 @@
 
 		-- register with oUF
 		self.SwingTimer = element
---]]
-
-local _, ns = ...
+--]] local _, ns = ...
 local oUF = ns.oUF
-assert(oUF, "oUF_SwingTimer was unable to locate oUF install.")
+assert(oUF, 'oUF_SwingTimer was unable to locate oUF install.')
 
 local COLORS = {
-    ["main-hand"] = oUF:CreateColor(0.80, 0.30, 0.10),
-    ["off-hand"] = oUF:CreateColor(0.10, 0.10, 0.80)
+    ['main-hand'] = oUF:CreateColor(0.80, 0.30, 0.10),
+    ['off-hand'] = oUF:CreateColor(0.10, 0.10, 0.80)
 }
 
 local COMBAT_EVENTS = {
-    ["SWING_DAMAGE"] = true,
-    ["RANGE_DAMAGE"] = true,
-    ["SWING_MISSED"] = true,
-    ["RANGE_MISSED"] = true,
-    ["SPELL_CAST_SUCCESS"] = true,
+    ['SWING_DAMAGE'] = true,
+    ['RANGE_DAMAGE'] = true,
+    ['SWING_MISSED'] = true,
+    ['RANGE_MISSED'] = true,
+    ['SPELL_CAST_SUCCESS'] = true
 }
 
 local SWING_RESET_SPELLS = {
     [78] = true, -- Heroic Strike (Rank 1)
-    [284] = true, -- Heroic Strike (Rank 2)
+    [284] = true -- Heroic Strike (Rank 2)
     -- Add more spell IDs as needed
 }
 
 local function UpdateColor(self, arg, ...)
-	local element = self.SwingTimer
+    local element = self.SwingTimer
 
-    local color = COLORS[arg or "none"]
-    local frame = (arg == "main-hand") and element.MainHand or element.OffHand
+    local color = COLORS[arg or 'none']
+    local frame = (arg == 'main-hand') and element.MainHand or element.OffHand
 
-	if frame and color then
-		frame:SetStatusBarColor(color.r, color.g, color.b)
+    if frame and color then
+        frame:SetStatusBarColor(color.r, color.g, color.b)
 
         local bg = frame.bg
         if bg then
             local mu = bg.multiplier or 1
             bg:SetVertexColor(color.r * mu, color.g * mu, color.b * mu)
         end
-	end
+    end
 end
 
 local function OnUpdate(self, elapsed)
     self.updateInterval = (self.updateInterval or 0) - elapsed
     if self.updateInterval <= 0 then
         local now = GetTime()
-        
+
         -- update main-hand bar
         do
             local statusbar = self.MainHand
@@ -121,17 +119,17 @@ local function OnUpdate(self, elapsed)
                 local value = now - (statusbar.startTime or now)
                 if value >= max then
                     value = 0
-                    statusbar.startTime = now
+                    statusbar.startTime = nil
                 end
 
                 statusbar:SetValue(value)
 
                 if statusbar.Text then
-                    statusbar.Text:SetFormattedText("%.1f / %.1f", value, max)
+                    statusbar.Text:SetFormattedText('%.1f / %.1f', value, max)
                 end
             end
         end
-        
+
         -- update off-hand bar
         do
             local statusbar = self.OffHand
@@ -140,13 +138,13 @@ local function OnUpdate(self, elapsed)
                 local value = now - (statusbar.startTime or now)
                 if value >= max then
                     value = 0
-                    statusbar.startTime = now
+                    statusbar.startTime = nil
                 end
 
                 statusbar:SetValue(value)
 
                 if statusbar.Text then
-                    statusbar.Text:SetFormattedText("%.1f / %.1f", value, max)
+                    statusbar.Text:SetFormattedText('%.1f / %.1f', value, max)
                 end
             end
         end
@@ -155,9 +153,11 @@ local function OnUpdate(self, elapsed)
     end
 end
 
-local function Reset(self, event, isOffHand)
+local function Reset(self, isOffHand)
     local element = self.SwingTimer
-    if not element then return end
+    if not element then
+        return
+    end
 
     local statusbar = isOffHand and element.OffHand or element.MainHand
     statusbar.startTime = GetTime()
@@ -166,80 +166,78 @@ end
 
 local function Update(self, event, unit)
     local element = self.SwingTimer
-    if not element then return end
+    if not element then
+        return
+    end
 
     local mainhand = element.MainHand
     local offhand = element.OffHand
 
-    if event == "UNIT_ATTACK_SPEED" or event == "ForceUpdate" then
-        local mainSpeed, offSpeed = UnitAttackSpeed("player")
-        local rangedSpeed, _, _, _, _, _ = UnitRangedDamage("player")
-        
+    if event == 'UNIT_ATTACK_SPEED' or event == 'PLAYER_EQUIPMENT_CHANGED' or event == 'ForceUpdate' then
+        local mainSpeed, offSpeed = UnitAttackSpeed('player')
+        local rangedSpeed, _, _, _, _, _ = UnitRangedDamage('player')
+
         mainhand.speed = mainSpeed or 0
         mainhand:SetMinMaxValues(0, mainhand.speed)
-        
-        if not mainhand.speed then
-            mainhand:Hide()
-        end
-
+        mainhand:SetShown(mainhand.speed > 0)
         offhand.speed = offSpeed or rangedSpeed or 0
-        
-
-        if not offhand.speed then
-            offhand:Hide()
-        end
-    elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
+        offhand:SetShown(offhand.speed > 0)
+    elseif event == 'COMBAT_LOG_EVENT_UNFILTERED' then
         local _, subevent, _, sourceGUID, _, _, _, _ = CombatLogGetCurrentEventInfo()
-        
+
         -- ignore events
-        if not COMBAT_EVENTS[subevent] then return end
+        if not COMBAT_EVENTS[subevent] then
+            return
+        end
 
         -- ignore events not from player
-        if sourceGUID ~= element.__guid then return end
+        if sourceGUID ~= element.__guid then
+            return
+        end
 
-        if subevent == "SWING_DAMAGE" or subevent == "RANGE_DAMAGE" then
-            local index = (subevent == "RANGE_DAMAGE") and 15 or 12
+        if subevent == 'SWING_DAMAGE' or subevent == 'RANGE_DAMAGE' then
+            local index = (subevent == 'RANGE_DAMAGE') and 15 or 12
             local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(index, CombatLogGetCurrentEventInfo())
-            
-            if (subevent == "RANGE_DAMAGE" and element.__class == "PRIEST") then
+
+            if (subevent == 'RANGE_DAMAGE' and element.__range) then
                 isOffHand = true
             end
 
-            Reset(self, event .. '.' .. subevent, isOffHand or false)
-        elseif subevent == "SWING_MISSED" or subevent == "RANGE_MISSED" then
-            local index = (subevent == "RANGE_MISSED") and 15 or 12
+            Reset(self, isOffHand or false)
+        elseif subevent == 'SWING_MISSED' or subevent == 'RANGE_MISSED' then
+            local index = (subevent == 'RANGE_MISSED') and 15 or 12
             local missType, isOffHand, amountMissed, critical = select(index, CombatLogGetCurrentEventInfo())
-            
-            if (subevent == "RANGE_MISSED" and element.__class == "PRIEST") then
+
+            if (subevent == 'RANGE_MISSED' and element.__range) then
                 isOffHand = true
             end
 
-            Reset(self, event .. '.' .. subevent, isOffHand or false)
-        elseif subevent == "" then
+            Reset(self, isOffHand or false)
+        elseif subevent == '' then
             local spellID, spellName, spellSchool, _ = select(12, CombatLogGetCurrentEventInfo())
             if SWING_RESET_SPELLS[spellID] then
-                Reset(self, event .. '.' .. subevent, false)
-                Reset(self, event .. '.' .. subevent, true)
+                Reset(self, false)
+                Reset(self, true)
             end
         else
             return
         end
-    elseif event == "PLAYER_REGEN_ENABLED" then
+    elseif event == 'PLAYER_REGEN_ENABLED' then
         element:Hide()
-        element:SetScript("OnUpdate", nil)
-    elseif event == "PLAYER_REGEN_DISABLED" then
+        element:SetScript('OnUpdate', nil)
+    elseif event == 'PLAYER_REGEN_DISABLED' then
         element:Show()
-        element:SetScript("OnUpdate", OnUpdate)
+        element:SetScript('OnUpdate', OnUpdate)
     end
 
-	--[[ Callback: SwingTimer:PreUpdate()
+    --[[ Callback: SwingTimer:PreUpdate()
 	Called before the element has been updated.
 
 	* self - the SwingTimer element
 	--]]
-	if(element.PreUpdate) then
-		element:PreUpdate()
-	end
+    if (element.PreUpdate) then
+        element:PreUpdate()
+    end
 
     local now = GetTime()
     mainhand:SetMinMaxValues(0, mainhand.speed)
@@ -248,29 +246,29 @@ local function Update(self, event, unit)
     offhand:SetMinMaxValues(0, offhand.speed)
     offhand:SetValue(offhand.startTime and (now - offhand.startTime) or 0)
 
-	--[[ Callback: SwingTimer:PostUpdate(cur, max)
+    --[[ Callback: SwingTimer:PostUpdate(cur, max)
 	Called after the element has been updated.
 
 	* self - the SwingTimer element
 	* cur  - the amount of staggered damage (number)
 	* max  - the player's maximum possible health value (number)
 	--]]
-	if(element.PostUpdate) then
-		element:PostUpdate(cur, max)
-	end
+    if (element.PostUpdate) then
+        element:PostUpdate(cur, max)
+    end
 end
 
 local function Path(self, ...)
-	--[[ Override: SwingTimer.Override(self, event, unit)
+    --[[ Override: SwingTimer.Override(self, event, unit)
 	Used to completely override the internal update function.
 
 	* self  - the parent object
 	* event - the event triggering the update (string)
 	* unit  - the unit accompanying the event (string)
 	--]]
-	(self.SwingTimer.Override or Update)(self, ...);
+    (self.SwingTimer.Override or Update)(self, ...);
 
-	--[[ Override: SwingTimer.UpdateColor(self, event, unit)
+    --[[ Override: SwingTimer.UpdateColor(self, event, unit)
 	Used to completely override the internal function for updating the widgets' colors.
 
 	* self  - the parent object
@@ -278,83 +276,85 @@ local function Path(self, ...)
 	* unit  - the unit accompanying the event (string)
 	--]]
     local fn = (self.SwingTimer.UpdateColor or UpdateColor)
-	fn(self, "main-hand", ...)
-	fn(self, "off-hand", ...)
+    fn(self, 'main-hand', ...)
+    fn(self, 'off-hand', ...)
 end
 
 local function Visibility(self, event, unit)
     local element = self.SwingTimer
 
-    local _, class = UnitClass(unit)
-    local mainSpeed, offSpeed = UnitAttackSpeed("player")
-    local rangedSpeed, _, _, _, _, _ = UnitRangedDamage("player")
-    
+    local mainSpeed, offSpeed = UnitAttackSpeed('player')
+    local rangedSpeed = UnitRangedDamage('player')
+
     element.MainHand.speed = mainSpeed
     element.OffHand.speed = offSpeed or rangedSpeed
 
-    -- if offSpeed or rangedSpeed then
-    --     element.OffHand:Show()
-    -- else
-    --     element.OffHand:Hide()
-    -- end
+    if (offSpeed and rangedSpeed or 0) > 0 then
+        element.OffHand:Show()
+    else
+        element.OffHand:Hide()
+    end
 
     Path(self, event, unit)
 end
 
 local function VisibilityPath(self, ...)
-	--[[ Override: SwingTimer.OverrideVisibility(self, event, unit)
+    --[[ Override: SwingTimer.OverrideVisibility(self, event, unit)
 	Used to completely override the internal visibility toggling function.
 
 	* self  - the parent object
 	* event - the event triggering the update (string)
 	* unit  - the unit accompanying the event (string)
 	--]]
-	(self.SwingTimer.OverrideVisibility or Visibility)(self, ...)
+    (self.SwingTimer.OverrideVisibility or Visibility)(self, ...)
 end
 
 local function ForceUpdate(element)
-	VisibilityPath(element.__owner, "ForceUpdate", element.__owner.unit)
+    VisibilityPath(element.__owner, 'ForceUpdate', element.__owner.unit)
 end
 
 local function Enable(self, unit)
-	local element = self.SwingTimer
-	if element and UnitIsUnit(unit, "player") then
-		element.__owner = self
-		element.ForceUpdate = ForceUpdate
+    local element = self.SwingTimer
+    if element and UnitIsUnit(unit, 'player') then
+        element.__owner = self
+        element.ForceUpdate = ForceUpdate
 
-		self:RegisterEvent("UNIT_ATTACK_SPEED", Path)
-		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", Path, true)
-		self:RegisterEvent("PLAYER_REGEN_ENABLED", Path, true)
-		self:RegisterEvent("PLAYER_REGEN_DISABLED", Path, true)
+        self:RegisterEvent('UNIT_ATTACK_SPEED', Path)
+        self:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED', Path, true)
+        self:RegisterEvent('PLAYER_REGEN_ENABLED', Path, true)
+        self:RegisterEvent('PLAYER_REGEN_DISABLED', Path, true)
+        self:RegisterEvent('PLAYER_EQUIPMENT_CHANGED', Path, true)
 
-        for _, frame in next, ({ element.MainHand, element.OffHand }) do
+        for _, frame in next, ({element.MainHand, element.OffHand}) do
             if frame and frame:IsObjectType('StatusBar') and not frame:GetStatusBarTexture() then
                 frame:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
             end
         end
 
-        local _, class = UnitClass("player")
+        local _, class = UnitClass('player')
         element.__class = class
-        element.__guid = UnitGUID("player")
+        element.__range = class == 'PRIEST' or class == 'MAGE' or class == 'WARLOCK'
+        element.__guid = UnitGUID('player')
         element.updateInterval = 0
         -- element:SetScript("OnUpdate", OnUpdate)
-		element:Hide()
+        element:Hide()
 
-		return true
-	end
+        return true
+    end
 end
 
 local function Disable(self)
-	local element = self.SwingTimer
-	if element then
-        element:SetScript("OnUpdate", nil)
-		element:Hide()
+    local element = self.SwingTimer
+    if element then
+        element:SetScript('OnUpdate', nil)
+        element:Hide()
 
-		self:UnregisterEvent("UNIT_ATTACK_SPEED", Path)
-		self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", Path)
-		self:UnregisterEvent("PLAYER_REGEN_ENABLED", Path)
-		self:UnregisterEvent("PLAYER_REGEN_DISABLED", Path)
-	end
+        self:UnregisterEvent('UNIT_ATTACK_SPEED', Path)
+        self:UnregisterEvent('COMBAT_LOG_EVENT_UNFILTERED', Path)
+        self:UnregisterEvent('PLAYER_REGEN_ENABLED', Path)
+        self:UnregisterEvent('PLAYER_REGEN_DISABLED', Path)
+        self:UnregisterEvent('PLAYER_EQUIPMENT_CHANGED', Path)
+    end
 end
 
-oUF:AddElement("SwingTimer", VisibilityPath, Enable, Disable)
+oUF:AddElement('SwingTimer', VisibilityPath, Enable, Disable)
