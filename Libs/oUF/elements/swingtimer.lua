@@ -86,8 +86,11 @@ local COMBAT_EVENTS = {
 local SWING_RESET_SPELLS = {
     [78] = true, -- Heroic Strike (Rank 1)
     [284] = true, -- Heroic Strike (Rank 2)
-    [47450] = true
     -- Add more spell IDs as needed
+    [47450] = true, -- 英勇
+    [47520] = true, -- 顺劈斩
+    [56815] = true, -- 符文打击
+    [48480] = true, -- 重殴
 }
 
 local function UpdateColor(self, arg, ...)
