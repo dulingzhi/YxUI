@@ -215,7 +215,7 @@ function Module:CreateReadyCheck()
         count, total = 0, 0
     end
 
-    local function updateReadyCheck(event)
+    local function updateReadyCheck(_, event)
         if event == 'READY_CHECK_FINISHED' then
             if count == total then
                 rc:SetTextColor(0, 1, 0)
