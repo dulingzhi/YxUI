@@ -85,7 +85,8 @@ local COMBAT_EVENTS = {
 
 local SWING_RESET_SPELLS = {
     [78] = true, -- Heroic Strike (Rank 1)
-    [284] = true -- Heroic Strike (Rank 2)
+    [284] = true, -- Heroic Strike (Rank 2)
+    [47450] = true
     -- Add more spell IDs as needed
 }
 
@@ -213,11 +214,13 @@ local function Update(self, event, unit)
             end
 
             Reset(self, isOffHand or false)
-        elseif subevent == '' then
+        elseif subevent == 'SPELL_CAST_SUCCESS' then
             local spellID, spellName, spellSchool, _ = select(12, CombatLogGetCurrentEventInfo())
             if SWING_RESET_SPELLS[spellID] then
                 Reset(self, false)
-                Reset(self, true)
+                if mainhand.startTime == offhand.startTime and mainhand.speed == offhand.speed then
+                    Reset(self, true)
+                end
             end
         else
             return
