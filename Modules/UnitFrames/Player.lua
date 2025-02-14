@@ -9,7 +9,7 @@ D["unitframes-player-power-height"] = 16
 D["unitframes-player-power-reverse"] = false
 D["unitframes-player-power-color"] = "POWER"
 D["unitframes-player-power-smooth"] = true
-D["unitframes-player-health-left"] = "[LevelColor][Level][Plus][ColorStop] [Name(30)] [Resting]"
+D["unitframes-player-health-left"] = "[LevelColor][Level][Plus][ColorStop] [Name(30)]" -- [Resting]
 D["unitframes-player-health-right"] = "[HealthPercent]"
 D["unitframes-player-power-left"] = "[HealthValues:Short]"
 D["unitframes-player-power-right"] = "[PowerValues:Short]"
@@ -902,6 +902,65 @@ Y.StyleFuncs["player"] = function(self, unit)
 	Resurrect:SetSize(16, 16)
 	Resurrect:SetPoint("CENTER", Health, 0, 0)
 	Resurrect:Hide()
+
+	do
+		local RestingIndicator = CreateFrame("Frame", nil, Health)
+		RestingIndicator:SetSize(5, 5)
+		if C["player-portrait-style"] and C["player-portrait-style"] ~= "OVERLAY" then
+			RestingIndicator:SetPoint("TOPLEFT", Portrait, "TOPLEFT", -2, 4)
+		else
+			RestingIndicator:SetPoint("TOPLEFT", Health, "TOPLEFT", -2, 4)
+		end
+		RestingIndicator:Hide()
+
+		local textFrame = CreateFrame("Frame", nil, RestingIndicator)
+		textFrame:SetAllPoints()
+		textFrame:SetFrameLevel(6)
+
+		local texts = {}
+		local offsets = {
+			{ 4, -4 },
+			{ 0, 0 },
+			{ -5, 5 },
+		}
+
+		for i = 1, 3 do
+			texts[i] = Y.CreateFontString(textFrame, (7 + i * 3), "z", "", "system", "CENTER", offsets[i][1], offsets[i][2])
+		end
+
+		local step, stepSpeed = 0, 0.33
+
+		local stepMaps = {
+			[1] = { true, false, false },
+			[2] = { true, true, false },
+			[3] = { true, true, true },
+			[4] = { false, true, true },
+			[5] = { false, false, true },
+			[6] = { false, false, false },
+		}
+
+		RestingIndicator:SetScript("OnUpdate", function(self, elapsed)
+			self.elapsed = (self.elapsed or 0) + elapsed
+			if self.elapsed > stepSpeed then
+				step = step + 1
+				if step == 7 then
+					step = 1
+				end
+
+				for i = 1, 3 do
+					texts[i]:SetShown(stepMaps[step][i])
+				end
+
+				self.elapsed = 0
+			end
+		end)
+
+		RestingIndicator:SetScript("OnHide", function()
+			step = 6
+		end)
+
+		self.RestingIndicator = RestingIndicator
+	end
 
 	-- Tags
 	self:Tag(HealthLeft, C["unitframes-player-health-left"])
