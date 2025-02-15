@@ -159,7 +159,7 @@ if (not YxUI.IsClassic) then
 		local Anchor, Parent, Anchor2, X, Y = VehicleSeatIndicator:GetPoint()
 
 		if Anchor then
-			self:SetPoint(Anchor, Parent, Anchor2, X, Y)
+			self:SetPoint(Anchor, Parent, Anchor2, X, Y - 80)
 		else
 			self:SetPoint("CENTER", UIParent, 0, 0)
 		end
