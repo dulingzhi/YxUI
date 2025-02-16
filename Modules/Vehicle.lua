@@ -24,7 +24,6 @@ function Vehicle:Load()
 
     self:SetAttribute('_onstate-exit', [[ if CanExitVehicle() then self:Show() else self:Hide() end ]])
     if (not CanExitVehicle()) then
-        self:SetAlpha(0)
         self:Hide()
     end
 
