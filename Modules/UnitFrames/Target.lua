@@ -156,7 +156,7 @@ YxUI.StyleFuncs["target"] = function(self, unit)
     self.Portrait = Portrait
 
 	-- Target Icon
-	local RaidTarget = Health:CreateTexture(nil, 'OVERLAY')
+	local RaidTarget = Health:CreateTexture(nil, 'OVERLAY', nil, 2)
 	RaidTarget:SetSize(16, 16)
 	RaidTarget:SetPoint("CENTER", Health, "TOP")
 
