@@ -127,6 +127,11 @@ local function OnUpdate(self, elapsed)
                 end
 
                 statusbar:SetValue(value)
+                if not statusbar.startTime then
+                    statusbar:SetALpha(0)
+                else
+                    statusbar:SetAlpha(1)
+                end
 
                 if statusbar.Text then
                     statusbar.Text:SetFormattedText('%.1f / %.1f', value, max)
@@ -146,6 +151,11 @@ local function OnUpdate(self, elapsed)
                 end
 
                 statusbar:SetValue(value)
+                if not statusbar.startTime then
+                    statusbar:SetALpha(0)
+                else
+                    statusbar:SetAlpha(1)
+                end
 
                 if statusbar.Text then
                     statusbar.Text:SetFormattedText('%.1f / %.1f', value, max)
