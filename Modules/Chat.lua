@@ -26,6 +26,7 @@ D['chat-fade-time'] = 15
 D['chat-link-tooltip'] = true
 D['chat-shorten-channels'] = true
 D['chat-history-enable'] = true
+D['chat-history-character'] = false
 
 D['right-window-enable'] = false
 D['right-window-size'] = 'SINGLE'
@@ -1324,6 +1325,7 @@ Y:GetModule('GUI'):AddWidgets(L['General'], L['Chat'], function(left, right)
     left:CreateSwitch('chat-link-tooltip', C['chat-link-tooltip'], L['Show Link Tooltips'], L['Display a tooltip when hovering over links in chat'], UpdateEnableLinks)
     left:CreateSwitch('chat-shorten-channels', C['chat-shorten-channels'], L['Shorten Channel Names'], L['Shorten chat channel names to their channel number'], UpdateShortenChannels)
     left:CreateSwitch('chat-history-enable', C['chat-history-enable'], L['Enable Chat History'], L['Log chat history']):RequiresReload(true)
+    left:CreateSwitch('chat-history-character', C['chat-history-character'], L['Chat History pre-Character'], L['Chat history split for characters']):RequiresReload(true)
 
     right:CreateHeader(L['Install'])
     right:CreateButton('', L['Install'], L['Install Chat Defaults'], L['Set default channels and settings related to chat'], RunChatInstall):RequiresReload(true)

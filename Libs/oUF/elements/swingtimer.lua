@@ -128,7 +128,7 @@ local function OnUpdate(self, elapsed)
 
                 statusbar:SetValue(value)
                 if not statusbar.startTime then
-                    statusbar:SetALpha(0)
+                    statusbar:SetAlpha(0)
                 else
                     statusbar:SetAlpha(1)
                 end
