@@ -11,7 +11,7 @@ local UnitIsPlayer = UnitIsPlayer
 local Class, Colors, _
 
 Defaults["unitframes-only-player-debuffs"] = false
-Defaults["unitframes-show-player-buffs"] = true
+Defaults["unitframes-show-player-buffs"] = false
 Defaults["unitframes-show-player-debuffs"] = true
 Defaults["unitframes-show-target-buffs"] = true
 Defaults["unitframes-show-target-debuffs"] = true

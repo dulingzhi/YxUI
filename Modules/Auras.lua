@@ -451,9 +451,9 @@ YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Auras"], functio
 	left:CreateSlider("auras-per-row", Settings["auras-per-row"], 8, 16, 1, Language["Auras Per Row"], Language["Set the number of auras per row"], UpdateAurasPerRow)
 
 	left:CreateHeader(Language["Font"])
-	left:CreateDropdown("auras-font", Settings["auras-font"], Assets:GetFontList(), Language["Font"], "Set the font of the auras", UpdateAuraFont, "Font")
-	left:CreateSlider("auras-font-size", Settings["auras-font-size"], 8, 32, 1, "Font Size", "Set the font size of the auras", UpdateAuraFont)
-	left:CreateDropdown("auras-font-flags", Settings["auras-font-flags"], Assets:GetFlagsList(), Language["Font Flags"], "Set the font flags of the auras", UpdateAuraFont)
+	left:CreateDropdown("auras-font", Settings["auras-font"], Assets:GetFontList(), Language["Font"], Language["Set the font of the auras"], UpdateAuraFont, "Font")
+	left:CreateSlider("auras-font-size", Settings["auras-font-size"], 8, 32, 1, Language["Font Size"], Language["Set the font size of the auras"], UpdateAuraFont)
+	left:CreateDropdown("auras-font-flags", Settings["auras-font-flags"], Assets:GetFlagsList(), Language["Font Flags"], Language["Set the font flags of the auras"], UpdateAuraFont)
 
 	right:CreateHeader(Language["Duration Text"])
 	right:CreateSlider("auras-duration-xoffset", Settings["auras-duration-xoffset"], -30, 30, 1, Language["X Offset"], Language["Set the x-axis offset of the duration text"], UpdateDurationPosition)

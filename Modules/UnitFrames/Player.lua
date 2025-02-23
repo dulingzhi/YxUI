@@ -1521,7 +1521,7 @@ Y:GetModule("GUI"):AddWidgets(L["General"], L["Player"], L["Unit Frames"], funct
 
 	left:CreateHeader(L["Health"])
 	left:CreateSwitch("unitframes-player-health-reverse", C["unitframes-player-health-reverse"], L["Reverse Health Fill"], L["Reverse the fill of the health bar"], UpdatePlayerHealthFill)
-	left:CreateSlider("unitframes-player-health-height", C["unitframes-player-health-height"], 6, 60, 1, "Health Bar Height", "Set the height of the player health bar", UpdatePlayerHealthHeight)
+	left:CreateSlider("unitframes-player-health-height", C["unitframes-player-health-height"], 6, 60, 1, L["Health Bar Height"], L["Set the height of the player health bar"], UpdatePlayerHealthHeight)
 	left:CreateDropdown("unitframes-player-health-color", C["unitframes-player-health-color"], {[L["Class"]] = "CLASS", [L["Reaction"]] = "REACTION", [L["Custom"]] = "CUSTOM"}, L["Health Bar Color"], L["Set the color of the health bar"], UpdatePlayerHealthColor)
 	left:CreateInput("unitframes-player-health-left", C["unitframes-player-health-left"], L["Left Health Text"], L["Set the text on the left of the player health bar"], ReloadUI):RequiresReload(true)
 	left:CreateInput("unitframes-player-health-right", C["unitframes-player-health-right"], L["Right Health Text"], L["Set the text on the right of the player health bar"], ReloadUI):RequiresReload(true)
@@ -1529,19 +1529,19 @@ Y:GetModule("GUI"):AddWidgets(L["General"], L["Player"], L["Unit Frames"], funct
 
 	left:CreateHeader(L["Buffs"])
 	left:CreateSwitch("unitframes-show-player-buffs", C["unitframes-show-player-buffs"], L["Show Player Buffs"], L["Show your auras above the player unit frame"], UpdateDisplayedAuras)
-	left:CreateSlider("PlayerBuffSize", C.PlayerBuffSize, 26, 50, 2, "Set Size", "Set the size of the auras", UpdateBuffSize)
-	left:CreateSlider("PlayerBuffSpacing", C.PlayerBuffSpacing, -1, 10, 1, "Set Spacing", "Set the spacing between the auras", UpdateBuffSpacing)
+	left:CreateSlider("PlayerBuffSize", C.PlayerBuffSize, 26, 50, 2, L["Set Size"], L["Set the size of the auras"], UpdateBuffSize)
+	left:CreateSlider("PlayerBuffSpacing", C.PlayerBuffSpacing, -1, 10, 1, L["Set Spacing"], L["Set the spacing between the auras"], UpdateBuffSpacing)
 
 	left:CreateHeader(L["Debuffs"])
 	left:CreateSwitch("unitframes-show-player-debuffs", C["unitframes-show-player-debuffs"], L["Show Player Debuffs"], L["Show your debuff auras above the player unit frame"], UpdateDisplayedAuras)
-	left:CreateSlider("PlayerDebuffSize", C.PlayerDebuffSize, 26, 50, 2, "Set Size", "Set the size of the auras", UpdateDebuffSize)
-	left:CreateSlider("PlayerDebuffSpacing", C.PlayerDebuffSpacing, -1, 10, 1, "Set Spacing", "Set the spacing between the auras", UpdateDebuffSpacing)
+	left:CreateSlider("PlayerDebuffSize", C.PlayerDebuffSize, 26, 50, 2, L["Set Size"], L["Set the size of the auras"], UpdateDebuffSize)
+	left:CreateSlider("PlayerDebuffSpacing", C.PlayerDebuffSpacing, -1, 10, 1, L["Set Spacing"], L["Set the spacing between the auras"], UpdateDebuffSpacing)
 
 	right:CreateHeader(L["Power"])
 	right:CreateSwitch("unitframes-player-enable-power", C["unitframes-player-enable-power"], L["Enable Power Bar"], L["Enable the player power bar"], ReloadUI):RequiresReload(true)
 	right:CreateSwitch("unitframes-player-power-reverse", C["unitframes-player-power-reverse"], L["Reverse Power Fill"], L["Reverse the fill of the power bar"], UpdatePlayerPowerFill)
 	right:CreateSwitch("player-move-power", C["player-move-power"], L["Detach Power"], L["Detach the power bar from the unit frame"], UpdatePowerBarPosition)
-	right:CreateSlider("unitframes-player-power-height", C["unitframes-player-power-height"], 2, 30, 1, "Power Bar Height", "Set the height of the player power bar", UpdatePlayerPowerHeight)
+	right:CreateSlider("unitframes-player-power-height", C["unitframes-player-power-height"], 2, 30, 1, L["Power Bar Height"], L["Set the height of the player power bar"], UpdatePlayerPowerHeight)
 	right:CreateDropdown("unitframes-player-power-color", C["unitframes-player-power-color"], {[L["Class"]] = "CLASS", [L["Reaction"]] = "REACTION", [L["Power Type"]] = "POWER"}, L["Power Bar Color"], L["Set the color of the power bar"], UpdatePlayerPowerColor)
 	right:CreateInput("unitframes-player-power-left", C["unitframes-player-power-left"], L["Left Power Text"], L["Set the text on the left of the player power bar"], ReloadUI):RequiresReload(true)
 	right:CreateInput("unitframes-player-power-right", C["unitframes-player-power-right"], L["Right Power Text"], L["Set the text on the right of the player power bar"], ReloadUI):RequiresReload(true)
