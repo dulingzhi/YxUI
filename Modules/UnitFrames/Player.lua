@@ -1,4 +1,4 @@
-local Y, L, A, C, D = select(2, ...):get()
+local Y, L, A, C, D = YxUIGlobal:get()
 
 D["unitframes-player-width"] = 200
 D["unitframes-player-health-height"] = 34
