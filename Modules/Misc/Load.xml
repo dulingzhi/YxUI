@@ -6,4 +6,5 @@
   <Script file="ActionBarPager.lua"/>
   <Script file="RaidTools.lua"/>
   <Script file="Gossip.lua"/>
+  <Script file="ClickCast.lua"/>
 </Ui>
