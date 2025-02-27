@@ -48,7 +48,7 @@ function Module:CreatePanel()
     self:SetSize(120, 22)
     self:SetFrameLevel(2)
     self:SkinButton()
-    self:SetPoint('TOP', Y.UIParent, 0, -8)
+    self:SetPoint('TOP', Y.UIParent, -220, -8)
     Y:CreateMover(self)
 
     self:UpdateVisibility()

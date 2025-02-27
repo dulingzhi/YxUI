@@ -32,6 +32,7 @@ local ClientToName = {
 	AUKS = Language["Call of Duty: MWII"],
 	Fen = Language["Diablo IV"],
 	GRY = Language["Warcraft Rumble"],
+	W3 = Language["Warcraft III"],
 }
 
 local ProjectIDToName = {
@@ -298,6 +299,20 @@ ClientInfo["Fen"] = function(name, id)
 end
 
 ClientInfo["GRY"] = function(name, id)
+	local HasFocus, CharacterName, Client, RealmName, RealmID, Faction, Race, Class, Blank, Area, Level, RichPresence, CustomMessage, CustomMessageTime, IsOnline, GameAccountID, BNetAccountID, IsAFK, IsBusy = BNGetGameAccountInfo(id)
+
+	if IsAFK then
+		name = format("|cFF00FFF6%s|r |cFFFFFF33%s|r", name, CHAT_FLAG_AFK)
+	elseif IsBusy then
+		name = format("|cFF00FFF6%s|r |cFFFFFF33%s|r", name, CHAT_FLAG_DND)
+	else
+		name = format("|cFF00FFF6%s|r", name)
+	end
+
+	return ClientToName[Client], name, RichPresence
+end
+
+ClientInfo["W3"] = function(name, id)
 	local HasFocus, CharacterName, Client, RealmName, RealmID, Faction, Race, Class, Blank, Area, Level, RichPresence, CustomMessage, CustomMessageTime, IsOnline, GameAccountID, BNetAccountID, IsAFK, IsBusy = BNGetGameAccountInfo(id)
 
 	if IsAFK then

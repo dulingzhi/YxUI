@@ -12,8 +12,8 @@ local GetQuests, GetSpecInfo
 local GetNumLoadedAddOns = function()
 	local NumLoaded = 0
 
-	for i = 1, GetNumAddOns() do
-		if IsAddOnLoaded(i) then
+	for i = 1, C_AddOns.GetNumAddOns() do
+		if C_AddOns.IsAddOnLoaded(i) then
 			NumLoaded = NumLoaded + 1
 		end
 	end
@@ -116,6 +116,14 @@ else
 	end
 end
 
+local UpdateZoneInfo = function()
+	local ZoneText = GetZoneText()
+	local SubZoneText = GetMinimapZoneText()
+
+	GUI:GetWidget("dbg-zone").Right:SetText(ZoneText)
+	GUI:GetWidget("dbg-subzone").Right:SetText(SubZoneText)
+end
+
 local OnShow = function()
 	Debug:RegisterEvent("ZONE_CHANGED")
 	Debug:RegisterEvent("ZONE_CHANGED_INDOORS")
@@ -171,7 +179,7 @@ GUI:AddWidgets(Language["Info"], Language["Debug"], function(left, right)
 	right:CreateDoubleLine("dbg-trial", Language["Trial Account"], IsTrialAccount() and YES or NO)
 
 	right:CreateHeader(Language["AddOns Information"])
-	right:CreateDoubleLine("dbg-total-addons", Language["Total AddOns"], GetNumAddOns())
+	right:CreateDoubleLine("dbg-total-addons", Language["Total AddOns"], C_AddOns.GetNumAddOns())
 	right:CreateDoubleLine("dbg-loaded-addons", Language["Loaded AddOns"], GetNumLoadedAddOns())
 	right:CreateDoubleLine("dbg-loaded-plugins", Language["Loaded Plugins"], #YxUI.Plugins)
 end)
@@ -186,21 +194,6 @@ function Debug:UI_SCALE_CHANGED()
 	GUI:GetWidget("dbg-suggested-scale").Right:SetText((768 / select(2, GetPhysicalScreenSize())))
 end
 
-function Debug:ZONE_CHANGED()
-	GUI:GetWidget("dbg-zone").Right:SetText(GetZoneText())
-	GUI:GetWidget("dbg-subzone").Right:SetText(GetMinimapZoneText())
-end
-
-function Debug:ZONE_CHANGED_INDOORS()
-	GUI:GetWidget("dbg-zone").Right:SetText(GetZoneText())
-	GUI:GetWidget("dbg-subzone").Right:SetText(GetMinimapZoneText())
-end
-
-function Debug:ZONE_CHANGED_NEW_AREA()
-	GUI:GetWidget("dbg-zone").Right:SetText(GetZoneText())
-	GUI:GetWidget("dbg-subzone").Right:SetText(GetMinimapZoneText())
-end
-
 function Debug:PLAYER_LEVEL_UP()
 	GUI:GetWidget("dbg-level").Right:SetText(UnitLevel("player"))
 end
@@ -210,7 +203,8 @@ function Debug:QUEST_LOG_UPDATE()
 end
 
 function Debug:ADDON_LOADED()
-	GUI:GetWidget("dbg-loaded-addons").Right:SetText(GetLoadedAddOns())
+    local get = GetLoadedAddOns or GetNumLoadedAddOns
+	GUI:GetWidget("dbg-loaded-addons").Right:SetText(get())
 end
 
 function Debug:CVAR_UPDATE(cvar)
@@ -222,6 +216,10 @@ end
 function Debug:CHARACTER_POINTS_CHANGED()
 	GUI:GetWidget("dbg-spec").Right:SetText(GetSpecInfo())
 end
+
+Debug.ZONE_CHANGED = UpdateZoneInfo
+Debug.ZONE_CHANGED_INDOORS = UpdateZoneInfo
+Debug.ZONE_CHANGED_NEW_AREA = UpdateZoneInfo
 
 function Debug:OnEvent(event)
 	if self[event] then

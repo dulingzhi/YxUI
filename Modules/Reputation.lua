@@ -5,6 +5,7 @@ local Reputation = Y:NewModule("Reputation")
 local format = format
 local floor = floor
 local GetWatchedFactionInfo = GetWatchedFactionInfo
+local GetWatchedFactionData = C_Reputation and C_Reputation.GetWatchedFactionData
 
 D["reputation-enable"] = true
 D["reputation-width"] = 316 -- 310
@@ -157,14 +158,14 @@ function Reputation:OnEvent()
 	local Name, StandingID, Min, Max, Value
 
 	if Y.IsMainline then
-		local Data = C_Reputation.GetWatchedFactionData()
+		local Data = GetWatchedFactionData()
 		
 		if Data then
 			Name = Data.name
-			StandingID = Data.currentStanding
-			Min = Data.reaction
-			Max = Data.currentReactionThreshold
-			Value = Data.currentReactionThreshold
+			StandingID = Data.reaction
+			Min = Data.currentReactionThreshold
+			Max = Data.nextReactionThreshold
+			Value = Data.currentStanding
 		end
 	else
 		Name, StandingID, Min, Max, Value = GetWatchedFactionInfo()
@@ -227,7 +228,21 @@ function Reputation:OnEnter()
 
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -8)
 
-	local Name, StandingID, Min, Max, Value, FactionID = GetWatchedFactionInfo()
+	local Name, StandingID, Min, Max, Value
+
+	if Y.IsMainline then
+		local Data = GetWatchedFactionData()
+
+		if Data then
+			Name = Data.name
+			StandingID = Data.reaction
+			Min = Data.currentReactionThreshold
+			Max = Data.nextReactionThreshold
+			Value = Data.currentStanding
+		end
+	else
+		Name, StandingID, Min, Max, Value = GetWatchedFactionInfo()
+	end
 
 	if (not Name) then
 		return
