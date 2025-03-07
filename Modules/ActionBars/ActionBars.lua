@@ -1328,7 +1328,7 @@ function AB:CreateBars()
         self:CreateExtraBar()
     end
 
-    if (MultiCastActionBarFrame and MultiCastActionBarFrame.numActiveSlots and MultiCastActionBarFrame.numActiveSlots > 0) then
+    if (MultiCastActionBarFrame and Y.UserClass == 'SHAMAN') then
         self:StyleTotemBar()
         --MultiCastActionBarFrame:SetParent(UIParent)
         --MultiCastActionBarFrame:ClearAllPoints()
