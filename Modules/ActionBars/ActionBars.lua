@@ -1550,6 +1550,7 @@ function AB:StyleTotemBar()
     self.TotemBar:SetSize((30 * 6) + (2 * 5), 30)
     self:UpdateTotemBarPosition()
 
+    MultiCastActionBarFrame_Update(MultiCastActionBarFrame)
     MultiCastActionBarFrame:SetParent(self.TotemBar)
     MultiCastSummonSpellButton:SetParent(self.TotemBar)
     MultiCastSummonSpellButton:ClearAllPoints()
