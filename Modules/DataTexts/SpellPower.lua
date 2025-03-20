@@ -20,10 +20,10 @@ end
 local GetSpecInfo = function()
 	local MainSpecID
 	local HighestPoints = 0
-	local Name, PointsSpent, _
+	local Name, PointsSpent
 
 	for i = 1, 3 do
-		Name, _, PointsSpent = GetTalentTabInfo(i)
+		PointsSpent, Name = GetTalentTabInfo(i)
 
 		if Name then
 			if (PointsSpent > HighestPoints) then
