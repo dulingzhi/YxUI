@@ -671,7 +671,7 @@ Y.StyleFuncs["player"] = function(self, unit)
 
 			self.Runes = Runes
 			self.AuraParent = Runes
-		elseif (Y.UserClass == "PALADIN" and (Y.IsMainline or Y.IsCata)) then
+		elseif (Y.UserClass == "PALADIN" and (Y.ClientVersion > 40000)) then
 			local Count = Y.IsMainline and 5 or 3
 		
 			local HolyPower = CreateFrame("Frame", self:GetName() .. "HolyPower", self, "BackdropTemplate")
