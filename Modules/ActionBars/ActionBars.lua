@@ -1329,7 +1329,16 @@ function AB:CreateBars()
     end
 
     if (MultiCastActionBarFrame and Y.UserClass == 'SHAMAN') then
-        self:StyleTotemBar()
+        if MultiCastActionBarFrame.numActiveSlots == 0 then
+            C_Timer.After(1, function()
+                if not InCombatLockdown() then
+                    MultiCastActionBarFrame_Update(MultiCastActionBarFrame)
+                    self:StyleTotemBar()
+                end
+            end)
+        else
+            self:StyleTotemBar()
+        end
         --MultiCastActionBarFrame:SetParent(UIParent)
         --MultiCastActionBarFrame:ClearAllPoints()
         --MultiCastActionBarFrame:SetPoint("BOTTOMLEFT", UIParent, 300, 20)
@@ -1550,7 +1559,6 @@ function AB:StyleTotemBar()
     self.TotemBar:SetSize((30 * 6) + (2 * 5), 30)
     self:UpdateTotemBarPosition()
 
-    MultiCastActionBarFrame_Update(MultiCastActionBarFrame)
     MultiCastActionBarFrame:SetParent(self.TotemBar)
     MultiCastSummonSpellButton:SetParent(self.TotemBar)
     MultiCastSummonSpellButton:ClearAllPoints()

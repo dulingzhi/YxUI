@@ -49,14 +49,18 @@ elseif YxUI.IsCata then
         TalentMicroButton,
         AchievementMicroButton,
         QuestLogMicroButton,
-        GuildMicroButton,
         CollectionsMicroButton,
         PVPMicroButton,
         LFGMicroButton,
-        EJMicroButton,
         MainMenuMicroButton,
         HelpMicroButton,
     }
+    if EJMicroButton then
+        table.insert(MicroButtons.Buttons, #MicroButtons.Buttons - 2, EJMicroButton)
+    end
+    if GuildMicroButton and GuildMicroButton:IsShown() then
+        table.insert(MicroButtons.Buttons, 6, GuildMicroButton)
+    end
 else
     MicroButtons.Buttons = {
         CharacterMicroButton,
