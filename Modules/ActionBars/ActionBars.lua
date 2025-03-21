@@ -1050,6 +1050,7 @@ function AB:CreatePetBar()
 
     if PetActionBar then
         PetActionBar:SetParent(self.PetBar)
+		PetActionBar:SetAllPoints(self.PetBar)
 
         hooksecurefunc(PetActionBar, "UpdateGridLayout", PetBarUpdateGridLayout)
     else

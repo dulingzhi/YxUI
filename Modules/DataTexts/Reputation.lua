@@ -1,5 +1,8 @@
 local YxUI, Language, Assets, Settings = select(2, ...):get()
 
+local GetWatchedFactionInfo = GetWatchedFactionInfo
+local GetWatchedFactionData = C_Reputation and C_Reputation.GetWatchedFactionData
+
 local OnMouseUp = function()
 	ToggleCharacter("ReputationFrame")
 end
@@ -7,7 +10,21 @@ end
 local OnEnter = function(self)
 	self:SetTooltip()
 
-	local Name, StandingID, Min, Max, Value, FactionID = GetWatchedFactionInfo()
+    local Name, StandingID, Min, Max, Value
+
+	if YxUI.IsMainline then
+		local Data = GetWatchedFactionData()
+
+		if Data then
+			Name = Data.name
+			StandingID = Data.reaction
+			Min = Data.currentReactionThreshold
+			Max = Data.nextReactionThreshold
+			Value = Data.currentStanding
+		end
+	else
+		Name, StandingID, Min, Max, Value = GetWatchedFactionInfo()
+	end
 
 	if (not Name) then
 		return
@@ -41,7 +58,21 @@ local OnLeave = function()
 end
 
 local Update = function(self)
-	local Name, StandingID, Min, Max, Value, FactionID = GetWatchedFactionInfo()
+	local Name, StandingID, Min, Max, Value
+
+	if YxUI.IsMainline then
+		local Data = GetWatchedFactionData()
+
+		if Data then
+			Name = Data.name
+			StandingID = Data.reaction
+			Min = Data.currentReactionThreshold
+			Max = Data.nextReactionThreshold
+			Value = Data.currentStanding
+		end
+	else
+		Name, StandingID, Min, Max, Value = GetWatchedFactionInfo()
+	end
 
 	if Name then
 		Max = Max - Min

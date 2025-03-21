@@ -1120,7 +1120,7 @@ function GUI:CreateGUI()
 	self.FadeOut:SetScript("OnFinished", FadeOnFinished)
 
 	self.Fader = LibMotion:CreateAnimation(self, "Fade")
-	self.Fader:SetDuration(0.5)
+	self.Fader:SetDuration(0.2)
 
 	-- Header
 	self.Header = CreateFrame("Frame", nil, self, "BackdropTemplate")
@@ -1400,33 +1400,21 @@ end
 
 -- Enabling the mouse wheel will stop the scrolling if we pass over a widget, but I really want mousewheeling
 function GUI:MODIFIER_STATE_CHANGED(key, state)
-	if GetMouseFocus then
-		local MouseFocus = GetMouseFocus()
-
-		if (not MouseFocus) then
-			return
-		end
-
-		if (MouseFocus.OnMouseWheel and state == 1) then
-			MouseFocus:SetScript("OnMouseWheel", MouseFocus.OnMouseWheel)
-		elseif (MouseFocus.HasScript and MouseFocus:HasScript("OnMouseWheel")) then
-			MouseFocus:SetScript("OnMouseWheel", nil)
-		end
-	elseif GetMouseFoci then
-		local MouseFocus = GetMouseFoci()
-
-		if (not MouseFocus) then
-			return
-		end
-
-		local Focus = MouseFocus[1]
-
-		if (Focus.OnMouseWheel and state == 1) then
-			Focus:SetScript("OnMouseWheel", Focus.OnMouseWheel)
-		elseif (Focus.HasScript and Focus:HasScript("OnMouseWheel")) then
-			Focus:SetScript("OnMouseWheel", nil)
-		end
-	end
+    local MouseFocus
+    if GetMouseFocus then
+        MouseFocus = GetMouseFocus()
+    elseif GetMouseFoci then
+        MouseFocus = GetMouseFoci()
+        MouseFocus = MouseFocus and MouseFocus[1]
+    end
+    if (not MouseFocus) then
+        return
+    end
+    if (MouseFocus.OnMouseWheel and state == 1) then
+        MouseFocus:SetScript("OnMouseWheel", MouseFocus.OnMouseWheel)
+    elseif (MouseFocus.HasScript and MouseFocus:HasScript("OnMouseWheel")) then
+        MouseFocus:SetScript("OnMouseWheel", nil)
+    end
 end
 
 function GUI:PLAYER_STARTED_MOVING()
