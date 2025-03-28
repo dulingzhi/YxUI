@@ -66,6 +66,10 @@ if (Y.UserLocale == 'enGB') then
     Y.UserLocale = 'enUS'
 end
 
+-- disable CPU Profilter
+C_CVar.RegisterCVar("addonProfilerEnabled", "1")
+C_CVar.SetCVar("addonProfilerEnabled", "0")
+
 -- Lists
 Y.ClassList = {}
 Y.ClassColors = {}

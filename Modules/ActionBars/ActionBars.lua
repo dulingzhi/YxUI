@@ -1330,7 +1330,7 @@ function AB:CreateBars()
     end
 
     if (MultiCastActionBarFrame and Y.UserClass == 'SHAMAN') then
-        if MultiCastActionBarFrame.numActiveSlots == 0 then
+        if not MultiCastActionBarFrame.numActiveSlots or MultiCastActionBarFrame.numActiveSlots == 0 then
             C_Timer.After(1, function()
                 if not InCombatLockdown() then
                     MultiCastActionBarFrame_Update(MultiCastActionBarFrame)
@@ -1344,10 +1344,6 @@ function AB:CreateBars()
         --MultiCastActionBarFrame:ClearAllPoints()
         --MultiCastActionBarFrame:SetPoint("BOTTOMLEFT", UIParent, 300, 20)
     end
-end
-
-if MultiCastActionBarFrame then
-    MultiCastActionBarFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 -- Black magic, the movers won't budge if a secure frame is positioned on it
@@ -1481,16 +1477,16 @@ local MultiCastSummonSpellButton_Update = function()
         local Button = _G["MultiCastActionButton" .. i]
         Button:ClearAllPoints()
 
-        if (i == 1 or i == 5 or i == 9) then
-            Button:SetPoint("LEFT", MultiCastSummonSpellButton, "RIGHT", 2, 0)
+        if (i % 4) == 1 then
+            Button:SetPoint("LEFT", MultiCastSummonSpellButton, "RIGHT", 5, 0)
         else
-            Button:SetPoint("LEFT", _G["MultiCastActionButton" .. i - 1], "RIGHT", 2, 0)
+            Button:SetPoint("LEFT", _G["MultiCastActionButton" .. i - 1], "RIGHT", 5, 0)
         end
     end
 end
 local MultiCastRecallSpellButton_Update = function()
     MultiCastRecallSpellButton:ClearAllPoints()
-    MultiCastRecallSpellButton:SetPoint("LEFT", MultiCastActionButton4, "RIGHT", 2, 0)
+    MultiCastRecallSpellButton:SetPoint("LEFT", MultiCastActionButton4, "RIGHT", 5, 0)
 end
 
 local MultiCastFlyoutFrame_ToggleFlyout = function(frame, type, parent)
@@ -1602,7 +1598,7 @@ function AB:StyleTotemBar()
 
         --Button:ClearAllPoints()
 
-        if (i == 1 or i == 5 or i == 9) then
+        if (i % 4) == 1 then
             Button:SetPoint("LEFT", MultiCastSummonSpellButton, "RIGHT", 5, 0)
         else
             Button:SetPoint("LEFT", _G["MultiCastActionButton" .. i - 1], "RIGHT", 5, 0)
