@@ -99,17 +99,17 @@ function ZT:CreateFontObjects()
 		SubFrame.Group = LibMotion:CreateAnimationGroup()
 
 		SubFrame.FadeIn = LibMotion:CreateAnimation(SubFrame, "fade")
+		SubFrame.FadeIn:SetGroup(SubFrame.Group)
 		SubFrame.FadeIn:SetEasing("in")
 		SubFrame.FadeIn:SetDuration(0.4)
 		SubFrame.FadeIn:SetEndDelay(2.5)
 		SubFrame.FadeIn:SetChange(1)
-		SubFrame.FadeIn:SetGroup(SubFrame.Group)
 
 		SubFrame.FadeOut = LibMotion:CreateAnimation(SubFrame, "fade")
+		SubFrame.FadeOut:SetGroup(SubFrame.Group)
 		SubFrame.FadeOut:SetEasing("out")
 		SubFrame.FadeOut:SetDuration(0.75)
 		SubFrame.FadeOut:SetChange(0)
-		SubFrame.FadeOut:SetGroup(SubFrame.Group)
 		SubFrame.FadeOut:SetOrder(2)
 		
 		ZoneFrame[i] = SubFrame
