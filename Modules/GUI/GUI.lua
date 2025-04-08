@@ -1274,6 +1274,13 @@ function GUI:CreateGUI()
 		GUI.ScaleOut:Play()
 		GUI.FadeOut:Play()
 
+		GUI:UnregisterEvent("MODIFIER_STATE_CHANGED")
+
+		if Settings["gui-enable-fade"] then
+			GUI:UnregisterEvent("PLAYER_STARTED_MOVING")
+			GUI:UnregisterEvent("PLAYER_STOPPED_MOVING")
+		end
+    
 		if (GUI.ColorPicker and GUI.ColorPicker:GetAlpha() > 0) then
 			GUI.ColorPicker.FadeOut:Play()
 		end
@@ -1400,6 +1407,9 @@ end
 
 -- Enabling the mouse wheel will stop the scrolling if we pass over a widget, but I really want mousewheeling
 function GUI:MODIFIER_STATE_CHANGED(key, state)
+    if not self:IsMouseOver() then
+        return
+    end
     local MouseFocus
     if GetMouseFocus then
         MouseFocus = GetMouseFocus()
