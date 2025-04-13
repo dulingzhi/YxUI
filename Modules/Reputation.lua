@@ -202,7 +202,9 @@ function Reputation:OnEvent()
 end
 
 function Reputation:OnMouseUp()
-	ToggleCharacter("ReputationFrame")
+	if not InCombatLockdown() then
+		ToggleCharacter("ReputationFrame")
+	end
 end
 
 function Reputation:OnEnter()
