@@ -318,12 +318,12 @@ end
 
 local OnEditFocusLost = function(self)
     Chat.EditBox:SetAlpha(0)
-    Chat.EditBox:EnableMouse(false)
+    self:EnableMouse(false)
 end
 
 local OnEditFocusGained = function(self)
     Chat.EditBox:SetAlpha(1)
-    Chat.EditBox:EnableMouse(true)
+    self:EnableMouse(true)
 end
 
 local CheckForBottom = function(self)

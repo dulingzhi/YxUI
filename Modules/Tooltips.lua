@@ -445,9 +445,12 @@ local function GetLine(self, index)
 end
 
 local function AppendText(object, text, align)
-    if text and object and object:GetText() then
-        object:SetText(text .. '|n' .. object:GetText())
-        object:SetJustifyH(align)
+    if text and object then
+        local oldText = object:GetText()
+        if oldText and not string.find(oldText, text) then
+            object:SetText(text .. '|n' .. oldText)
+            object:SetJustifyH(align)
+        end
     end
 end
 
