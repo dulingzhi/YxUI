@@ -1,6 +1,6 @@
 ## Interface: 110100
 ## Author: Jai
-## Version: 1.0.0
+## Version: 1.0
 ## Title: |cff5C8BCFYxUI|r
 ## Notes: Interface replacement for Shadowlands
 ## SavedVariables: YxUIProfileData, YxUIProfiles, YxUIData, YxUIGold
