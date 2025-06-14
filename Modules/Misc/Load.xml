@@ -1,7 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
   <Script file="Misc.lua"/>
   <Script file="AutoGreed.lua"/>
-  <Script file="Interrupts.lua"/>
   <Script file="AutoConfirm.lua"/>
   <Script file="ActionBarPager.lua"/>
   <Script file="RaidTools.lua"/>

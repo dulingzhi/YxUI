@@ -61,7 +61,7 @@ Announcements.Events = {
 		if Channel then
 			SendChatMessage(format(InterruptMessage, target, id, spell), Channel)
 		else
-			print(format(InterruptMessage, target, id, spell))
+			YxUI:print(format(InterruptMessage, target, id, spell))
 		end
 	end,
 
@@ -77,7 +77,7 @@ Announcements.Events = {
 		if Channel then
 			SendChatMessage(format(StolenMessage, target, id, spell), Channel)
 		else
-			print(format(StolenMessage, target, id, spell))
+			YxUI:print(format(StolenMessage, target, id, spell))
 		end
 	end,
 }
