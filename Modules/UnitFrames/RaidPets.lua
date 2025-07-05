@@ -10,10 +10,13 @@ Defaults["raid-pets-health-smooth"] = true
 Defaults["raid-pets-power-height"] = 0 -- NYI
 
 local UF = YxUI:GetModule("Unit Frames")
+local InCombatLockdown = InCombatLockdown
 
 YxUI.StyleFuncs["raidpet"] = function(self, unit)
 	-- General
-	self:RegisterForClicks("AnyUp")
+    if not InCombatLockdown() then
+        self:RegisterForClicks("AnyUp")
+    end
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
 	self:SetScript("OnLeave", UnitFrame_OnLeave)
 

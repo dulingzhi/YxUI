@@ -14,6 +14,7 @@ local GetWeaponEnchantInfo = GetWeaponEnchantInfo
 local GetInventoryItemTexture = GetInventoryItemTexture
 local GetInventoryItemQuality = GetInventoryItemQuality
 local ITEM_QUALITY_COLORS = ITEM_QUALITY_COLORS
+local InCombatLockdown = InCombatLockdown
 
 local DebuffColors = YxUI.DebuffColors
 
@@ -131,7 +132,9 @@ YxUIAuraOnEnter = function(self)
 end
 
 YxUISkinAura = function(button)
-	button:RegisterForClicks("RightButtonUp")
+    if not InCombatLockdown() then
+        button:RegisterForClicks("RightButtonUp")
+    end
     button:CreateBorder()
     button:StyleButton()
 
