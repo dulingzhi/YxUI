@@ -4,7 +4,7 @@ local ZT = YxUI:NewModule("Zone Text")
 
 local GetZoneText = GetZoneText
 local GetSubZoneText = GetSubZoneText
-local GetZonePVPInfo = GetZonePVPInfo
+local GetZonePVPInfo = GetZonePVPInfo or C_PvP.GetZonePVPInfo
 local SANCTUARY_TERRITORY = SANCTUARY_TERRITORY
 local FREE_FOR_ALL_TERRITORY = FREE_FOR_ALL_TERRITORY
 local FACTION_CONTROLLED_TERRITORY = FACTION_CONTROLLED_TERRITORY

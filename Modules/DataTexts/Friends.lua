@@ -40,6 +40,7 @@ local ProjectIDToName = {
 	[5] = EXPANSION_NAME1,
 	[11] = EXPANSION_NAME2,
 	[14] = EXPANSION_NAME3,
+	[19] = EXPANSION_NAME4,
 }
 
 local GetClass = function(class)
@@ -210,9 +211,10 @@ ClientInfo["WoW"] = function(name, info)
 	Class = GetClass(info.gameAccountInfo.className)
 
 	local ClassColor = YxUI.ClassColors[Class]
+	local ProjectName = ProjectIDToName[info.gameAccountInfo.wowProjectID] or CINEMATIC_NAME_1
 
 	if (not ClassColor) then
-		return ProjectIDToName[info.gameAccountInfo.wowProjectID], name
+		return ProjectName, name
 	end
 
 	ClassColor = YxUI:RGBToHex(ClassColor[1], ClassColor[2], ClassColor[3])
@@ -235,7 +237,7 @@ ClientInfo["WoW"] = function(name, info)
 		Area = format("|cFF33FF33%s|r", Area)
 	end
 
-	return ProjectIDToName[info.gameAccountInfo.wowProjectID], NameInfo, Area
+	return ProjectName, NameInfo, Area
 end
 
 ClientInfo["WTCG"] = function(name, info)

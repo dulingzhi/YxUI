@@ -49,6 +49,8 @@ local STAGGER_GREEN_INDEX = _G.STAGGER_GREEN_INDEX or 1
 local STAGGER_YELLOW_INDEX = _G.STAGGER_YELLOW_INDEX or 2
 local STAGGER_RED_INDEX = _G.STAGGER_RED_INDEX or 3
 
+local GetSpecialization = GetSpecialization or C_SpecializationInfo.GetSpecialization
+
 local function UpdateColor(self, event, unit)
 	if(unit and unit ~= self.unit) then return end
 	local element = self.Stagger

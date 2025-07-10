@@ -12,7 +12,7 @@ local PickupMerchantItem = PickupMerchantItem
 local GetCoinTextureString = GetCoinTextureString
 local CanGuildBankRepair = CanGuildBankRepair
 local GetGuildBankWithdrawMoney = GetGuildBankWithdrawMoney
-local GetItemInfo = GetItemInfo
+local GetItemInfo = GetItemInfo or C_Item.GetItemInfo
 
 Defaults["auto-vendor-enable"] = true
 Defaults["auto-vendor-report"] = true

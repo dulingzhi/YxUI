@@ -7,7 +7,7 @@ local oUF = ns.oUF
 
 local UnitPower = UnitPower
 local ShardsPower = Enum.PowerType.SoulShards
-local MAX_SHARDS = SHARD_BAR_NUM_SHARDS
+local MAX_SHARDS = SHARD_BAR_NUM_SHARDS or UnitPowerMax("player", ShardsPower)
 local Shards
 
 local Update = function(self, event, unit)

@@ -1,7 +1,7 @@
 local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetMinimapZoneText = GetMinimapZoneText
-local GetZonePVPInfo = GetZonePVPInfo
+local GetZonePVPInfo = GetZonePVPInfo or C_PvP.GetZonePVPInfo
 
 local OnEnter = function(self)
 	self:SetTooltip()

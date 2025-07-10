@@ -7,7 +7,7 @@ local oUF = ns.oUF
 
 local UnitPower = UnitPower
 local HolyPower = Enum.PowerType.HolyPower
-local MAX_POWER = MAX_HOLY_POWER
+local MAX_POWER = MAX_HOLY_POWER or UnitPowerMax("player", HolyPower or 9)
 local Power
 
 local Update = function(self, event, unit)

@@ -44,6 +44,7 @@ Y.IsClassic = Y.ClientVersion > 10000 and Y.ClientVersion < 20000
 Y.IsTBC = Y.ClientVersion > 20000 and Y.ClientVersion < 30000
 Y.IsWrath = false -- Y.ClientVersion > 30000 and Y.ClientVersion < 40000
 Y.IsCata = Y.ClientVersion > 30000 and Y.ClientVersion < 50000
+Y.IsMists = Y.ClientVersion > 50000 and Y.ClientVersion < 60000
 Y.IsMainline = Y.ClientVersion > 90000
 Y.Dummy = function()
 end

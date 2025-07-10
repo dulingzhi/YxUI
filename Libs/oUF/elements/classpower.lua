@@ -49,6 +49,8 @@ local oUF = ns.oUF
 
 local _, PlayerClass = UnitClass('player')
 
+local GetSpecialization = GetSpecialization or C_SpecializationInfo.GetSpecialization
+
 -- sourced from FrameXML/Constants.lua
 local SPEC_MAGE_ARCANE = _G.SPEC_MAGE_ARCANE or 1
 local SPEC_MONK_WINDWALKER = _G.SPEC_MONK_WINDWALKER or 3
@@ -116,7 +118,7 @@ local function Update(self, event, unit, powerType)
 		cur = UnitPower(unit, powerID, true)
 		max = UnitPowerMax(unit, powerID)
 		mod = UnitPowerDisplayMod(powerID)
-		chargedPoints = GetUnitChargedPowerPoints(unit)
+		chargedPoints = GetUnitChargedPowerPoints and GetUnitChargedPowerPoints(unit) or 0
 
 		-- UNIT_POWER_POINT_CHARGE doesn't provide a power type
 		powerType = powerType or ClassPowerType
@@ -258,7 +260,9 @@ do
 		self:RegisterEvent('UNIT_POWER_FREQUENT', Path)
 
 		-- according to Blizz any class may receive this event due to specific spell auras
-		self:RegisterEvent('UNIT_POWER_POINT_CHARGE', Path)
+        if select(4, GetBuildInfo()) >= 90000 then
+		    self:RegisterEvent('UNIT_POWER_POINT_CHARGE', Path)
+        end
 
 		self.ClassPower.__isEnabled = true
 

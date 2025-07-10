@@ -3,6 +3,7 @@ local YxUI, Language, Assets, Settings = select(2, ...):get()
 local Gold = YxUI:GetModule("Gold")
 
 local GetMoney = GetMoney
+local GetCoinTextureString = GetCoinTextureString or C_CurrencyInfo.GetCoinTextureString
 
 local OnEnter = function(self)
 	self:SetTooltip()

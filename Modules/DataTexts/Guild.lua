@@ -163,7 +163,7 @@ local OnMouseUp = function()
 
 	if YxUI.IsMainline then
 		ToggleCommunitiesFrame()
-	elseif YxUI.IsCata then
+	elseif YxUI.IsCata or YxUI.IsMists then
 		ToggleGuildFrame()
 	else
 		ToggleFriendsFrame(3)

@@ -48,7 +48,7 @@ local UnitIsGhost = UnitIsGhost
 local UnitIsDead = UnitIsDead
 local UnitClassification = UnitClassification
 local GetMouseFocus = GetMouseFocus
-local GetItemInfo = GetItemInfo
+local GetItemInfo = GetItemInfo or C_Item.GetItemInfo
 local GetItemIcon = GetItemIcon
 local InCombatLockdown = InCombatLockdown
 local UnitPlayerControlled = UnitPlayerControlled
@@ -62,6 +62,7 @@ local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local GetQuestDifficultyColor = GetQuestDifficultyColor
 local IsInRaid = IsInRaid
 local GetHappiness
+local GetCoinTextureString = GetCoinTextureString or C_CurrencyInfo.GetCoinTextureString
 
 local GameTooltipStatusBar = GameTooltipStatusBar
 local MyGuild
@@ -674,7 +675,7 @@ function Tooltips:AddHooks()
         end
     end
 
-    if (TooltipDataProcessor and not Y.IsCata) then
+    if (TooltipDataProcessor and not (Y.IsCata or Y.IsMists)) then
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit)
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetItem)
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, OnTooltipSetSpell)

@@ -41,6 +41,7 @@ local ProjectIDToName = {
 	[5] = EXPANSION_NAME1,
 	[11] = EXPANSION_NAME2,
 	[14] = EXPANSION_NAME3,
+	[19] = EXPANSION_NAME4,
 }
 
 local GetClass = function(class)
@@ -267,7 +268,8 @@ ClientInfo["WoW"] = function(name, id)
 		Area = format("|cFF33FF33%s|r", Area)
 	end
 
-	return ProjectIDToName[WoWProjectID], NameInfo, Area
+	local ProjectName = ProjectIDToName[WoWProjectID] or CINEMATIC_NAME_1
+	return ProjectName, NameInfo, Area
 end
 
 ClientInfo["WTCG"] = function(name, id)

@@ -211,7 +211,7 @@ local function load()
         end
     end
 
-    hooksecurefunc('SpellBookFrame_Update', function()
+    hooksecurefunc(SpellBookFrame, 'Update', function()
         if SpellBinder.sbOpen then
             SpellBinder:ToggleButtons()
         end

@@ -472,7 +472,13 @@ Y.StyleFuncs["player"] = function(self, unit)
 			self.ComboPoints = ComboPoints
 			self.AuraParent = ComboPoints
 		elseif (Y.UserClass == "WARLOCK" and (Y.IsMainline or Y.ClientVersion > 40000)) then
-			local Count = Y.IsMainline and 5 or 3
+			local Count = 3
+
+			if Y.IsMainline then
+				Count = 5
+			elseif Y.IsMists then
+				Count = 4
+			end
 		
 			local SoulShards = CreateFrame("Frame", self:GetName() .. "SoulShards", self, "BackdropTemplate")
 			SoulShards:SetSize(C["unitframes-player-width"], C["player-resource-height"] + 2)

@@ -3,6 +3,7 @@ local YxUI, Language, Assets, Settings = select(2, ...):get()
 local GetNumSlots
 local GetNumFreeSlots
 local ContainerToInventoryID
+local GetItemInfo = GetItemInfo or C_Item.GetItemInfo
 local NUM_BAG_SLOTS = NUM_BAG_SLOTS
 local Label = Language["Bags"]
 
