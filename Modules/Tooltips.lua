@@ -84,7 +84,8 @@ Tooltips.Handled = {
     ['FrameStackTooltip'] = 'Blizzard_DebugTools',
     ['EventTraceTooltip'] = 'Blizzard_EventTrace',
     ['LibDBIconTooltip'] = false,
-    ['AceConfigDialogTooltip'] = false
+    ['AceConfigDialogTooltip'] = false,
+    ['SAM_ADDON_LIST_TOOLTIP'] = false,
 }
 
 Tooltips.Classifications = {
