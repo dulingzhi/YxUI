@@ -1268,6 +1268,7 @@ function AB:CreateExtraBar()
     self.ExtraBar:SetSize(C["ab-extra-button-size"], C["ab-extra-button-size"])
     self.ExtraBar:SetPoint("CENTER", Y.UIParent, 0, -220)
 
+	ExtraActionBarFrame:SetParent(YxUIParent)
     ExtraActionBarFrame:ClearAllPoints()
     ExtraActionBarFrame:SetAllPoints(self.ExtraBar)
     ExtraActionButton1.style:SetAlpha(0)
@@ -1277,14 +1278,22 @@ function AB:CreateExtraBar()
     hooksecurefunc(ExtraActionBarFrame, "SetParent", UpdateExtraActionParent)
 
     self:StyleActionButton(ExtraActionButton1)
+    
+    if Y.IsMists then
+        --ExtraActionButton1:SetParent(ExtraActionBarFrame)
+        ExtraActionButton1:ClearAllPoints()
+        ExtraActionButton1:SetPoint("CENTER", ExtraActionBarFrame)
+    end
 
-    ZoneAbilityFrame:ClearAllPoints()
-    ZoneAbilityFrame:SetPoint("CENTER", self.ExtraBar)
-    ZoneAbilityFrame.Style:SetAlpha(0)
-    --ZoneAbilityFrame.ignoreInLayout = true
+	if ZoneAbilityFrame then
+        ZoneAbilityFrame:ClearAllPoints()
+        ZoneAbilityFrame:SetPoint("CENTER", self.ExtraBar)
+        ZoneAbilityFrame.Style:SetAlpha(0)
+        --ZoneAbilityFrame.ignoreInLayout = true
 
-    hooksecurefunc(ZoneAbilityFrame, "SetPoint", UpdateZoneAbilityPosition)
-    hooksecurefunc(ZoneAbilityFrame, "UpdateDisplayedZoneAbilities", SkinZoneAbilityButtons)
+        hooksecurefunc(ZoneAbilityFrame, "SetPoint", UpdateZoneAbilityPosition)
+        hooksecurefunc(ZoneAbilityFrame, "UpdateDisplayedZoneAbilities", SkinZoneAbilityButtons)
+    end
 end
 
 function AB:OnEvent(event, ...)
@@ -1325,7 +1334,8 @@ function AB:CreateBars()
         self:CreateStanceBar()
     end
 
-    if Y.IsMainline then
+    -- if Y.IsMainline then
+    if ExtraActionButton1 then
         self:CreateExtraBar()
     end
 
@@ -1392,7 +1402,8 @@ function AB:CreateMovers()
         Y:CreateMover(self.TotemBar)
     end
 
-    if Y.IsMainline then
+    if Y.IsMainline or Y.IsMists then -- Temporarily disabling the mover on Mists, causing issues
+	--if ExtraActionButton1 then
         self.ExtraBarMover = Y:CreateMover(self.ExtraBar)
     end
 

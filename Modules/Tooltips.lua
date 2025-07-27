@@ -393,7 +393,7 @@ local OnTooltipSetUnit = function(self)
                 else
                     Line:SetText(format('%s %s|r %s', LEVEL, Level, Class))
                 end
-            elseif (find(LineText, PVP)) then
+            elseif (Line and Line.GetText and Line:GetText() and find(Line:GetText(), PVP)) then
                 Line:SetText(format('|cFFEE4D4D%s|r', PVP))
             elseif Guild and find(LineText, Guild) then
                 if (Guild == MyGuild) then
@@ -486,7 +486,7 @@ local OnTooltipSetItem = function(self)
         return
     end
 
-    if (not Y.IsMainline) and C['tooltips-show-price'] then
+    if (not Y.IsMainline or not Y.IsMists) and C['tooltips-show-price'] then
         local Price = select(11, GetItemInfo(Link))
 
         if Price then

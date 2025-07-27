@@ -365,7 +365,7 @@ UF.AuraOffsets = {
 	BOTTOM = {0, 0},
 }
 
-if YxUI.IsMainline then
+if YxUI.IsMainline or YxUI.IsMists then
 	UF.BuffIDs = {
 		["DRUID"] = {
 			{774, "TOPLEFT", {0.8, 0.4, 0.8}},      -- Rejuvenation
