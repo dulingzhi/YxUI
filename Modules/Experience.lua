@@ -22,7 +22,7 @@ local XPMod = 1
 
 if Y.IsMainline then
 	GetNumQuests = C_QuestLog.GetNumQuestLogEntries
-elseif Y.IsCata then
+elseif Y.IsCata or Y.IsMists then
 	GetNumQuests = GetNumQuestLogEntries
 	HasXPBuff = IsSpellKnown(78632) -- Fast Track +10%
 	XPMod = 1.10

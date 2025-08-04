@@ -99,7 +99,6 @@ local GetTime = GetTime
 
 local ClientVersion = select(4, GetBuildInfo())
 local IsClassic = ClientVersion > 10000 and ClientVersion < 20000
-local IsMainline = ClientVersion > 90000
 local LibCC
 
 if IsClassic then
@@ -447,7 +446,7 @@ local function Enable(self, unit)
 			self:RegisterEvent('UNIT_SPELLCAST_FAILED', CastFail)
 			self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED', CastFail)
 			
-			if IsMainline then
+			if ClientVersion > 40000 then
 				self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE', CastInterruptible)
 				self:RegisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE', CastInterruptible)
 				
@@ -522,7 +521,7 @@ local function Disable(self)
 			self:UnregisterEvent('UNIT_SPELLCAST_FAILED', CastFail)
 			self:UnregisterEvent('UNIT_SPELLCAST_INTERRUPTED', CastFail)
 			
-			if IsMainline then
+			if ClientVersion > 40000 then
 				self:UnregisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE', CastInterruptible)
 				self:UnregisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE', CastInterruptible)
 				
