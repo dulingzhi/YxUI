@@ -18,6 +18,10 @@ local Quality, Locked, Threshold, _
 Loot.LootSlots = {}
 Loot.Grouped = false
 
+if YxUI.IsMainline then
+	GetLootMethod = C_PartyInfo.GetLootMethod
+end
+
 function Loot:LOOT_READY()
 	if (GetCVar("autoLootDefault") == "1" and not IsModifiedClick("AUTOLOOTTOGGLE")) or (GetCVar("autoLootDefault") ~= "1" and IsModifiedClick("AUTOLOOTTOGGLE")) then
 		if (GetLootMethod() == "master") then

@@ -10,6 +10,10 @@ local pairs = pairs
 local next = next
 local GUIDs = {}
 
+if C_Spell then
+	GetSpellInfo = C_Spell.GetSpellInfo
+end
+
 local PLAYER_UNITS = {
 	player = true,
 	vehicle = true,

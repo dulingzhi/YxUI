@@ -678,7 +678,7 @@ Y.StyleFuncs["player"] = function(self, unit)
 			self.Runes = Runes
 			self.AuraParent = Runes
 		elseif (Y.UserClass == "PALADIN" and (Y.ClientVersion > 40000)) then
-			local Count = Y.IsMainline and 5 or 3
+			local Count = 5
 		
 			local HolyPower = CreateFrame("Frame", self:GetName() .. "HolyPower", self, "BackdropTemplate")
 			HolyPower:SetSize(C["unitframes-player-width"], C["player-resource-height"] + 2)
