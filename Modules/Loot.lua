@@ -18,7 +18,7 @@ local Quality, Locked, Threshold, _
 Loot.LootSlots = {}
 Loot.Grouped = false
 
-if YxUI.IsMainline then
+if C_PartyInfo and C_PartyInfo.GetLootMethod then
 	GetLootMethod = C_PartyInfo.GetLootMethod
 end
 

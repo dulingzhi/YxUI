@@ -25,7 +25,7 @@ D['tooltips-cursor-anchor-y'] = 8
 D['tooltips-show-health'] = true
 D['tooltips-show-price'] = true
 D['tooltips-opacity'] = 100
-D['tooltips-show-ilevel'] = true
+D['tooltips-show-ilevel'] = false
 
 local select = select
 local find = string.find
