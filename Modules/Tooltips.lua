@@ -25,7 +25,7 @@ D['tooltips-cursor-anchor-y'] = 8
 D['tooltips-show-health'] = true
 D['tooltips-show-price'] = true
 D['tooltips-opacity'] = 100
-D['tooltips-show-ilevel'] = false
+D['tooltips-show-ilevel'] = true
 
 local select = select
 local find = string.find
@@ -892,6 +892,7 @@ Y:GetModule('GUI'):AddWidgets(L['General'], L['Tooltips'], function(left, right)
     left:CreateSwitch('tooltips-display-title', C['tooltips-display-title'], L['Display Title'], L['Display character titles'])
     left:CreateSwitch('tooltips-display-rank', C['tooltips-display-rank'], L['Display Guild Rank'], L['Display character guild ranks'])
     left:CreateSwitch('tooltips-show-price', C['tooltips-show-price'], L['Display Vendor Price'], L['Display the vendor price of an item'])
+    left:CreateSwitch('tooltips-show-ilevel', C['tooltips-show-ilevel'], L['Display Item Level'], L['Display the item level of an item'])
 
     left:CreateHeader(L['Opacity'])
     left:CreateSlider('tooltips-opacity', C['tooltips-opacity'], 0, 100, 5, L['Tooltip Opacity'], L['Set the opacity of the tooltip background'], UpdateTooltipBackdrop)

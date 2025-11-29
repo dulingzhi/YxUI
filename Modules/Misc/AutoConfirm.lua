@@ -2,6 +2,7 @@
 local Y, L, A, C, D = YxUIGlobal:get()
 
 local Module = Y:GetModule('Miscellaneous')
+local STATICPOPUP_NUMDIALOGS = STATICPOPUP_NUMDIALOGS or 4
 
 local function AutoConfirm()
     for i = 1, STATICPOPUP_NUMDIALOGS do
