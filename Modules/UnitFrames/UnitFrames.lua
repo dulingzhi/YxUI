@@ -205,7 +205,7 @@ else
 end
 
 local CancelAuraOnMouseUp = function(aura, button)
-	if ((button ~= "RightButton") or InCombatLockdown()) then
+	if ((button ~= "RightButton") or InCombatLockdown() or not aura.isPlayer) then
 		return
 	end
 
