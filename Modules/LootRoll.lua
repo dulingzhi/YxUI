@@ -11,7 +11,9 @@ local rolltypes = { [1] = "need", [2] = "greed", [3] = "disenchant", [4] = "tran
 local LootRollAnchor = Y:NewModule("LootRollAnchor")
 
 local function ClickRoll(frame)
-    if Y.IsMainline and not frame.parent.rollID then return end
+    if Y.IsMainline and not frame.parent.rollID then
+        return
+    end
     if frame.parent.test then
         frame.parent:Hide()
     else
@@ -19,7 +21,9 @@ local function ClickRoll(frame)
     end
 end
 
-local function HideTip() GameTooltip:Hide() end
+local function HideTip()
+    GameTooltip:Hide()
+end
 local function HideTip2()
     GameTooltip:Hide()
     ResetCursor()
@@ -31,16 +35,28 @@ local function SetTip(frame)
     if not frame:IsEnabled() then
         GameTooltip:AddLine(frame.errtext, 1, 0.2, 0.2, 1)
     end
-    for name, roll in pairs(frame.parent.rolls) do if roll == rolltypes[frame.rolltype] then GameTooltip:AddLine(name, 1, 1, 1) end end
+    for name, roll in pairs(frame.parent.rolls) do
+        if roll == rolltypes[frame.rolltype] then
+            GameTooltip:AddLine(name, 1, 1, 1)
+        end
+    end
     GameTooltip:Show()
 end
 
 local function SetItemTip(frame)
-    if not frame.link then return end
+    if not frame.link then
+        return
+    end
     GameTooltip:SetOwner(frame, "ANCHOR_TOPLEFT")
     GameTooltip:SetHyperlink(frame.link)
-    if IsShiftKeyDown() then GameTooltip_ShowCompareItem() end
-    if IsModifiedClick("DRESSUP") then ShowInspectCursor() else ResetCursor() end
+    if IsShiftKeyDown() then
+        GameTooltip_ShowCompareItem()
+    end
+    if IsModifiedClick("DRESSUP") then
+        ShowInspectCursor()
+    else
+        ResetCursor()
+    end
 end
 
 local function ItemOnUpdate(frame)
@@ -74,13 +90,18 @@ local function LootClick(frame)
 end
 
 local function OnEvent(frame, event, rollID)
-    if event == "CANCEL_ALL_LOOT_ROLLS" then
+    if event == "CANCEL_ALL_LOOT_ROLLS" or event == "LOOT_HISTORY_ROLL_COMPLETE" then
+        if frame.rollID ~= rollID then
+            return
+        end
         frame.rollID = nil
         frame.time = nil
         frame:Hide()
     else
         cancelled_rolls[rollID] = true
-        if frame.rollID ~= rollID then return end
+        if frame.rollID ~= rollID then
+            return
+        end
 
         frame.rollID = nil
         frame.time = nil
@@ -89,16 +110,18 @@ local function OnEvent(frame, event, rollID)
 end
 
 local function StatusUpdate(frame)
-    if not frame.parent.rollID then return end
+    if not frame.parent.rollID then
+        return
+    end
     local t = GetLootRollTimeLeft(frame.parent.rollID)
     frame:SetValue(t)
 end
 
 local textpos = {
-    [1] = { 0, 1 },  -- need
-    [2] = { 1, 2 },  -- greed
-    [4] = { 2, 0 },  -- transmog
-    [3] = { 1, 2 },  -- disenchant
+    [1] = { 0, 1 }, -- need
+    [2] = { 1, 2 }, -- greed
+    [4] = { 2, 0 }, -- transmog
+    [3] = { 1, 2 }, -- disenchant
     [0] = { 1, -1 }, -- pass
 }
 
@@ -107,7 +130,9 @@ local function CreateRollButton(parent, ntex, ptex, htex, rolltype, tiptext, ...
     f:SetPoint(...)
     f:SetSize(24, 24)
     f:SetNormalTexture(ntex)
-    if ptex then f:SetPushedTexture(ptex) end
+    if ptex then
+        f:SetPushedTexture(ptex)
+    end
     f:SetHighlightTexture(htex)
     f.rolltype = rolltype
     f.parent = parent
@@ -136,7 +161,11 @@ local function CreateRollFrame()
     frame:SetFrameStrata("MEDIUM")
     frame:SetFrameLevel(10)
     frame:SetScript("OnEvent", OnEvent)
-    frame:RegisterEvent("CANCEL_LOOT_ROLL")
+    if C["loot-hide-on-click"] then
+        frame:RegisterEvent("CANCEL_LOOT_ROLL")
+    else
+        frame:RegisterEvent("LOOT_HISTORY_ROLL_COMPLETE")
+    end
     if Y.IsMainline then
         frame:RegisterEvent("CANCEL_ALL_LOOT_ROLLS")
         frame:RegisterEvent("MAIN_SPEC_NEED_ROLL")
@@ -144,7 +173,7 @@ local function CreateRollFrame()
     frame:Hide()
 
     local button = CreateFrame("Button", nil, frame)
-    button:SetPoint("RIGHT", frame, 'LEFT', -5, 0)
+    button:SetPoint("RIGHT", frame, "LEFT", -5, 0)
     button:SetSize(22, 22)
     button:CreateBackdrop()
     button:SetScript("OnEnter", SetItemTip)
@@ -242,35 +271,94 @@ end
 
 local function FindFrame(rollID)
     for _, f in ipairs(frames) do
-        if f.rollID == rollID then return f end
+        if f.rollID == rollID then
+            return f
+        end
     end
 end
 
 local function UpdateRoll(i, rolltype)
     local num = 0
     local rollID, _, numPlayers, isDone = C_LootHistory.GetItem(i)
-
-    if isDone or not numPlayers then return end
-
+    if isDone or not numPlayers then
+        return
+    end
     local f = FindFrame(rollID)
-    if not f then return end
+    if not f then
+        return
+    end
 
+    local myName = UnitName("player")
+    local myType = nil
     for j = 1, numPlayers do
         local name, _, thisrolltype = C_LootHistory.GetPlayerInfo(i, j)
         f.rolls[name] = rolltypes[thisrolltype]
-        if rolltype == thisrolltype then num = num + 1 end
+        if rolltype == thisrolltype then
+            num = num + 1
+        end
+        if name == myName then
+            myType = thisrolltype
+        end
     end
-
     f[rolltypes[rolltype] .. "Text"]:SetText(num)
+
+    if myType then
+        f.need:Disable()
+        f.need:SetAlpha(0.5)
+        f.greed:Disable()
+        f.greed:SetAlpha(0.5)
+        f.disenchant:Disable()
+        f.disenchant:SetAlpha(0.5)
+        f.transmog:Disable()
+        f.transmog:SetAlpha(0.5)
+        f.pass:Disable()
+        f.pass:SetAlpha(0.5)
+
+        if myType == 1 then
+            f.need:SetAlpha(1)
+            f.need:SetBackdropBorderColor(1, 1, 0.3)
+        end
+        if myType == 2 then
+            f.greed:SetAlpha(1)
+            f.greed:SetBackdropBorderColor(1, 1, 0.3)
+        end
+        if myType == 3 then
+            f.disenchant:SetAlpha(1)
+            f.disenchant:SetBackdropBorderColor(1, 1, 0.3)
+        end
+        if myType == 4 then
+            f.transmog:SetAlpha(1)
+            f.transmog:SetBackdropBorderColor(1, 1, 0.3)
+        end
+        if myType == 0 then
+            f.pass:SetAlpha(1)
+            f.pass:SetBackdropBorderColor(1, 1, 0.3)
+        end
+    else
+        f.need:Enable()
+        f.need:SetAlpha(1)
+        f.greed:Enable()
+        f.greed:SetAlpha(1)
+        f.disenchant:Enable()
+        f.disenchant:SetAlpha(1)
+        f.transmog:Enable()
+        f.transmog:SetAlpha(1)
+        f.pass:Enable()
+        f.pass:SetAlpha(1)
+    end
 end
 
 local function START_LOOT_ROLL(rollID, time)
-    if cancelled_rolls[rollID] then return end
+    if cancelled_rolls[rollID] then
+        return
+    end
 
     local f = GetFrame()
     f.rollID = rollID
     f.time = time
-    for i in pairs(f.rolls) do f.rolls[i] = nil end
+    for i in pairs(f.rolls) do
+        f.rolls[i] = nil
+    end
     if not Y.IsMainline then
         f.needText:SetText(0)
         f.greedText:SetText(0)
@@ -445,7 +533,7 @@ SLASH_TESTROLL1 = "/testroll"
 function LootRollAnchor:Load()
     self:SetSize(313, 26)
     self:SetPoint("TOP", Y.UIParent, "TOP", 0, -250)
-    self:Event('START_LOOT_ROLL', function(_, _, ...)
+    self:Event("START_LOOT_ROLL", function(_, _, ...)
         START_LOOT_ROLL(...)
     end)
     if not Y.IsMainline then
