@@ -1,5 +1,5 @@
 <Ui>
-	<Button name="YxUIAuraTemplate" virtual="true" inherits="SecureActionButtonTemplate">
+	<Button name="YxUIAuraTemplate" registerForClicks="RightButtonUp" virtual="true" inherits="SecureActionButtonTemplate">
 		<Attributes>
 			<Attribute name="type" value="cancelaura"/>
 		</Attributes>

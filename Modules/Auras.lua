@@ -132,9 +132,6 @@ YxUIAuraOnEnter = function(self)
 end
 
 YxUISkinAura = function(button)
-    if not InCombatLockdown() then
-        button:RegisterForClicks("RightButtonUp")
-    end
     button:CreateBorder()
     button:StyleButton()
 
