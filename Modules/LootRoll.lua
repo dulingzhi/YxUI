@@ -89,14 +89,37 @@ local function LootClick(frame)
     end
 end
 
+local function IsFrameDone(frame)
+    local index = frame.index
+    local isDone
+    if not index then
+        for i = 1, C_LootHistory.GetNumItems() do
+            local id, _, _, isDone = C_LootHistory.GetItem(i)
+            if id == frame.rollID then
+                return isDone
+            end
+        end
+    else
+        return (select(4, C_LootHistory.GetItem(index)))
+    end
+end
+
 local function OnEvent(frame, event, rollID)
-    if event == "CANCEL_ALL_LOOT_ROLLS" or event == "LOOT_HISTORY_ROLL_COMPLETE" then
+    if event == "CANCEL_ALL_LOOT_ROLLS" then
         if frame.rollID ~= rollID then
             return
         end
         frame.rollID = nil
         frame.time = nil
+        frame.index = nil
         frame:Hide()
+    elseif event == "LOOT_HISTORY_ROLL_COMPLETE" then
+        if IsFrameDone(frame) then
+            frame.rollID = nil
+            frame.time = nil
+            frame.index = nil
+            frame:Hide()
+        end
     else
         cancelled_rolls[rollID] = true
         if frame.rollID ~= rollID then
@@ -105,6 +128,7 @@ local function OnEvent(frame, event, rollID)
 
         frame.rollID = nil
         frame.time = nil
+        frame.index = nil
         frame:Hide()
     end
 end
@@ -277,6 +301,17 @@ local function FindFrame(rollID)
     end
 end
 
+local LootAlpha = {
+    [0] = 1,
+    [1] = 1,
+    [2] = 1,
+    [3] = 1,
+    [4] = 1,
+}
+local function GetLootAlpha(rolltype)
+    return LootAlpha[rolltype] or rolltype == nil and 1 or 0.5
+end
+
 local function UpdateRoll(i, rolltype)
     local num = 0
     local rollID, _, numPlayers, isDone = C_LootHistory.GetItem(i)
@@ -287,7 +322,7 @@ local function UpdateRoll(i, rolltype)
     if not f then
         return
     end
-
+    f.index = i
     local myName = UnitName("player")
     local myType = nil
     for j = 1, numPlayers do
@@ -302,49 +337,26 @@ local function UpdateRoll(i, rolltype)
     end
     f[rolltypes[rolltype] .. "Text"]:SetText(num)
 
-    if myType then
-        f.need:Disable()
-        f.need:SetAlpha(0.5)
-        f.greed:Disable()
-        f.greed:SetAlpha(0.5)
-        f.disenchant:Disable()
-        f.disenchant:SetAlpha(0.5)
-        f.transmog:Disable()
-        f.transmog:SetAlpha(0.5)
-        f.pass:Disable()
-        f.pass:SetAlpha(0.5)
-
-        if myType == 1 then
-            f.need:SetAlpha(1)
-            f.need:SetBackdropBorderColor(1, 1, 0.3)
-        end
-        if myType == 2 then
-            f.greed:SetAlpha(1)
-            f.greed:SetBackdropBorderColor(1, 1, 0.3)
-        end
-        if myType == 3 then
-            f.disenchant:SetAlpha(1)
-            f.disenchant:SetBackdropBorderColor(1, 1, 0.3)
-        end
-        if myType == 4 then
-            f.transmog:SetAlpha(1)
-            f.transmog:SetBackdropBorderColor(1, 1, 0.3)
-        end
-        if myType == 0 then
-            f.pass:SetAlpha(1)
-            f.pass:SetBackdropBorderColor(1, 1, 0.3)
-        end
-    else
-        f.need:Enable()
-        f.need:SetAlpha(1)
-        f.greed:Enable()
-        f.greed:SetAlpha(1)
-        f.disenchant:Enable()
-        f.disenchant:SetAlpha(1)
-        f.transmog:Enable()
-        f.transmog:SetAlpha(1)
-        f.pass:Enable()
-        f.pass:SetAlpha(1)
+    local alpha = GetLootAlpha(myType)
+    if f.need then
+        f.need:SetEnabled(myType == nil)
+        f.need:SetAlpha(alpha)
+    end
+    if f.greed then
+        f.greed:SetEnabled(myType == nil)
+        f.greed:SetAlpha(alpha)
+    end
+    if f.disenchant then
+        f.disenchant:SetEnabled(myType == nil)
+        f.disenchant:SetAlpha(alpha)
+    end
+    if f.transmog then
+        f.transmog:SetEnabled(myType == nil)
+        f.transmog:SetAlpha(alpha)
+    end
+    if f.pass then
+        f.pass:SetEnabled(myType == nil)
+        f.pass:SetAlpha(alpha)
     end
 end
 
