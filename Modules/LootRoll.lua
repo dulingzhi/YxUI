@@ -231,7 +231,7 @@ local function CreateRollFrame()
     if not Y.IsMainline then
         need, needText = CreateRollButton(frame, "Interface\\Buttons\\UI-GroupLoot-Dice-Up", "Interface\\Buttons\\UI-GroupLoot-Dice-Highlight", "Interface\\Buttons\\UI-GroupLoot-Dice-Down", 1, NEED, "LEFT", frame.button, "RIGHT", 10, -1.2)
         greed, greedText = CreateRollButton(frame, "Interface\\Buttons\\UI-GroupLoot-Coin-Up", "Interface\\Buttons\\UI-GroupLoot-Coin-Highlight", "Interface\\Buttons\\UI-GroupLoot-Coin-Down", 2, GREED, "LEFT", need, "RIGHT", 0, -1)
-        if Y.IsCata then
+        if Y.IsCata and not Y.IsWrath then
             -- transmog, transmogText = CreateRollButton(frame, "lootroll-toast-icon-transmog-up", "lootroll-toast-icon-transmog-highlight", "lootroll-toast-icon-transmog-down", 4, TRANSMOGRIFY, "LEFT", need, "RIGHT", -1, 1)
             de, deText = CreateRollButton(frame, "Interface\\Buttons\\UI-GroupLoot-DE-Up", "Interface\\Buttons\\UI-GroupLoot-DE-Highlight", "Interface\\Buttons\\UI-GroupLoot-DE-Down", 3, ROLL_DISENCHANT, "LEFT", greed, "RIGHT", 0, -1)
         end
@@ -374,7 +374,7 @@ local function START_LOOT_ROLL(rollID, time)
     if not Y.IsMainline then
         f.needText:SetText(0)
         f.greedText:SetText(0)
-        if Y.IsCata then
+        if f.disenchantText then
             -- f.transmogText:SetText(0)
             f.disenchantText:SetText(0)
         end
@@ -428,7 +428,7 @@ local function START_LOOT_ROLL(rollID, time)
         end
     end
 
-    if Y.IsCata or Y.IsMainline then
+    if f.disenchant then
         if canDisenchant then
             f.disenchant:Enable()
             f.disenchant:SetAlpha(1)
@@ -502,7 +502,7 @@ local function testRoll(f)
     if not Y.IsMainline then
         f.needText:SetText(1)
         f.greedText:SetText(2)
-        if Y.IsCata then
+        if f.disenchantText then
             -- f.transmogText:SetText(2)
             f.disenchantText:SetText(0)
         end
