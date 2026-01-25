@@ -113,7 +113,7 @@ local function OnEvent(frame, event, rollID)
         frame.time = nil
         frame.index = nil
         frame:Hide()
-    elseif event == "LOOT_HISTORY_ROLL_COMPLETE" then
+    elseif event == "LOOT_HISTORY_ROLL_COMPLETE" or event == "LOOT_ROLLS_COMPLETE" then
         if IsFrameDone(frame) then
             frame.rollID = nil
             frame.time = nil
@@ -189,6 +189,7 @@ local function CreateRollFrame()
         frame:RegisterEvent("CANCEL_LOOT_ROLL")
     else
         frame:RegisterEvent("LOOT_HISTORY_ROLL_COMPLETE")
+        frame:RegisterEvent("LOOT_ROLLS_COMPLETE")
     end
     if Y.IsMainline then
         frame:RegisterEvent("CANCEL_ALL_LOOT_ROLLS")
