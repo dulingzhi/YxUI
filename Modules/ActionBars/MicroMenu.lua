@@ -103,6 +103,16 @@ local ButtonOnLeave = function(self)
     end
 end
 
+local GetButtons = function()
+    local buttons = {}
+    for i = 1, #MicroButtons.Buttons do
+        if MicroButtons.Buttons[i]:IsShown() then
+            table.insert(buttons, MicroButtons.Buttons[i])
+        end
+    end
+    return buttons
+end
+
 function MicroButtons:UpdateVisibility()
     if (Settings["micro-buttons-visiblity"] == "HIDE") then
         self.Panel:SetScript("OnEnter", nil)
@@ -123,13 +133,15 @@ function MicroButtons:UpdateVisibility()
 end
 
 function MicroButtons:UpdateMicroButtonsParent()
-    for i = 1, #MicroButtons.Buttons do
-        MicroButtons.Buttons[i]:SetParent(MicroButtons.Panel)
+    local buttons = GetButtons()
+    for i = 1, #buttons do
+        buttons[i]:SetParent(MicroButtons.Panel)
     end
 end
 
 function MicroButtons:PositionButtons()
-    local NumButtons = #MicroButtons.Buttons
+    local buttons = GetButtons()
+    local NumButtons = #buttons
     local PerRow = Settings["micro-buttons-per-row"]
     local Spacing = Settings["micro-buttons-gap"]
 
@@ -143,24 +155,24 @@ function MicroButtons:PositionButtons()
         Columns = 1
     end
 
-    local Width, Height = MicroButtons.Buttons[1]:GetSize()
+    local Width, Height = buttons[1]:GetSize()
 
     -- Bar sizing
-    MicroButtons.Panel:SetWidth((Width + Spacing) * (PerRow - 1) + Spacing / 2)
+    MicroButtons.Panel:SetWidth((Width + Spacing) * (PerRow - 1) + Spacing / 2 + 6)
     MicroButtons.Panel:SetHeight(Height * Columns + Spacing * (Columns - 1) + Spacing / 2)
 
     -- Actual moving
-    for i = 1, #MicroButtons.Buttons do
-        local Button = MicroButtons.Buttons[i]
-
+    local lastIndex = 1
+    for i = 1, #buttons do
+        local Button = buttons[i]
         Button:ClearAllPoints()
 
         if (i == 1) then
             Button:SetPoint("TOPLEFT", MicroButtons.Panel, 0, 0)
         elseif ((i - 1) % PerRow == 0) then
-            Button:SetPoint("TOP", MicroButtons.Buttons[i - PerRow], "BOTTOM", 0, -Spacing)
+            Button:SetPoint("TOP", buttons[i - PerRow], "BOTTOM", 0, -Spacing)
         else
-            Button:SetPoint("LEFT", MicroButtons.Buttons[i - 1], "RIGHT", Spacing - 2, 0)
+            Button:SetPoint("LEFT", buttons[i - 1], "RIGHT", Spacing - 2, 0)
         end
     end
 end
