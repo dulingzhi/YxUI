@@ -9,7 +9,6 @@ local LE_PARTY_CATEGORY_HOME = LE_PARTY_CATEGORY_HOME
 local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 
 local AddOnVersion = YxUI.UIVersion
-local AddOnNum = tonumber(YxUI.UIVersion)
 local User = YxUI.UserName .. "-" .. YxUI.UserRealm
 local tinsert = table.insert
 local tremove = table.remove
@@ -24,6 +23,12 @@ local Tables = {}
 local Queue = {}
 
 local Throttle = YxUI:GetModule("Throttle")
+
+local function GetVersionNumber(version)
+    local major, minor, patch = strsplit('.', version)
+    return tonumber(major) * 10000 + tonumber(minor) * 100 + tonumber(patch)
+end
+local AddOnNum = GetVersionNumber(YxUI.UIVersion)
 
 function Update:QueueChannel(channel, target)
 	local Data
@@ -105,18 +110,18 @@ function Update:CHAT_MSG_ADDON(prefix, message, channel, sender)
 		return
 	end
 
-	message = tonumber(message)
+	local version = GetVersionNumber(message)
 
-	if (AddOnNum > message) then -- We have a higher version, share it
+	if (AddOnNum > version) then -- We have a higher version, share it
 		self:QueueChannel(channel)
-	elseif (message > AddOnNum) then -- We're behind!
+	elseif (version > AddOnNum) then -- We're behind!
 		YxUI:print(Language["You can get an updated version of YxUI at https://www.curseforge.com/wow/addons/hydraui"])
 		print(Language["Join the NetEase DD community for support and feedback https://dd.163.com/i/zY5l3huBtM"])
 
 		YxUI:GetModule("GUI"):CreateUpdateAlert()
 
-		AddOnNum = message
-		AddOnVersion = tostring(message)
+		AddOnNum = version
+		AddOnVersion = message
 	end
 end
 
