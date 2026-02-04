@@ -782,6 +782,7 @@ YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Raid"], Language
 
 	left:CreateHeader(Language["Attributes"])
 	left:CreateSwitch("raid-show-solo", Settings["raid-show-solo"], Language["Show Solo"], Language["Display the raid frames while not in a group"], UpdateShowSolo)
+	left:CreateSwitch("raid-multi-headers", Settings["raid-multi-headers"], Language["Separate Raid Headers"], Language["Create a separate raid header for each party group."], ReloadUI):RequiresReload(true)
 	left:CreateSlider("raid-x-offset", Settings["raid-x-offset"], -10, 10, 1, Language["X Offset"], Language["Set the x offset of raid units from eachother"], UpdateRaidXOffset)
 	left:CreateSlider("raid-y-offset", Settings["raid-y-offset"], -10, 10, 1, Language["Y Offset"], Language["Set the y offset of raid units from eachother"], UpdateRaidYOffset)
 	left:CreateSlider("raid-units-per-column", Settings["raid-units-per-column"], 1, 40, 1, Language["Units Per Column"], Language["Set the maximum number of units per column"], UpdateRaidUnitsPerColumn)

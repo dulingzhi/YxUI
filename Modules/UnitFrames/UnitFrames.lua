@@ -20,6 +20,7 @@ Defaults["unitframes-font"] = "Roboto"
 Defaults["unitframes-font-size"] = 12
 Defaults["unitframes-font-flags"] = ""
 Defaults["unitframes-display-aura-timers"] = true
+Defaults["raid-multi-headers"] = false
 
 local UF = YxUI:NewModule("Unit Frames")
 
@@ -679,48 +680,254 @@ local UpdateShowPlayerBuffs = function(value)
 end
 
 local UpdateRaidSortingMethod = function(value)
-	if (value == "CLASS") then
-		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "DEATHKNIGHT,DEMONHUNTER,DRUID,HUNTER,MAGE,MONK,PALADIN,PRIEST,SHAMAN,WARLOCK,WARRIOR")
-		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
-		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "CLASS")
-	elseif (value == "ROLE") then
-		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "TANK,HEALER,DAMAGER,NONE")
-		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
-		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "ASSIGNEDROLE")
-	elseif (value == "NAME") then
-		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
-		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
-		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", nil)
-	elseif (value == "MTMA") then
-		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "MAINTANK,MAINASSIST,NONE")
-		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
-		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "ROLE")
-	else -- GROUP
-		YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
-		YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "INDEX")
-		YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "GROUP")
+	if Settings["raid-multi-headers"] then
+		for g = 1, 8 do
+			local h = YxUI.UnitFrames["raidgroup" .. g]
+
+			if h then
+				if (value == "GROUP") then
+					h:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
+					h:SetAttribute("sortMethod", "INDEX")
+					h:SetAttribute("groupBy", "GROUP")
+				else
+					-- for multi headers, non-GROUP sorting doesn't make much sense across separate headers,
+					-- fallback to per-header index ordering
+					h:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
+					h:SetAttribute("sortMethod", "INDEX")
+					h:SetAttribute("groupBy", nil)
+				end
+			end
+		end
+	else
+		if (value == "CLASS") then
+			YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "DEATHKNIGHT,DEMONHUNTER,DRUID,HUNTER,MAGE,MONK,PALADIN,PRIEST,SHAMAN,WARLOCK,WARRIOR")
+			YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
+			YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "CLASS")
+		elseif (value == "ROLE") then
+			YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "TANK,HEALER,DAMAGER,NONE")
+			YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
+			YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "ASSIGNEDROLE")
+		elseif (value == "NAME") then
+			YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
+			YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
+			YxUI.UnitFrames["raid"]:SetAttribute("groupBy", nil)
+		elseif (value == "MTMA") then
+			YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "MAINTANK,MAINASSIST,NONE")
+			YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "NAME")
+			YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "ROLE")
+		else -- GROUP
+			YxUI.UnitFrames["raid"]:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
+			YxUI.UnitFrames["raid"]:SetAttribute("sortMethod", "INDEX")
+			YxUI.UnitFrames["raid"]:SetAttribute("groupBy", "GROUP")
+		end
 	end
 end
 
 local UpdateRaidShowPower = function(value)
-	if YxUI.UnitFrames["raid"] then
-		local Unit
+	if Settings["raid-multi-headers"] then
+		for g = 1, 8 do
+			local header = YxUI.UnitFrames["raidgroup" .. g]
 
-		for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
-			Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
+			if header then
+				for i = 1, header:GetNumChildren() do
+					local Unit = select(i, header:GetChildren())
 
-			if Unit then
-				if value then
-					Unit:EnableElement("Power")
-					Unit:SetHeight(Settings["party-health-height"] + Settings["party-power-height"] + 3)
-				else
-					Unit:DisableElement("Power")
-					Unit:SetHeight(Settings["party-health-height"] + 2)
+					if Unit then
+						if value then
+							Unit:EnableElement("Power")
+							Unit:SetHeight(Settings["party-health-height"] + Settings["party-power-height"] + 3)
+						else
+							Unit:DisableElement("Power")
+							Unit:SetHeight(Settings["party-health-height"] + 2)
+						end
+
+						Unit:UpdateAllElements("ForceUpdate")
+					end
 				end
-
-				Unit:UpdateAllElements("ForceUpdate")
 			end
 		end
+	else
+		if YxUI.UnitFrames["raid"] then
+			for i = 1, YxUI.UnitFrames["raid"]:GetNumChildren() do
+				local Unit = select(i, YxUI.UnitFrames["raid"]:GetChildren())
+
+				if Unit then
+					if value then
+						Unit:EnableElement("Power")
+						Unit:SetHeight(Settings["party-health-height"] + Settings["party-power-height"] + 3)
+					else
+						Unit:DisableElement("Power")
+						Unit:SetHeight(Settings["party-health-height"] + 2)
+					end
+
+					Unit:UpdateAllElements("ForceUpdate")
+				end
+			end
+		end
+	end
+end
+
+-- Raid header management for dynamic switching
+local pendingRaidLayout = nil
+local eventFrame = CreateFrame("Frame")
+eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+eventFrame:SetScript("OnEvent", function(self, event)
+	if event == "PLAYER_REGEN_ENABLED" and pendingRaidLayout ~= nil then
+		local v = pendingRaidLayout
+		pendingRaidLayout = nil
+		if UF.ToggleRaidLayout then
+			UF.ToggleRaidLayout(v)
+		end
+	end
+end)
+
+local function DestroyRaidHeaders()
+	if InCombatLockdown() then
+		return false
+	end
+
+	for i = 1, 8 do
+		local h = YxUI.UnitFrames["raidgroup" .. i]
+
+		if h then
+			UnregisterUnitWatch(h)
+			h:Hide()
+			h:SetParent(Hider)
+			YxUI.UnitFrames["raidgroup" .. i] = nil
+		end
+	end
+
+	if YxUI.UnitFrames["raid"] then
+		local r = YxUI.UnitFrames["raid"]
+
+		if r then
+			UnregisterUnitWatch(r)
+			r:Hide()
+			r:SetParent(Hider)
+		end
+
+		YxUI.UnitFrames["raid"] = nil
+	end
+
+	if YxUI.UnitFrames["raid-pets"] then
+		local rp = YxUI.UnitFrames["raid-pets"]
+
+		if rp then
+			UnregisterUnitWatch(rp)
+			rp:Hide()
+			rp:SetParent(Hider)
+			YxUI.UnitFrames["raid-pets"] = nil
+		end
+	end
+
+	return true
+end
+
+local function CreateSingleRaid()
+	if InCombatLockdown() then
+		return false
+	end
+
+	local Raid = oUF:SpawnHeader("YxUI Raid", nil, "raid,solo",
+		"initial-width", Settings["raid-width"],
+		"initial-height", (Settings["raid-health-height"] + Settings["raid-power-height"] + 3),
+		"isTesting", false,
+		"showSolo", Settings["raid-show-solo"],
+		"showPlayer", true,
+		"showParty", false,
+		"showRaid", true,
+		"point", Settings["raid-point"],
+		"xoffset", Settings["raid-x-offset"],
+		"yOffset", Settings["raid-y-offset"],
+		"maxColumns", Settings["raid-max-columns"],
+		"unitsPerColumn", Settings["raid-units-per-column"],
+					"columnSpacing", Settings["raid-column-spacing"],
+					"columnAnchorPoint", "LEFT",
+		"oUF-initialConfigFunction", [[
+			local Header = self:GetParent()
+
+			self:SetWidth(Header:GetAttribute("initial-width"))
+			self:SetHeight(Header:GetAttribute("initial-height"))
+		]]
+	)
+
+	Raid:SetPoint("BOTTOMLEFT", UF.RaidAnchor or YxUI.UnitFrames.RaidAnchor or UIParent, 0, 0)
+	Raid:SetParent(YxUI.UIParent)
+
+	YxUI:CreateMover(UF.RaidAnchor or YxUI.UnitFrames.RaidAnchor or UIParent)
+
+	YxUI.UnitFrames["raid"] = Raid
+
+	UpdateRaidSortingMethod(Settings["raid-sorting-method"])
+
+	return true
+end
+
+local function CreateMultiHeaders()
+	if InCombatLockdown() then
+		return false
+	end
+
+	local UnitHeight = (Settings["raid-health-height"] + Settings["raid-power-height"]) + 1
+
+	for i = 1, 8 do
+		local y = (8 - i) * (UnitHeight + Settings["raid-y-offset"])
+
+		local Header = oUF:SpawnHeader("YxUI Raid Group " .. i, nil, "raid,solo",
+			"initial-width", Settings["raid-width"],
+			"initial-height", UnitHeight,
+			"isTesting", false,
+			"showSolo", Settings["raid-show-solo"],
+			"showPlayer", true,
+			"showParty", false,
+			"showRaid", true,
+			"groupFilter", tostring(i),
+			"point", "LEFT",
+			"maxColumns", Settings["raid-units-per-column"],
+			"unitsPerColumn", 1,
+			"xOffset", Settings["raid-x-offset"],
+			"yOffset", 0,
+			"columnSpacing", Settings["raid-column-spacing"],
+			"columnAnchorPoint", "LEFT",
+			"oUF-initialConfigFunction", [[
+				local Header = self:GetParent()
+
+				self:SetWidth(Header:GetAttribute("initial-width"))
+				self:SetHeight(Header:GetAttribute("initial-height"))
+			]]
+		)
+
+		Header:SetPoint("BOTTOMLEFT", UF.RaidAnchor or YxUI.UnitFrames.RaidAnchor or UIParent, "BOTTOMLEFT", 0, y)
+		Header:SetParent(YxUI.UIParent)
+		YxUI.UnitFrames["raidgroup" .. i] = Header
+	end
+
+	YxUI.UnitFrames["raid"] = YxUI.UnitFrames["raidgroup1"]
+
+	for i = 1, 8 do
+		local h = YxUI.UnitFrames["raidgroup" .. i]
+		if h then
+			h:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
+			h:SetAttribute("sortMethod", "INDEX")
+			h:SetAttribute("groupBy", "GROUP")
+		end
+	end
+
+	return true
+end
+
+function UF.ToggleRaidLayout(value)
+	if InCombatLockdown() then
+		pendingRaidLayout = value
+		return
+	end
+
+	DestroyRaidHeaders()
+
+	if value then
+		CreateMultiHeaders()
+	else
+		CreateSingleRaid()
 	end
 end
 
@@ -980,29 +1187,6 @@ function UF:Load()
 	end
 
 	if Settings["raid-enable"] then
-		local Raid = oUF:SpawnHeader("YxUI Raid", nil, "raid,solo",
-			"initial-width", Settings["raid-width"],
-			"initial-height", (Settings["raid-health-height"] + Settings["raid-power-height"] + 3),
-			"isTesting", false,
-			"showSolo", Settings["raid-show-solo"],
-			"showPlayer", true,
-			"showParty", false,
-			"showRaid", true,
-			"point", Settings["raid-point"],
-			"xoffset", Settings["raid-x-offset"],
-			"yOffset", Settings["raid-y-offset"],
-			"maxColumns", Settings["raid-max-columns"],
-			"unitsPerColumn", Settings["raid-units-per-column"],
-			"columnSpacing", Settings["raid-column-spacing"],
-			"columnAnchorPoint", Settings["raid-column-anchor"],
-			"oUF-initialConfigFunction", [[
-				local Header = self:GetParent()
-
-				self:SetWidth(Header:GetAttribute("initial-width"))
-				self:SetHeight(Header:GetAttribute("initial-height"))
-			]]
-		)
-
 		local UnitHeight = (Settings["raid-health-height"] + Settings["raid-power-height"]) + 1
 		local MaxSize = floor(40 / Settings["raid-max-columns"])
 
@@ -1019,14 +1203,88 @@ function UF:Load()
 			CompactRaidFrameManager:SetParent(Hider)
 		end
 
-		Raid:SetPoint("BOTTOMLEFT", self.RaidAnchor, 0, 0)
-		Raid:SetParent(YxUI.UIParent)
+		-- Support option: create multiple headers, one per party group
+		if Settings["raid-multi-headers"] then
 
-		YxUI:CreateMover(self.RaidAnchor)
+			for i = 1, 8 do
+				local y = (8 - i) * (UnitHeight + Settings["raid-y-offset"])
 
-		YxUI.UnitFrames["raid"] = Raid
+				local Header = oUF:SpawnHeader("YxUI Raid Group " .. i, nil, "raid,solo",
+					"initial-width", Settings["raid-width"],
+					"initial-height", UnitHeight,
+					"isTesting", false,
+					"showSolo", Settings["raid-show-solo"],
+					"showPlayer", true,
+					"showParty", false,
+					"showRaid", true,
+					"groupFilter", tostring(i),
+					"point", "LEFT",
+					"maxColumns", Settings["raid-units-per-column"],
+					"unitsPerColumn", 1,
+					"xOffset", Settings["raid-x-offset"],
+					"yOffset", 0,
+					"columnSpacing", Settings["raid-column-spacing"],
+					"columnAnchorPoint", "LEFT",
+					"oUF-initialConfigFunction", [[
+						local Header = self:GetParent()
 
-		UpdateRaidSortingMethod(Settings["raid-sorting-method"])
+						self:SetWidth(Header:GetAttribute("initial-width"))
+						self:SetHeight(Header:GetAttribute("initial-height"))
+					]]
+				)
+
+				Header:SetPoint("BOTTOMLEFT", self.RaidAnchor, "BOTTOMLEFT", 0, y)
+				Header:SetParent(YxUI.UIParent)
+				YxUI.UnitFrames["raidgroup" .. i] = Header
+			end
+
+			-- Apply default sorting for multi headers
+			for i = 1, 8 do
+				local h = YxUI.UnitFrames["raidgroup" .. i]
+				if h then
+					h:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8")
+					h:SetAttribute("sortMethod", "INDEX")
+					h:SetAttribute("groupBy", "GROUP")
+				end
+			end
+
+				-- point compatibility: set `raid` ref to first group header
+				YxUI.UnitFrames["raid"] = YxUI.UnitFrames["raidgroup1"]
+
+			YxUI:CreateMover(self.RaidAnchor)
+		else
+			local Raid = oUF:SpawnHeader("YxUI Raid", nil, "raid,solo",
+				"initial-width", Settings["raid-width"],
+				"initial-height", (Settings["raid-health-height"] + Settings["raid-power-height"] + 3),
+				"isTesting", false,
+				"showSolo", Settings["raid-show-solo"],
+				"showPlayer", true,
+				"showParty", false,
+				"showRaid", true,
+				"point", Settings["raid-point"],
+				"xoffset", Settings["raid-x-offset"],
+				"yOffset", Settings["raid-y-offset"],
+				"maxColumns", Settings["raid-max-columns"],
+				"unitsPerColumn", Settings["raid-units-per-column"],
+				"columnSpacing", Settings["raid-column-spacing"],
+				"columnAnchorPoint", Settings["raid-column-anchor"],
+				"oUF-initialConfigFunction", [[
+					local Header = self:GetParent()
+
+					self:SetWidth(Header:GetAttribute("initial-width"))
+					self:SetHeight(Header:GetAttribute("initial-height"))
+				]]
+			)
+
+			Raid:SetPoint("BOTTOMLEFT", self.RaidAnchor, 0, 0)
+			Raid:SetParent(YxUI.UIParent)
+
+			YxUI:CreateMover(self.RaidAnchor)
+
+			YxUI.UnitFrames["raid"] = Raid
+
+			UpdateRaidSortingMethod(Settings["raid-sorting-method"])
+		end
 
 		if Settings["raid-pets-enable"] then
 			local RaidPet = oUF:SpawnHeader("YxUI Raid Pets", "SecureGroupPetHeaderTemplate", "raid,solo",
