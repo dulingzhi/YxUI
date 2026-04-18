@@ -82,16 +82,58 @@ SlashCmdList['GLOBALSTRINGFIND'] = function(query)
     end
 end
 
-local button = CreateFrame('Button', nil, GameMenuFrame, Y.IsMainline and 'MainMenuFrameButtonTemplate' or 'GameMenuButtonTemplate')
-button:SetFormattedText(Y.UITitle)
-button:SetScript('OnClick', function()
+local function ClickMenu()
     Commands.settings()
     if not InCombatLockdown() then
         HideUIPanel(GameMenuFrame)
     end
-end)
+end
+
 if GameMenuFrame.Layout then
+    GameMenuFrame:SetWidth(230)
+    GameMenuFrame:StripTextures()
+    GameMenuFrame:CreateBorder()
+    GameMenuFrame.Header:StripTextures()
+    GameMenuFrame.Header:ClearAllPoints()
+    GameMenuFrame.Header:SetPoint('TOP', GameMenuFrame, 0, 7)
+    GameMenuFrame.Header.Text:SetFontObject(Game16Font)
+    GameMenuFrame.Header.Text:SetTextColor(Y.UserColor.r, Y.UserColor.g, Y.UserColor.b)
+    local yxui
+    hooksecurefunc(GameMenuFrame, "InitButtons", function(menu)
+        if not menu.buttonPool then
+            return
+        end
+        yxui = GameMenuFrame:AddButton(Y.UITitle, ClickMenu)
+        yxui:SkinButton(true)
+        yxui:SetSize(180, 26)
+        for button in menu.buttonPool:EnumerateActive() do
+            button:SkinButton(true)
+            button:SetSize(180, 26)
+        end
+    end)
+    hooksecurefunc(GameMenuFrame, "Layout", function(self)
+        local buttons = {}
+        for button in self.buttonPool:EnumerateActive() do
+            table.insert(buttons, button)
+        end
+        table.sort(buttons, function(a, b)
+            local _, _, _, _, y1 = a:GetPoint()
+            local _, _, _, _, y2 = b:GetPoint()
+            return y1 > y2
+        end)
+        for i, button in ipairs(buttons) do
+            local point, anchor, point2, x, y = button:GetPoint()
+            button:SetPoint(point, anchor, point2, x, y - 36 - i * 5)
+        end
+        yxui:ClearAllPoints()
+        yxui:SetPoint('TOP', GameMenuFrame.Header, 'BOTTOM', 0, 0)
+        self:SetHeight(#buttons * (yxui:GetHeight() + 15) + 26)
+    end)
 else
+        
+    local button = CreateFrame('Button', nil, GameMenuFrame, Y.IsMainline and 'MainMenuFrameButtonTemplate' or 'GameMenuButtonTemplate')
+    button:SetFormattedText(Y.UITitle)
+    button:SetScript('OnClick', ClickMenu)
     GameMenuFrame:SetWidth(230)
     button:SetPoint('TOP', GameMenuButtonAddons, 'BOTTOM', 0, -1)
     local buttons = {}
@@ -122,4 +164,6 @@ else
         GameMenuButtonLogout:SetPoint('TOP', button, 'BOTTOM', 0, -26)
         self:SetHeight(#buttons * (button:GetHeight() + 10) + 90)
     end)
+
 end
+
