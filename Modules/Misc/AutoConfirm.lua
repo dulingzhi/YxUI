@@ -26,9 +26,9 @@ Module:Add('misc-auto-confirm', true, L['Auto Confirm Loot Bind'], L['Auto confi
         local deleteDialog = StaticPopupDialogs['DELETE_GOOD_ITEM']
         if deleteDialog.OnShow then
             hooksecurefunc(deleteDialog, 'OnShow', function(s)
-                s.editBox:SetText(DELETE_ITEM_CONFIRM_STRING)
-                s.editBox:SetAutoFocus(false)
-                s.editBox:ClearFocus()
+                s.EditBox:SetText(DELETE_ITEM_CONFIRM_STRING)
+                s.EditBox:SetAutoFocus(false)
+                s.EditBox:ClearFocus()
             end)
         end
     else

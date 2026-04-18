@@ -1165,7 +1165,7 @@ function Chat:Load()
     hooksecurefunc('FCF_OpenTemporaryWindow', OpenTemporaryWindow)
     hooksecurefunc('FCF_RestorePositionAndDimensions', MoveChatFrames)
     hooksecurefunc('FCFTab_UpdateColors', UpdateTabColors)
-    hooksecurefunc('FloatingChatFrame_OnEvent', UpdateTabEventColors)
+    -- hooksecurefunc('FloatingChatFrame_OnEvent', UpdateTabEventColors)
 
     if Y.IsMainline then
         self:Event('PLAYER_ENTERING_WORLD', self.MoveChatFrames)

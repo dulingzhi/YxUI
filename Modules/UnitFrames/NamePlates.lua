@@ -81,8 +81,8 @@ Y.StyleFuncs['nameplate'] = function(self, unit)
 
     -- Target Icon
     local RaidTargetIndicator = Health:CreateTexture(nil, 'OVERLAY')
-    RaidTargetIndicator:SetSize(16, 16)
-    RaidTargetIndicator:SetPoint('LEFT', Health, 'RIGHT', 5, 0)
+    RaidTargetIndicator:SetSize(32, 32)
+    RaidTargetIndicator:SetPoint('BOTTOM', Health, 'BOTTOM', 0, 30)
 
     local Top = Health:CreateFontString(nil, 'OVERLAY')
     Y:SetFontInfo(Top, C['nameplates-font'], C['nameplates-font-size'], C['nameplates-font-flags'])
@@ -276,13 +276,13 @@ Y.StyleFuncs['nameplate'] = function(self, unit)
     TargetIndicator.Bg:SetVertexColor(0.086, 0.086, 0.086)
 
     TargetIndicator.Left = TargetIndicator:CreateTexture(nil, 'ARTWORK')
-    TargetIndicator.Left:SetSize(16, 16)
-    TargetIndicator.Left:SetPoint('RIGHT', TargetIndicator, 'LEFT', 2, 0)
+    TargetIndicator.Left:SetSize(32, 32)
+    TargetIndicator.Left:SetPoint('RIGHT', TargetIndicator, 'LEFT', 8, 0)
     TargetIndicator.Left:SetVertexColor(Y:HexToRGB(C['ui-widget-color']))
 
     TargetIndicator.Right = TargetIndicator:CreateTexture(nil, 'ARTWORK')
-    TargetIndicator.Right:SetSize(16, 16)
-    TargetIndicator.Right:SetPoint('LEFT', TargetIndicator, 'RIGHT', -3, 0)
+    TargetIndicator.Right:SetSize(32, 32)
+    TargetIndicator.Right:SetPoint('LEFT', TargetIndicator, 'RIGHT', -10, 0)
     TargetIndicator.Right:SetVertexColor(Y:HexToRGB(C['ui-widget-color']))
 
     if (C['nameplates-target-indicator-size'] == 'SMALL') then

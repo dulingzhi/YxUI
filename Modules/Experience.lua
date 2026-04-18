@@ -237,7 +237,7 @@ function Experience:CreateBar()
 	Y:SetFontInfo(self.Percentage, C["ui-widget-font"], C["ui-font-size"])
 	self.Percentage:SetJustifyH("RIGHT")
 
-	Y:CreateMover(self, 6)
+ 	-- Y:CreateMover(self, 6)
 end
 
 function Experience:Update()

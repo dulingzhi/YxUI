@@ -35,6 +35,7 @@ elseif YxUI.IsWrath then
         TalentMicroButton,
         AchievementMicroButton,
         QuestLogMicroButton,
+        GuildMicroButton,
         SocialsMicroButton,
         CollectionsMicroButton,
         PVPMicroButton,

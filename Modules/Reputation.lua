@@ -151,13 +151,13 @@ function Reputation:CreateBar()
 		self.Percentage:Hide()
 	end
 
-	Y:CreateMover(self, 6)
+	-- Y:CreateMover(self, 6)
 end
 
 function Reputation:OnEvent()
 	local Name, StandingID, Min, Max, Value
 
-	if Y.IsMainline then
+	if GetWatchedFactionData then
 		local Data = GetWatchedFactionData()
 		
 		if Data then

@@ -1455,9 +1455,9 @@ function AB:UpdateEmptyButtons()
                     if Button.ShowGrid then
                         Button:ShowGrid(ACTION_BUTTON_SHOW_GRID_REASON_EVENT)
                     end
-
-                    if Y.IsMainline then
-                        Button:SetAttribute("showgrid", 1)
+                    if Button.SetShowGrid then
+                        Button:SetAttribute("showgrid", 8)
+                        Button:Show()
                     else
                         Button:SetAttribute("showgrid", 2)
                         ActionButton_ShowGrid(Button)
