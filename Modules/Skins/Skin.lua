@@ -1,7 +1,7 @@
 local Y, L, A, C, D = select(2, ...):get()
 
 local Skin = Y:NewModule('Skin')
-local IsAddOnLoaded = IsAddOnLoaded or C_AddOn.IsAddOnLoaded
+local IsAddOnLoaded = IsAddOnLoaded or C_AddOns.IsAddOnLoaded
 
 Skin.Configs = {}
 

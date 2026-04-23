@@ -9,6 +9,7 @@ local format = string.format
 local floor = math.floor
 local match = string.match
 local reverse = string.reverse
+local IsAddOnLoaded = IsAddOnLoaded or C_AddOns.IsAddOnLoaded
 
 -- Tools
 function YxUI:HexToRGB(hex)
