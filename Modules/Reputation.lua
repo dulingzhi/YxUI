@@ -151,7 +151,7 @@ function Reputation:CreateBar()
 		self.Percentage:Hide()
 	end
 
-	-- Y:CreateMover(self, 6)
+	Y:CreateMover(self, 6)
 end
 
 function Reputation:OnEvent()

@@ -197,7 +197,7 @@ local function load()
                     local spellname = GetSpellBookItemName(slot, SpellBookFrame.bookType)
                     if spellname then
                         SpellBinder.spellbuttons[i]:Show()
-                        AutoCastShine_AutoCastStart(SpellBinder.spellbuttons[i])
+                        SpellBinder.spellbuttons[i]:ShowAutoCastEnabled(true)
                     end
                 end
             end
@@ -381,7 +381,7 @@ local function load()
 
     for i = 1, SPELLS_PER_PAGE do
         local parent = _G['SpellButton' .. i]
-        local button = CreateFrame('Button', 'SpellBinderFakeButton' .. i, parent, 'AutoCastShineTemplate')
+        local button = CreateFrame('Button', 'SpellBinderFakeButton' .. i, parent, 'AutoCastOverlayTemplate')
         button:SetID(parent:GetID())
         button:RegisterForClicks('AnyDown')
         button:SetAllPoints(parent)

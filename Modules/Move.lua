@@ -255,7 +255,7 @@ function YxUI:CreateMover(frame, padding)
 	local Padding = padding or 0
 	local Width, Height = frame:GetSize()
 
-	local Mover = CreateFrame("Frame", nil, YxUI.UIParent, "SecureHandlerStateTemplate, BackdropTemplate")
+	local Mover = CreateFrame("Frame", nil, YxUI.UIParent, "BackdropTemplate")
 	Mover:SetSize(Width + Padding, Height + Padding)
 	Mover:SetBackdrop(YxUI.BackdropAndBorder)
 	Mover:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-bg-color"]))

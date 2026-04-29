@@ -237,7 +237,7 @@ function Experience:CreateBar()
 	Y:SetFontInfo(self.Percentage, C["ui-widget-font"], C["ui-font-size"])
 	self.Percentage:SetJustifyH("RIGHT")
 
- 	-- Y:CreateMover(self, 6)
+ 	Y:CreateMover(self, 6)
 end
 
 function Experience:Update()
@@ -524,6 +524,11 @@ function Experience:OnLeave()
 end
 
 function Experience:Load()
+	-- Hide native bars unconditionally; YxUI has its own experience/reputation bars.
+	if StatusTrackingBarManager then
+		StatusTrackingBarManager:Hide()
+	end
+
 	if (not C["experience-enable"] or Y.IsMaxLevel) then
 		return
 	end
@@ -552,9 +557,6 @@ function Experience:Load()
 		UpdatePercentVisibility(C["experience-percent-visibility"])
 	--end
 
-	if StatusTrackingBarManager then
-		StatusTrackingBarManager:Hide()
-	end
 end
 
 local UpdateBarColor = function(value)

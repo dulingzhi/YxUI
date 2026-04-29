@@ -145,6 +145,39 @@ function Durability:Load() -- Maybe a setting to hide the whole frame?
 	YxUI:CreateMover(self)
 end
 
+-- Block Edit Mode from overriding YxUI's custom frame positions.
+-- Uses hooksecurefunc (taint-safe post-hook) instead of direct function replacement.
+-- UpdateLayoutInfo is the single entry-point that calls InitSystemAnchors, UpdateSystems,
+-- and UpdateActionBarPositions — hooking it catches all repositioning in one place.
+if EditModeManagerFrame then
+	-- After EditMode finishes repositioning all registered Blizzard frames,
+	-- re-anchor any YxUI-managed frames back to their Movers.
+	hooksecurefunc(EditModeManagerFrame, 'UpdateLayoutInfo', function()
+		for _, mover in ipairs(YxUI.MovingFrames) do
+			if mover.Frame then
+				mover.Frame:ClearAllPoints()
+				mover.Frame:SetPoint('CENTER', mover, 0, 0)
+			end
+		end
+	end)
+
+	-- Prevent users from opening the Edit Mode panel
+	EditModeManagerFrame:HookScript('OnShow', function(self)
+		self:Hide()
+	end)
+end
+
+-- Always hide the native experience/reputation tracking bars.
+-- YxUI provides its own versions; the native ones must stay hidden
+-- regardless of whether the experience module is enabled or the player is max level.
+-- Also prevent EditMode's UpdateSystems from showing them again.
+if StatusTrackingBarManager then
+	StatusTrackingBarManager:Hide()
+	StatusTrackingBarManager:HookScript('OnShow', function(self)
+		self:Hide()
+	end)
+end
+
 if (not YxUI.IsClassic) then
 	local SeatIndicator = YxUI:NewModule("Vehicle Seats")
 
