@@ -1,6 +1,119 @@
 local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-if YxUI.IsMainline then return end -- Stopping support with TWW
+if YxUI.IsMainline then
+	local LastAnchors
+	local HookedTracker
+	local HookedContainer
+	local Editing
+
+	local function ShiftTracker()
+		local Frame = ObjectiveTrackerFrame
+		if not Frame or not Frame.SetPointBase or InCombatLockdown() or Editing then
+			return
+		end
+
+		local Anchors = {}
+		for i = 1, Frame:GetNumPoints() do
+			local Point, RelativeTo, RelativePoint, X, Y = Frame:GetPoint(i)
+			if not Point or type(X) ~= "number" or type(Y) ~= "number" then
+				return
+			end
+			Anchors[i] = {Point, RelativeTo, RelativePoint, X, Y}
+		end
+		if #Anchors == 0 then
+			return
+		end
+
+		Frame:SetClampedToScreen(true)
+
+		if LastAnchors and #LastAnchors == #Anchors then
+			local Unchanged = true
+			for i, Anchor in ipairs(Anchors) do
+				for j = 1, 5 do
+					if Anchor[j] ~= LastAnchors[i][j] then
+						Unchanged = false
+						break
+					end
+				end
+				if not Unchanged then
+					break
+				end
+			end
+			if Unchanged then
+				return
+			end
+		end
+
+		for _, Anchor in ipairs(Anchors) do
+			Frame:SetPointBase(Anchor[1], Anchor[2], Anchor[3], Anchor[4] - 140, Anchor[5])
+		end
+
+		LastAnchors = {}
+		for i = 1, Frame:GetNumPoints() do
+			LastAnchors[i] = {Frame:GetPoint(i)}
+		end
+	end
+
+	local function RestoreTrackerAnchor()
+		Editing = true
+		local Frame = ObjectiveTrackerFrame
+		if Frame and not InCombatLockdown() then
+			Frame:SetClampedToScreen(true)
+		end
+		if not Frame or not LastAnchors or InCombatLockdown() or Frame:GetNumPoints() ~= #LastAnchors then
+			LastAnchors = nil
+			return
+		end
+
+		for i, Anchor in ipairs(LastAnchors) do
+			local Point, RelativeTo, RelativePoint, X, Y = Frame:GetPoint(i)
+			if Point ~= Anchor[1] or RelativeTo ~= Anchor[2] or RelativePoint ~= Anchor[3] or X ~= Anchor[4] or Y ~= Anchor[5] then
+				LastAnchors = nil
+				return
+			end
+		end
+
+		for _, Anchor in ipairs(LastAnchors) do
+			Frame:SetPointBase(Anchor[1], Anchor[2], Anchor[3], Anchor[4] + 140, Anchor[5])
+		end
+		LastAnchors = nil
+	end
+
+	local function FinishEditing()
+		Editing = false
+		ShiftTracker()
+	end
+
+	local function HookTracker()
+		local Frame = ObjectiveTrackerFrame
+		if Frame and Frame ~= HookedTracker and Frame.ApplySystemAnchor then
+			hooksecurefunc(Frame, "ApplySystemAnchor", ShiftTracker)
+			hooksecurefunc(Frame, "OnEditModeEnter", RestoreTrackerAnchor)
+			hooksecurefunc(Frame, "OnEditModeExit", FinishEditing)
+			HookedTracker = Frame
+		end
+
+		local Container = GetRightManagedFrameContainer and GetRightManagedFrameContainer()
+		if Container and Container ~= HookedContainer and Container.Layout then
+			hooksecurefunc(Container, "Layout", ShiftTracker)
+			HookedContainer = Container
+		end
+
+		ShiftTracker()
+	end
+
+	local Events = CreateFrame("Frame")
+	Events:RegisterEvent("PLAYER_ENTERING_WORLD")
+	Events:RegisterEvent("PLAYER_REGEN_ENABLED")
+	Events:RegisterEvent("ADDON_LOADED")
+	Events:SetScript("OnEvent", function(_, Event, AddOn)
+		if Event ~= "ADDON_LOADED" or AddOn == "Blizzard_ObjectiveTracker" then
+			HookTracker()
+		end
+	end)
+	HookTracker()
+	return
+end
 
 local Tracker = YxUI:NewModule("Objective Tracker")
 
@@ -43,13 +156,13 @@ function Tracker:MoveTrackerFrame()
 end
 
 local AddObjective = function(self, block, objective)
-	if (block.HeaderText and not block.HeaderText.Handled) then
+	if block.HeaderText and not block.HeaderText.Handled then
 		YxUI:SetFontInfo(block.HeaderText, Settings["tracker-header-font"], Settings["tracker-header-font-size"], Settings["tracker-header-font-flags"])
 		block.HeaderText:SetTextColor(YxUI:HexToRGB(Settings["tracker-color-header"]))
 		block.HeaderText.Handled = true
 	end
 
-	if (block.itemButton and not block.itemButton.Handled) then
+	if block.itemButton and not block.itemButton.Handled then
 		local ItemButton = block.itemButton
 
 		ItemButton:ClearAllPoints()
@@ -103,11 +216,11 @@ local AddObjective = function(self, block, objective)
 
 	local Line = block.lines[objective]
 
-	if (Line and not Line.Handled) then
+	if Line and not Line.Handled then
 		YxUI:SetFontInfo(Line.Text, Settings["tracker-font"], Settings["tracker-font-size"], Settings["tracker-font-flags"])
 		Line.Handled = true
 
-		if (Line.Dash and not Line.Dash.Handled) then
+		if Line.Dash and not Line.Dash.Handled then
 			YxUI:SetFontInfo(Line.Dash, Settings["tracker-font"], Settings["tracker-font-size"], Settings["tracker-font-flags"])
 			Line.Dash.Handled = true
 		end
@@ -152,7 +265,7 @@ local MinimizeHook = function(button, collapsed)
 	for i = 1, button:GetNumRegions() do
 		local Region = select(i, button:GetRegions())
 
-		if (Region and Region:GetObjectType() == "Texture") then
+		if Region and Region:GetObjectType() == "Texture" then
 			Region:SetTexture(nil)
 		end
 	end
@@ -180,13 +293,13 @@ function Tracker:CreateCustomHeader(tracker)
 		for i = 1, tracker.MinimizeButton:GetNumRegions() do
 			local Region = select(i, tracker.MinimizeButton:GetRegions())
 
-			if (Region and Region:GetObjectType() == "Texture") then
+			if Region and Region:GetObjectType() == "Texture" then
 				Region:SetTexture(nil)
 			end
 		end
 	end
 
-	if (tracker and tracker.CreateTexture) then
+	if tracker and tracker.CreateTexture then
 		tracker.BG = tracker:CreateTexture(nil, "BORDER")
 		tracker.BG:SetPoint("TOPLEFT", tracker, 0, -2)
 		tracker.BG:SetPoint("BOTTOMRIGHT", tracker, 12, -1)
@@ -267,7 +380,7 @@ function Tracker:StyleWindow()
 	ObjectiveTrackerFrame.BG.InnerBorder:SetBackdrop(YxUI.Outline)
 	ObjectiveTrackerFrame.BG.InnerBorder:SetBackdropBorderColor(0, 0, 0)
 
-	if (not Settings["tracker-enable-backdrop"]) then
+	if not Settings["tracker-enable-backdrop"] then
 		ObjectiveTrackerFrame.BG:Hide()
 	end
 
@@ -382,7 +495,7 @@ local SkinAutoQuestPopup = function()
 
 		local QuestTitle = C_QuestLog.GetTitleForQuestID(QuestID)
 
-		if (QuestTitle and QuestTitle ~= "") then
+		if QuestTitle and QuestTitle ~= "" then
 			local Block = AUTO_QUEST_POPUP_TRACKER_MODULE:GetBlock(QuestID)
 
 			if Block then
@@ -392,7 +505,7 @@ local SkinAutoQuestPopup = function()
 				BlockContents:SetPoint("LEFT", Block, 0, 2)
 				BlockContents:GetParent():SetWidth(268)
 
-				if (not BlockContents.Backdrop) then
+				if not BlockContents.Backdrop then
 					BlockContents.Backdrop = CreateFrame("Frame", nil, BlockContents, "BackdropTemplate")
 					--BlockContents.Backdrop:SetPoint("TOPLEFT", BlockContents:GetParent(), 36, -1)
 					--BlockContents.Backdrop:SetPoint("BOTTOMRIGHT", BlockContents:GetParent(), 40, 1)
@@ -413,7 +526,7 @@ local SkinAutoQuestPopup = function()
 					BlockContents.Backdrop.Highlight:Hide()
 				end
 
-				if (not BlockContents.Handled) then
+				if not BlockContents.Handled then
 					YxUI:SetFontInfo(BlockContents.TopText, Settings["tracker-font"], Settings["tracker-font-size"], Settings["tracker-font-flags"])
 					YxUI:SetFontInfo(BlockContents.BottomText, Settings["tracker-font"], Settings["tracker-font-size"], Settings["tracker-font-flags"])
 					YxUI:SetFontInfo(BlockContents.QuestName, Settings["tracker-header-font"], Settings["tracker-header-font-size"], Settings["tracker-header-font-flags"])
@@ -424,7 +537,7 @@ local SkinAutoQuestPopup = function()
 				if  (PopupType == "COMPLETE") then
 					BlockContents.QuestionMark:ClearAllPoints()
 					BlockContents.QuestionMark:SetPoint("LEFT", BlockContents.Backdrop, 18, 0)
-				elseif (PopupType == "OFFER") then
+				elseif PopupType == "OFFER" then
 					BlockContents.Exclamation:ClearAllPoints()
 					BlockContents.Exclamation:SetPoint("LEFT", BlockContents.Backdrop, 18, 0)
 				end
@@ -487,12 +600,12 @@ local UpdateScenarioBlock = function()
 end
 
 function Tracker:AddHooks()
-	if (not ObjectiveTrackerFrame.initialized) then -- I'll move or hook this case later, but the tracker also loads on player entering world, so sometimes we need to start it
+	if not ObjectiveTrackerFrame.initialized then -- I'll move or hook this case later, but the tracker also loads on player entering world, so sometimes we need to start it
 		ObjectiveTracker_Initialize(ObjectiveTrackerFrame)
 
 		--ObjectiveTracker_Update() -- Tainting in 9.1
 
-		if (not QuestSuperTracking_IsSuperTrackedQuestValid()) then
+		if not QuestSuperTracking_IsSuperTrackedQuestValid() then
 			QuestSuperTracking_ChooseClosestQuest()
 		end
 
@@ -520,7 +633,7 @@ function Tracker:AddHooks()
 end
 
 function Tracker:Load()
-	if (not Settings["tracker-enable"]) then
+	if not Settings["tracker-enable"] then
 		return
 	end
 
@@ -589,19 +702,47 @@ local UpdateBackdropOpacity = function(value)
 end
 
 local UpdateEnableBackdrop = function(value)
-	if (value and not ObjectiveTrackerFrame.collapsed) then
+	if value and not ObjectiveTrackerFrame.collapsed then
 		ObjectiveTrackerFrame.BG:Show()
 	else
 		ObjectiveTrackerFrame.BG:Hide()
 	end
 end
 
-YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Objectives"], function(left, right)
+local function UpdateTrackerDependencies()
+	local Enabled = Settings["tracker-enable"]
+	YxUI:GetModule("GUI").WidgetCore.UpdateDependencies({
+		["tracker-enable-backdrop"] = Enabled,
+		["tracker-backdrop-opacity"] = Enabled and Settings["tracker-enable-backdrop"],
+		["tracker-height"] = Enabled,
+		["tracker-color-normal"] = Enabled,
+		["tracker-color-normal-highlight"] = Enabled,
+		["tracker-color-header"] = Enabled,
+		["tracker-color-header-highlight"] = Enabled,
+		["tracker-color-failed"] = Enabled,
+		["tracker-color-failed-highlight"] = Enabled,
+		["tracker-color-timeleft"] = Enabled,
+		["tracker-color-timeleft-highlight"] = Enabled,
+		["tracker-color-complete"] = Enabled,
+		["tracker-module-font"] = Enabled,
+		["tracker-module-font-size"] = Enabled,
+		["tracker-module-font-flags"] = Enabled,
+		["tracker-module-font-color"] = Enabled,
+		["tracker-header-font"] = Enabled,
+		["tracker-header-font-size"] = Enabled,
+		["tracker-header-font-flags"] = Enabled,
+		["tracker-font"] = Enabled,
+		["tracker-font-size"] = Enabled,
+		["tracker-font-flags"] = Enabled,
+	})
+end
+
+YxUI:GetModule("GUI"):AddWidgetsID("General", "Objectives", function(left, right)
 	left:CreateHeader(Language["Enable"])
-	left:CreateSwitch("tracker-enable", Settings["tracker-enable"], Language["Enable Tracker Module"], Language["Enable the YxUI objective tracker module"], ReloadUI):RequiresReload(true)
+	left:CreateSwitch("tracker-enable", Settings["tracker-enable"], Language["Enable Tracker Module"], Language["Enable the YxUI objective tracker module"], function() UpdateTrackerDependencies(); ReloadUI() end):RequiresReload(true)
 
 	left:CreateHeader(Language["Styling"])
-	left:CreateSwitch("tracker-enable-backdrop", Settings["tracker-enable-backdrop"], Language["Enable Backdrop"], Language["Enable a backdrop for the objective tracker"], UpdateEnableBackdrop)
+	left:CreateSwitch("tracker-enable-backdrop", Settings["tracker-enable-backdrop"], Language["Enable Backdrop"], Language["Enable a backdrop for the objective tracker"], function(value) UpdateEnableBackdrop(value); UpdateTrackerDependencies() end)
 	left:CreateSlider("tracker-backdrop-opacity", Settings["tracker-backdrop-opacity"], 0, 100, 5, Language["Backdrop Opacity"], Language["Set the backdrop opacity of the objective tracker"], UpdateBackdropOpacity)
 	left:CreateSlider("tracker-height", Settings["tracker-height"], 100, 500, 1, Language["Set Height"], Language["Set the height of the objective tracker"], UpdateHeight)
 
@@ -631,4 +772,32 @@ YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Objectives"], fu
 	right:CreateDropdown("tracker-font", Settings["tracker-font"], Assets:GetFontList(), Language["Font"], Language["Set the font of the objective tracker lines"], UpdateLineFont, "Font")
 	right:CreateSlider("tracker-font-size", Settings["tracker-font-size"], 8, 18, 1, Language["Font Size"], Language["Set the font size of the objective tracker lines"], UpdateLineFont)
 	right:CreateDropdown("tracker-font-flags", Settings["tracker-font-flags"], Assets:GetFlagsList(), Language["Font Flags"], Language["Set the font flags of the objective tracker lines"], UpdateLineFont)
+	UpdateTrackerDependencies()
 end)
+YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "Objectives", {
+	{"tracker-enable-backdrop", function(value) UpdateEnableBackdrop(value); UpdateTrackerDependencies() end},
+	{"tracker-backdrop-opacity", UpdateBackdropOpacity},
+	{"tracker-height", UpdateHeight},
+	{"tracker-color-normal", UpdateHeaderFont},
+	{"tracker-color-normal-highlight", UpdateHeaderFont},
+	{"tracker-color-header", UpdateHeaderFont},
+	{"tracker-color-header-highlight", UpdateHeaderFont},
+	{"tracker-color-failed", UpdateHeaderFont},
+	{"tracker-color-failed-highlight", UpdateHeaderFont},
+	{"tracker-color-timeleft", UpdateHeaderFont},
+	{"tracker-color-timeleft-highlight", UpdateHeaderFont},
+	{"tracker-color-complete", UpdateHeaderFont},
+	{"tracker-module-font", UpdateCategoryFont},
+	{"tracker-module-font-size", UpdateCategoryFont},
+	{"tracker-module-font-flags", UpdateCategoryFont},
+	{"tracker-module-font-color", UpdateCategoryFont},
+	{"tracker-header-font", UpdateHeaderFont},
+	{"tracker-header-font-size", UpdateHeaderFont},
+	{"tracker-header-font-flags", UpdateHeaderFont},
+	{"tracker-font", UpdateLineFont},
+	{"tracker-font-size", UpdateLineFont},
+	{"tracker-font-flags", UpdateLineFont},
+}, nil)
+
+
+YxUI:GetModule("GUI"):RegisterReloadSettings({"tracker-enable"})

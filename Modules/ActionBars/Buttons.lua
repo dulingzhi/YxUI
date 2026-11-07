@@ -1,0 +1,575 @@
+local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
+
+local AB = YxUI:GetModule("Action Bars")
+local GUI = YxUI:GetModule("GUI")
+
+local IsUsableAction = IsUsableAction
+local HasAction = HasAction
+local NUM_PET_ACTION_SLOTS = NUM_PET_ACTION_SLOTS
+local CooldownKeys = {"cooldown", "chargeCooldown", "lossOfControlCooldown"}
+local LegacyHotkeysHooked
+
+local function StopRotation(animation)
+	animation:Stop()
+end
+
+local function SuppressRotation(animation)
+	if not animation then
+		return
+	end
+
+	-- These groups only rotate decorative textures. Keep Blizzard's methods,
+	-- frame visibility and action state intact, including their combat updates.
+	hooksecurefunc(animation, "Play", StopRotation)
+	animation:Stop()
+end
+
+local function SuppressButtonRotations(button)
+	if not YxUI.IsMainline then
+		return
+	end
+
+	-- Cooldown edges rotate independently of animation groups, including on
+	-- the global cooldown. Keep the swipe and countdown, but remove the edges
+	-- from normal, charge-recovery and loss-of-control cooldowns.
+	for _, key in ipairs(CooldownKeys) do
+		local Cooldown = button[key]
+		if Cooldown then
+			Cooldown:SetDrawEdge(false)
+		end
+	end
+
+	if button.TargetReticleAnimFrame then
+		SuppressRotation(button.TargetReticleAnimFrame.HighlightAnim)
+	end
+
+	-- The assisted combat frame is created lazily when its action is placed on
+	-- the button. Leave it running: its OnUpdate refreshes the action's icon.
+	local StyledFrame
+	local function UpdateAssistedCombatRotation()
+		local Frame = button.AssistedCombatRotationFrame
+		if Frame then
+			Frame:SetAlpha(Settings["ab-hide-assisted-combat"] and 0 or 1)
+			if Frame ~= StyledFrame and Frame.ActiveFrame then
+				SuppressRotation(Frame.ActiveFrame.GlowAnim)
+				StyledFrame = Frame
+			end
+		end
+	end
+
+	if button.UpdateAssistedCombatRotationFrame then
+		hooksecurefunc(button, "UpdateAssistedCombatRotationFrame", UpdateAssistedCombatRotation)
+	end
+
+	UpdateAssistedCombatRotation()
+end
+
+local function SetButtonSwipe(button, value)
+	for _, key in ipairs(CooldownKeys) do
+		local cooldown = button[key]
+		if cooldown and cooldown.SetDrawSwipe then
+			cooldown:SetDrawSwipe(value)
+		end
+	end
+end
+
+function AB:StyleActionButton(button)
+	if button.Styled then
+		return
+	end
+
+	SuppressButtonRotations(button)
+	SetButtonSwipe(button, Settings["ab-show-swipe"])
+	if YxUI.IsMainline and button.SpellCastAnimFrame then
+		button.SpellCastAnimFrame:SetAlpha(Settings["ab-show-action-cast-animation"] and 1 or 0)
+	end
+
+	if button.IconMask then
+		button.IconMask:Hide()
+	end
+
+	if button.RightDivider then
+		button.RightDivider:Hide()
+	end
+
+	if button.SlotArt then
+		button.SlotArt:Hide()
+	end
+
+	if button.SlotBackground then
+		button.SlotBackground:SetAlpha(0)
+		button.SlotBackground:Hide()
+	end
+
+	if _G[button:GetName().."NormalTexture"] then
+		_G[button:GetName().."NormalTexture"]:SetTexture(nil)
+	end
+
+	if button:GetNormalTexture() then
+		button:GetNormalTexture():SetTexture(nil)
+	end
+
+	button:SetNormalTexture("")
+
+	if button.Border then
+		button.Border:SetTexture(nil)
+	end
+
+	-- ActionButtonMixin exposes the icon as Icon on current clients. Keep the
+	-- lowercase lookup for older clients, which used the template global.
+	-- Keep Blizzard-owned fields and methods secure for stance updates in combat.
+	local Icon = button.Icon or button.icon
+
+	if Icon then
+		Icon:ClearAllPoints()
+		Icon:SetPoint("TOPLEFT", button, 1, -1)
+		Icon:SetPoint("BOTTOMRIGHT", button, -1, 1)
+		Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+		Icon:SetAlpha(1)
+
+		-- Blizzard normally owns icon visibility, but the texture can still be
+		-- visible when an empty button is first styled. Clear that stale state
+		-- now instead of waiting for the next action-button update (such as the
+		-- update triggered by hovering over the button).
+		if button.action and not HasAction(button.action) then
+			Icon:Hide()
+		end
+	end
+
+	if _G[button:GetName() .. "FloatingBG"] then
+		self:Disable(_G[button:GetName() .. "FloatingBG"])
+	end
+
+	if button.HotKey then
+		button.HotKey:ClearAllPoints()
+		button.HotKey:SetPoint("TOPLEFT", button, 2, -3)
+		YxUI:SetFontInfo(button.HotKey, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		button.HotKey:SetJustifyH("LEFT")
+		button.HotKey:SetTextColor(1, 1, 1)
+
+		AB.UpdateHotKeyText(button)
+
+		if not Settings["ab-show-hotkey"] then
+			button.HotKey:SetAlpha(0)
+		end
+	end
+
+	if button.Name then
+		button.Name:ClearAllPoints()
+		button.Name:SetPoint("BOTTOMLEFT", button, 2, 2)
+		button.Name:SetWidth(button:GetWidth() - 4)
+		YxUI:SetFontInfo(button.Name, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		button.Name:SetJustifyH("LEFT")
+		button.Name:SetTextColor(1, 1, 1)
+
+		if not Settings["ab-show-macro"] then
+			button.Name:SetAlpha(0)
+		end
+	end
+
+	if button.Count then
+		button.Count:ClearAllPoints()
+		button.Count:SetPoint("BOTTOMRIGHT", button, -2, 2)
+		YxUI:SetFontInfo(button.Count, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		button.Count:SetJustifyH("RIGHT")
+		button.Count:SetDrawLayer("OVERLAY")
+		button.Count:SetTextColor(1, 1, 1)
+
+		if not Settings["ab-show-count"] then
+			button.Count:SetAlpha(0)
+		end
+	end
+
+	button.Backdrop = CreateFrame("Frame", nil, button, "BackdropTemplate")
+	button.Backdrop:SetPoint("TOPLEFT", button, 0, 0)
+	button.Backdrop:SetPoint("BOTTOMRIGHT", button, 0, 0)
+	button.Backdrop:SetBackdrop(YxUI.Backdrop)
+	button.Backdrop:SetBackdropColor(0, 0, 0)
+	button.Backdrop:SetFrameLevel(button:GetFrameLevel() - 1)
+
+	button.Backdrop.Texture = button.Backdrop:CreateTexture(nil, "BORDER")
+	button.Backdrop.Texture:SetPoint("TOPLEFT", button.Backdrop, 1, -1)
+	button.Backdrop.Texture:SetPoint("BOTTOMRIGHT", button.Backdrop, -1, 1)
+	button.Backdrop.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
+	button.Backdrop.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
+
+	if button:GetCheckedTexture() then
+		local Checked = button:GetCheckedTexture()
+		Checked:SetTexture(Assets:GetTexture(Settings["action-bars-button-highlight"]))
+		Checked:SetColorTexture(0.1, 0.9, 0.1, 0.2)
+		Checked:SetPoint("TOPLEFT", button, 1, -1)
+		Checked:SetPoint("BOTTOMRIGHT", button, -1, 1)
+	end
+
+	if button:GetPushedTexture() then
+		local Pushed = button:GetPushedTexture()
+		Pushed:SetTexture(Assets:GetTexture(Settings["action-bars-button-highlight"]))
+		Pushed:SetColorTexture(0.9, 0.8, 0.1, 0.3)
+		Pushed:SetPoint("TOPLEFT", button, 1, -1)
+		Pushed:SetPoint("BOTTOMRIGHT", button, -1, 1)
+	end
+
+	local Highlight = button:GetHighlightTexture()
+	Highlight:SetTexture(Assets:GetTexture(Settings["action-bars-button-highlight"]))
+	Highlight:SetColorTexture(1, 1, 1, 0.2)
+	Highlight:SetPoint("TOPLEFT", button, 1, -1)
+	Highlight:SetPoint("BOTTOMRIGHT", button, -1, 1)
+
+	if button.Flash then
+		button.Flash:SetVertexColor(0.7, 0.7, 0.1, 0.3)
+		button.Flash:SetPoint("TOPLEFT", button, 1, -1)
+		button.Flash:SetPoint("BOTTOMRIGHT", button, -1, 1)
+	end
+
+	local Range = button:CreateTexture(nil, "ARTWORK")
+	Range:SetTexture(Assets:GetTexture(Settings["action-bars-button-highlight"]))
+	Range:SetVertexColor(0.7, 0, 0)
+	Range:SetPoint("TOPLEFT", button, 1, -1)
+	Range:SetPoint("BOTTOMRIGHT", button, -1, 1)
+	Range:SetAlpha(0)
+
+	button.Range = Range
+
+	if button.cooldown then
+		button.cooldown:ClearAllPoints()
+		button.cooldown:SetPoint("TOPLEFT", button, 1, -1)
+		button.cooldown:SetPoint("BOTTOMRIGHT", button, -1, 1)
+
+		button.cooldown:SetDrawEdge(not YxUI.IsMainline)
+		button.cooldown:SetEdgeTexture(Assets:GetTexture("Blank"))
+		button.cooldown:SetSwipeColor(0, 0, 0, 1)
+
+		local FontString = button.cooldown:GetRegions()
+
+		if FontString then
+			YxUI:SetFontInfo(FontString, Settings["ab-font"], Settings["ab-cd-size"], Settings["ab-font-flags"])
+		end
+	end
+
+	button:SetFrameLevel(15)
+	button:SetFrameStrata("MEDIUM")
+
+	if button.UpdateHotkeys then
+		hooksecurefunc(button, "UpdateHotkeys", AB.UpdateHotKeyText)
+	elseif button.Update then
+		hooksecurefunc(button, "Update", AB.UpdateHotKeyText)
+	elseif ActionButton_UpdateHotkeys and not LegacyHotkeysHooked then
+		hooksecurefunc("ActionButton_UpdateHotkeys", AB.UpdateHotKeyText)
+		LegacyHotkeysHooked = true
+	end
+
+	button.Styled = true
+end
+
+function AB:StylePetActionButton(button)
+	if button.Styled then
+		return
+	end
+
+	button:SetSize(Settings["ab-pet-button-size"], Settings["ab-pet-button-size"])
+
+	local Name = button:GetName()
+
+	if _G[Name .. "AutoCastable"] then
+		_G[Name .. "AutoCastable"]:SetSize(Settings["ab-pet-button-size"] * 2 - 4, Settings["ab-pet-button-size"] * 2 - 4)
+	end
+
+	local Shine = _G[Name .. "Shine"]
+
+	if Shine then
+		Shine:SetSize(Settings["ab-pet-button-size"] - 6, Settings["ab-pet-button-size"] - 6)
+		Shine:ClearAllPoints()
+		Shine:SetPoint("CENTER", button, 0, 0)
+	end
+
+	button.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+	button.icon:SetDrawLayer("BACKGROUND", 7)
+	button.icon:SetPoint("TOPLEFT", button, 1, -1)
+	button.icon:SetPoint("BOTTOMRIGHT", button, -1, 1)
+
+	if button.IconMask then
+		button.IconMask:Hide()
+	end
+
+	if button.SlotArt then
+		button.SlotArt:Hide()
+	end
+
+	if button.SlotBackground then
+		button.SlotBackground:SetAlpha(0)
+		button.SlotBackground:Hide()
+	end
+
+	_G[button:GetName().."NormalTexture"]:SetAlpha(0)
+	_G[button:GetName().."NormalTexture"]:Hide()
+	button:GetNormalTexture():SetAlpha(0)
+	button:GetNormalTexture():Hide()
+
+	button:SetNormalTexture("")
+
+	if button.HotKey then
+		button.HotKey:ClearAllPoints()
+		button.HotKey:SetPoint("TOPLEFT", button, 2, -3)
+		YxUI:SetFontInfo(button.HotKey, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		button.HotKey:SetJustifyH("LEFT")
+		button.HotKey:SetDrawLayer("OVERLAY")
+		button.HotKey:SetTextColor(1, 1, 1)
+
+		if not Settings["action-bars-show-hotkeys"] then
+			button.HotKey:SetAlpha(0)
+		end
+	end
+
+	if button.Name then
+		button.Name:ClearAllPoints()
+		button.Name:SetPoint("BOTTOMLEFT", button, 2, 2)
+		button.Name:SetWidth(button:GetWidth() - 4)
+		YxUI:SetFontInfo(button.Name, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		button.Name:SetJustifyH("LEFT")
+		button.Name:SetDrawLayer("OVERLAY")
+		button.Name:SetTextColor(1, 1, 1)
+
+		if not Settings["action-bars-show-macro-names"] then
+			button.Name:SetAlpha(0)
+		end
+	end
+
+	if button.Count then
+		button.Count:ClearAllPoints()
+		button.Count:SetPoint("BOTTOMRIGHT", button, -2, 2)
+		YxUI:SetFontInfo(button.Count, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+		button.Count:SetJustifyH("RIGHT")
+		button.Count:SetDrawLayer("OVERLAY")
+		button.Count:SetTextColor(1, 1, 1)
+
+		if not Settings["action-bars-show-count"] then
+			button.Count:SetAlpha(0)
+		end
+	end
+
+	_G[Name.."Flash"]:SetTexture("")
+
+	if _G[Name .. "NormalTexture2"] then
+		_G[Name .. "NormalTexture2"]:Hide()
+	end
+
+	local Checked = button:GetCheckedTexture()
+	Checked:SetTexture(Assets:GetTexture(Settings["action-bars-button-highlight"]))
+	Checked:SetColorTexture(0.1, 0.9, 0.1, 0.3)
+	Checked:SetPoint("TOPLEFT", button, 1, -1)
+	Checked:SetPoint("BOTTOMRIGHT", button, -1, 1)
+
+	local Pushed = button:GetPushedTexture()
+	Pushed:SetTexture(Assets:GetTexture(Settings["action-bars-button-highlight"]))
+	Pushed:SetColorTexture(0.9, 0.8, 0.1, 0.3)
+	Pushed:SetPoint("TOPLEFT", button, 1, -1)
+	Pushed:SetPoint("BOTTOMRIGHT", button, -1, 1)
+
+	local Highlight = button:GetHighlightTexture()
+	Highlight:SetTexture(Assets:GetTexture(Settings["action-bars-button-highlight"]))
+	Highlight:SetColorTexture(1, 1, 1, 0.2)
+	Highlight:SetPoint("TOPLEFT", button, 1, -1)
+	Highlight:SetPoint("BOTTOMRIGHT", button, -1, 1)
+
+	button.Backdrop = CreateFrame("Frame", nil, button, "BackdropTemplate")
+	button.Backdrop:SetPoint("TOPLEFT", button, 0, 0)
+	button.Backdrop:SetPoint("BOTTOMRIGHT", button, 0, 0)
+	button.Backdrop:SetBackdrop(YxUI.Backdrop)
+	button.Backdrop:SetBackdropColor(0, 0, 0)
+	button.Backdrop:SetFrameLevel(button:GetFrameLevel() - 1)
+
+	button.Backdrop.Texture = button.Backdrop:CreateTexture(nil, "BORDER")
+	button.Backdrop.Texture:SetPoint("TOPLEFT", button.Backdrop, 1, -1)
+	button.Backdrop.Texture:SetPoint("BOTTOMRIGHT", button.Backdrop, -1, 1)
+	button.Backdrop.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
+	button.Backdrop.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-window-main-color"]))
+
+	button.Styled = true
+end
+
+function AB:PetActionBar_Update()
+	for i = 1, NUM_PET_ACTION_SLOTS do
+		AB.PetBar[i]:SetNormalTexture("")
+	end
+end
+
+function AB:StanceBar_UpdateState()
+	if not Settings["ab-stance-enable"] then
+		return
+	end
+
+	if GetNumShapeshiftForms() > 0 then
+		if not AB.StanceBar:IsShown() then
+			AB:EnableBar(AB.StanceBar)
+		end
+	elseif AB.StanceBar:IsShown() then
+		AB:DisableBar(AB.StanceBar)
+	end
+end
+
+function AB:UpdateButtonRange(button, inRange, checksRange)
+	local range = button.Range
+	if not range then
+		return
+	end
+
+	range:SetShown(checksRange)
+	range:SetAlphaFromBoolean(inRange, 0, 0.65)
+end
+
+function AB:UpdateButtonStatus(check, inrange)
+	if not check or not self.action then
+		return
+	end
+
+	local IsUsable, NoMana = IsUsableAction(self.action)
+
+	if IsUsable then
+		if inrange == false then
+			self.icon:SetVertexColor(YxUI:HexToRGB("FF4C19"))
+		else
+			self.icon:SetVertexColor(YxUI:HexToRGB("FFFFFF"))
+		end
+	elseif NoMana then
+		self.icon:SetVertexColor(YxUI:HexToRGB("7F7FE1"))
+	else
+		self.icon:SetVertexColor(YxUI:HexToRGB("4C4C4C"))
+	end
+end
+
+function AB:SetButtonRegionAlpha(regionName, alpha, includeAuxiliaryBars)
+	for _, bar in ipairs(self.Bars or {}) do
+		for i = 1, #bar do
+			local region = bar[i][regionName]
+			if region then
+				region:SetAlpha(alpha)
+			end
+		end
+	end
+
+	if includeAuxiliaryBars then
+		local function updateAuxiliaryBar(bar)
+			if not bar then
+				return
+			end
+			for i = 1, #bar do
+				local region = bar[i][regionName]
+				if region then
+					region:SetAlpha(alpha)
+				end
+			end
+		end
+
+		updateAuxiliaryBar(self.PetBar)
+		updateAuxiliaryBar(self.StanceBar)
+		if ExtraActionButton1 and ExtraActionButton1[regionName] then
+			ExtraActionButton1[regionName]:SetAlpha(alpha)
+		end
+	end
+end
+
+local UpdateShowSwipe = function(value)
+	for _, bar in ipairs(AB.Bars or {}) do
+		for i = 1, #bar do
+			SetButtonSwipe(bar[i], value)
+		end
+	end
+	for _, bar in ipairs({AB.PetBar, AB.StanceBar}) do
+		if bar then
+			for i = 1, #bar do
+				SetButtonSwipe(bar[i], value)
+			end
+		end
+	end
+	if ExtraActionButton1 then
+		SetButtonSwipe(ExtraActionButton1, value)
+	end
+end
+
+local UpdateShowHotKey = function(value)
+	AB:SetButtonRegionAlpha("HotKey", value and 1 or 0, true)
+end
+local UpdateShowMacroName = function(value)
+	AB:SetButtonRegionAlpha("Name", value and 1 or 0, false)
+end
+local UpdateShowCount = function(value)
+	AB:SetButtonRegionAlpha("Count", value and 1 or 0, false)
+end
+local UpdateHideAssistedCombat = function(value)
+	AB:SetButtonRegionAlpha("AssistedCombatRotationFrame", value and 0 or 1, false)
+end
+local UpdateActionCastAnimation = function(value)
+	AB:SetButtonRegionAlpha("SpellCastAnimFrame", value and 1 or 0, true)
+end
+
+function AB:UpdateButtonFont(button)
+	if button.HotKey then
+		YxUI:SetFontInfo(button.HotKey, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+	end
+
+	if button.Name then
+		YxUI:SetFontInfo(button.Name, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+	end
+
+	if button.Count then
+		YxUI:SetFontInfo(button.Count, Settings["ab-font"], Settings["ab-font-size"], Settings["ab-font-flags"])
+	end
+
+	if button.cooldown then
+		local Cooldown = button.cooldown:GetRegions()
+
+		if Cooldown then
+			YxUI:SetFontInfo(Cooldown, Settings["ab-font"], Settings["ab-cd-size"], Settings["ab-font-flags"])
+		end
+	end
+end
+
+local UpdateActionBarFont = function()
+	for _, bar in ipairs(AB.Bars or {}) do
+		for i = 1, #bar do
+			AB:UpdateButtonFont(bar[i])
+		end
+	end
+
+	local auxiliaryBars = { "PetBar", "StanceBar" }
+	for _, field in ipairs(auxiliaryBars) do
+		local bar = AB[field]
+		if bar then
+			for i = 1, #bar do
+				AB:UpdateButtonFont(bar[i])
+			end
+		end
+	end
+end
+
+
+GUI:AddWidgetsID("General", "Action Bars", function(left, right)
+	left:CreateHeader(Language["Styling"])
+	left:CreateSwitch("ab-show-swipe", Settings["ab-show-swipe"], Language["Cooldown Swipe"], Language["Show the radial cooldown overlay on action buttons"], UpdateShowSwipe)
+	left:CreateSwitch("ab-show-hotkey", Settings["ab-show-hotkey"], Language["Show Hotkeys"], Language["Display hotkey text on action buttons"], UpdateShowHotKey)
+	left:CreateSwitch("ab-show-macro", Settings["ab-show-macro"], Language["Show Macro Names"], Language["Display macro name text on action buttons"], UpdateShowMacroName)
+	left:CreateSwitch("ab-show-count", Settings["ab-show-count"], Language["Show Count Text"], Language["Display count text on action buttons"], UpdateShowCount)
+	if YxUI.IsMainline then
+		left:CreateSwitch("ab-show-action-cast-animation", Settings["ab-show-action-cast-animation"], Language["Action Button Cast Animation"], Language["Show casting and channeling progress on action buttons"], UpdateActionCastAnimation)
+		left:CreateSwitch("ab-hide-assisted-combat", Settings["ab-hide-assisted-combat"], Language["Hide Single-Button Assistant"], Language["Hide the Single-Button Assistant texture without disabling its functionality"], UpdateHideAssistedCombat)
+	end
+
+	left:CreateHeader(Language["Font"])
+	left:CreateDropdown("ab-font", Settings["ab-font"], Assets:GetFontList(), Language["Font"], Language["Set the font of the action bar buttons"], UpdateActionBarFont, "Font")
+	left:CreateSlider("ab-font-size", Settings["ab-font-size"], 8, 42, 1, Language["Font Size"], Language["Set the font size of the action bar buttons"], UpdateActionBarFont)
+	left:CreateSlider("ab-cd-size", Settings["ab-cd-size"], 8, 42, 1, Language["Cooldown Font Size"], Language["Set the font size of the action bar cooldowns"], UpdateActionBarFont)
+	left:CreateDropdown("ab-font-flags", Settings["ab-font-flags"], Assets:GetFlagsList(), Language["Font Flags"], Language["Set the font flags of the action bar buttons"], UpdateActionBarFont)
+end)
+YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "Action Bars", {
+	{"ab-show-swipe", UpdateShowSwipe},
+	{"ab-show-hotkey", UpdateShowHotKey},
+	{"ab-show-macro", UpdateShowMacroName},
+	{"ab-show-count", UpdateShowCount},
+	{"ab-show-action-cast-animation", YxUI.IsMainline and UpdateActionCastAnimation or nil},
+	{"ab-hide-assisted-combat", YxUI.IsMainline and UpdateHideAssistedCombat or nil},
+	{"ab-font", UpdateActionBarFont},
+	{"ab-font-size", UpdateActionBarFont},
+	{"ab-cd-size", UpdateActionBarFont},
+	{"ab-font-flags", UpdateActionBarFont},
+}, nil)
+

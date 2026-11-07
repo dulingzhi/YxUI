@@ -1,16 +1,17 @@
 <Ui>
-	<Button name="YxUIAuraTemplate" registerForClicks="RightButtonUp" virtual="true" inherits="SecureActionButtonTemplate">
+	<!-- Secure headers can create aura buttons in combat; register clicks in the template. -->
+	<Button name="YxUIAuraTemplate" virtual="true" inherits="SecureActionButtonTemplate" registerForClicks="RightButtonUp">
 		<Attributes>
 			<Attribute name="type" value="cancelaura"/>
 		</Attributes>
-		
+
 		<Scripts>
 			<OnLoad function="YxUISkinAura"/>
 			<OnEnter function="YxUIAuraOnEnter"/>
 			<OnLeave function="GameTooltip_Hide"/>
 		</Scripts>
 	</Button>
-	
+
 	<Button name="YxUIAuraTemplate20" virtual="true" inherits="YxUIAuraTemplate"><Size x="20" y="20"/></Button>
 	<Button name="YxUIAuraTemplate22" virtual="true" inherits="YxUIAuraTemplate"><Size x="22" y="22"/></Button>
 	<Button name="YxUIAuraTemplate24" virtual="true" inherits="YxUIAuraTemplate"><Size x="24" y="24"/></Button>

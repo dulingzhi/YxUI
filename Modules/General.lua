@@ -4,33 +4,23 @@ local Throttle = YxUI:GetModule("Throttle")
 local GUI = YxUI:GetModule("GUI")
 
 function YxUI:WelcomeMessage()
-	if (not Settings["ui-display-welcome"]) then
+	if not Settings["ui-display-welcome"] then
 		return
 	end
 
 	local Color = Settings["ui-widget-color"]
 
-	print(format(Language["Welcome to |cFF%sYx|r|cFFEFFFFFUI|r version |cFF%s%s|r - https://dd.163.com/i/zY5l3huBtM"], Color, Settings["ui-header-font-color"], YxUI.UIVersion))
-	print(format(Language["Type |cFF%s/yxui|r to access the settings window, or click |cFF%s|Hcommand:/yxui|h[here]|h|r."], Color, Color))
+	print(format(Language["Welcome to |cFF%sHydra|r|cFFEFFFFFUI|r version |cFF%s%s|r"], Color, Settings["ui-header-font-color"], YxUI.UIVersion))
+	print(format(Language["Type |cFF%s/hui|r to access the settings window, or click |cFF%s|Hcommand:/hui|h[here]|h|r."], Color, Color))
 end
 
 local UpdateUIScale = function(value)
 	YxUI:SetScale(tonumber(value))
 end
 
-local GetDiscordLink = function()
-	if (not Throttle:IsThrottled("discord-request")) then
-		YxUI:print(Language["Join the NetEase DD community for support and feedback https://dd.163.com/i/zY5l3huBtM"])
-
-		Throttle:Start("discord-request", 10)
-	end
-end
-
-local GetYouTubeLink = function()
-	if (not Throttle:IsThrottled("yt-request")) then
-		YxUI:print(Language["Subscribe to YouTube to see new features https://www.youtube.com/c/HydraMods"])
-
-		Throttle:Start("yt-request", 10)
+local UpdateFadeOpacity = function()
+	if Settings["gui-enable-fade"] and GUI.IsMoving and GUI:IsShown() then
+		GUI:PLAYER_STARTED_MOVING()
 	end
 end
 
@@ -42,6 +32,35 @@ local ResetMovers = function()
 	YxUI:ResetAllMovers()
 end
 
+local function RestoreLanguageSelection()
+	local Anchor = GUI:GetWidget("ui-language")
+	local Dropdown = Anchor and Anchor.Dropdown
+	if not Dropdown then return end
+	Dropdown.Value = Settings["ui-language"]
+	Dropdown.Menu.SynchronizedValue = nil
+	for Label, Value in pairs(Dropdown.Values) do
+		if Value == Dropdown.Value then
+			Dropdown.Current:SetText(Label)
+			YxUI:SetFontForText(Dropdown.Current, Label, Settings["ui-widget-font"], Settings["ui-font-size"], nil, Value)
+			break
+		end
+	end
+end
+
+local function AcceptLanguage(value)
+	if not YxUI.Languages[value] then return end
+	YxUIData = YxUIData or {}
+	YxUIData.LanguageOverrides = YxUIData.LanguageOverrides or {}
+	YxUIData.LanguageOverrides[YxUI.UserProfileKey] = value
+	GUI.WidgetCore.SetVariable("ui-language", value)
+	ReloadUI()
+end
+
+local function SelectLanguage(value)
+	if value == Settings["ui-language"] then return end
+	YxUI:DisplayPopup(Language["Attention"], Language["You have changed a setting that requires a UI reload. Would you like to reload the UI now?"], ACCEPT, AcceptLanguage, CANCEL, RestoreLanguageSelection, value)
+end
+
 local UpdateGUIEnableFade = function(value)
 	if value then
 		GUI:RegisterEvent("PLAYER_STARTED_MOVING")
@@ -49,44 +68,65 @@ local UpdateGUIEnableFade = function(value)
 	else
 		GUI:UnregisterEvent("PLAYER_STARTED_MOVING")
 		GUI:UnregisterEvent("PLAYER_STOPPED_MOVING")
+		GUI.IsMoving = false
 		GUI:SetAlpha(1)
 	end
 end
 
-GUI:AddWidgets(Language["General"], Language["General"], function(left, right)
+GUI:AddWidgetsID("General", "General", function(left, right)
 	left:CreateHeader(Language["Welcome"])
 	left:CreateSwitch("ui-display-welcome", Settings["ui-display-welcome"], Language["Display Welcome Message"], Language["Display a welcome message on login with UI information"])
+	left:CreateDropdown("ui-language", Settings["ui-language"], YxUI:GetLanguageList(), Language["Language"], Language["Choose the language used by YxUI"], SelectLanguage):DisableSaving()
 	--left:CreateSwitch("ui-display-whats-new", Settings["ui-display-whats-new"], Language[ [[Display "What's New" Pop-ups]] ], "")
-	left:CreateButton("", Language["Get Link"], Language["Join NetEase DD"], Language["Get a link to join the YxUI NetEase DD community"], GetDiscordLink)
-	left:CreateButton("", Language["Get Link"], Language["Watch YouTube"], Language["Get a link for the YxUI YouTube channel"], GetYouTubeLink)
 
 	left:CreateHeader(Language["Move UI"])
 	left:CreateButton("", Language["Toggle"], Language["Move UI"], Language["While toggled, you can drag some elements of YxUI around the screen"], ToggleMove)
-	left:CreateButton("", Language["Restore"], Language["Restore To Defaults"], Language["Restore all YxUI movable frames to their default locations"], ResetMovers)
+	left:CreateButton("", Language["Restore"], Language["Restore to Defaults"], Language["Restore all YxUI movable frames to their default locations"], ResetMovers)
 
 	right:CreateHeader(Language["Settings Window"])
-	right:CreateSwitch("gui-hide-in-combat", Settings["gui-hide-in-combat"], Language["Hide In Combat"], Language["Hide the settings window when engaging in combat"])
+	right:CreateSwitch("gui-hide-in-combat", Settings["gui-hide-in-combat"], Language["Hide in Combat"], Language["Hide the settings window when engaging in combat"])
 	right:CreateSwitch("gui-enable-fade", Settings["gui-enable-fade"], Language["Fade While Moving"], Language["Fade out the settings window while moving"], UpdateGUIEnableFade)
-	right:CreateSlider("gui-faded-alpha", Settings["gui-faded-alpha"], 0, 100, 10, Language["Set Faded Opacity"], Language["Set the opacity of the settings window while faded"], nil, nil, "%")
+	right:CreateSlider("gui-faded-alpha", Settings["gui-faded-alpha"], 0, 100, 10, Language["Set Faded Opacity"], Language["Set the opacity of the settings window while faded"], UpdateFadeOpacity, nil, "%")
 
 	right:CreateHeader(Language["Border Thickness"])
 	right:CreateSlider('ui-border-thickness', Settings['ui-border-thickness'], 0, 2, 1, Language["Border Thickness"], Language["Set how thick the border on UI elements is"], ReloadUI, nil, "px"):RequiresReload(true)
 end)
+YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "General", {
+	{"gui-enable-fade", UpdateGUIEnableFade},
+	{"gui-faded-alpha", UpdateFadeOpacity},
+}, nil)
+
 
 -- Putting Styles here too
-local AcceptNewStyle = function(value)
-	Assets:ApplyStyle(value)
+local function RestoreStyleSelection()
+	local anchor = GUI:GetWidget("ui-style")
+	local dropdown = anchor and anchor.Dropdown
+	if not dropdown then return end
 
+	local value = Settings["ui-style"]
+	dropdown.Value = value
+	dropdown.Menu.SynchronizedValue = nil
+	for label, entry in pairs(dropdown.Values) do
+		if entry == value then
+			dropdown.Current:SetText(label)
+			break
+		end
+	end
+end
+
+local function AcceptNewStyle(value)
+	GUI.WidgetCore.SetVariable("ui-style", value)
+	Assets:ApplyStyle(value)
 	ReloadUI()
 end
 
-local UpdateStyle = function(value)
-	YxUI:DisplayPopup(Language["Attention"], format(Language['Are you sure you would like to change to the current style to "%s"?'], value), ACCEPT, AcceptNewStyle, CANCEL, nil, value)
+local function UpdateStyle(value)
+	YxUI:DisplayPopup(Language["Attention"], format(Language['Are you sure you want to change the current style to "%s"?'], value), ACCEPT, AcceptNewStyle, CANCEL, RestoreStyleSelection, value)
 end
 
-GUI:AddWidgets(Language["General"], Language["Styles"], function(left, right)
+GUI:AddWidgetsID("General", "Styles", function(left, right)
 	left:CreateHeader(Language["Styles"])
-	left:CreateDropdown("ui-style", Settings["ui-style"], Assets:GetStyleList(), Language["Select Style"], Language["Select a style to load"], UpdateStyle)
+	left:CreateDropdown("ui-style", Settings["ui-style"], Assets:GetStyleList(), Language["Select Style"], Language["Select a style to load"], UpdateStyle):DisableSaving()
 
 	left:CreateHeader(Language["Headers"])
 	left:CreateColorSelection("ui-header-font-color", Settings["ui-header-font-color"], Language["Text Color"], "")
@@ -128,7 +168,7 @@ end)
 local Durability = YxUI:NewModule("Durability")
 
 local SetDurabilityPosition = function(self, anchor, parent)
-	if (parent ~= Durability) then
+	if parent ~= Durability then
 		self:ClearAllPoints()
 		self:SetPoint("CENTER", Durability, 0, 0)
 	end
@@ -145,44 +185,11 @@ function Durability:Load() -- Maybe a setting to hide the whole frame?
 	YxUI:CreateMover(self)
 end
 
--- Block Edit Mode from overriding YxUI's custom frame positions.
--- Uses hooksecurefunc (taint-safe post-hook) instead of direct function replacement.
--- UpdateLayoutInfo is the single entry-point that calls InitSystemAnchors, UpdateSystems,
--- and UpdateActionBarPositions — hooking it catches all repositioning in one place.
-if EditModeManagerFrame then
-	-- After EditMode finishes repositioning all registered Blizzard frames,
-	-- re-anchor any YxUI-managed frames back to their Movers.
-	hooksecurefunc(EditModeManagerFrame, 'UpdateLayoutInfo', function()
-		for _, mover in ipairs(YxUI.MovingFrames) do
-			if mover.Frame then
-				mover.Frame:ClearAllPoints()
-				mover.Frame:SetPoint('CENTER', mover, 0, 0)
-			end
-		end
-	end)
-
-	-- Prevent users from opening the Edit Mode panel
-	EditModeManagerFrame:HookScript('OnShow', function(self)
-		-- self:Hide()
-	end)
-end
-
--- Always hide the native experience/reputation tracking bars.
--- YxUI provides its own versions; the native ones must stay hidden
--- regardless of whether the experience module is enabled or the player is max level.
--- Also prevent EditMode's UpdateSystems from showing them again.
-if StatusTrackingBarManager then
-	StatusTrackingBarManager:Hide()
-	StatusTrackingBarManager:HookScript('OnShow', function(self)
-		self:Hide()
-	end)
-end
-
-if (not YxUI.IsClassic) then
+if VehicleSeatIndicator then
 	local SeatIndicator = YxUI:NewModule("Vehicle Seats")
 
 	local SetSeatIndicatorPosition = function(self, anchor, parent)
-		if (parent ~= SeatIndicator) then
+		if parent ~= SeatIndicator then
 			self:ClearAllPoints()
 			self:SetPoint("CENTER", SeatIndicator, 0, 0)
 		end
@@ -192,7 +199,7 @@ if (not YxUI.IsClassic) then
 		local Anchor, Parent, Anchor2, X, Y = VehicleSeatIndicator:GetPoint()
 
 		if Anchor then
-			self:SetPoint(Anchor, Parent, Anchor2, X, Y - 80)
+			self:SetPoint(Anchor, Parent, Anchor2, X, Y)
 		else
 			self:SetPoint("CENTER", UIParent, 0, 0)
 		end
@@ -206,3 +213,5 @@ if (not YxUI.IsClassic) then
 		YxUI:CreateMover(self)
 	end
 end
+
+YxUI:GetModule("GUI"):RegisterReloadSettings({"ui-border-thickness"})

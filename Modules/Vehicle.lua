@@ -1,54 +1,107 @@
-local Y, L, A, C = YxUIGlobal:get()
+local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local Vehicle = Y:NewModule('Vehicle', 'SecureHandlerStateTemplate')
+local Vehicle = YxUI:NewModule("Vehicle")
+
+local FadeOnFinished = function(self)
+	self.Parent:Hide()
+end
 
 function Vehicle:OnEnter()
-    local R, G, B = Y:HexToRGB(C['ui-widget-font-color'])
+	local R, G, B = YxUI:HexToRGB(Settings["ui-widget-font-color"])
 
-    GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT', 0, -6)
-    GameTooltip:AddLine(TAXI_CANCEL_DESCRIPTION, R, G, B)
-    GameTooltip:Show()
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, -6)
+	GameTooltip:AddLine(TAXI_CANCEL_DESCRIPTION, R, G, B)
+	GameTooltip:Show()
 end
 
 function Vehicle:OnLeave()
-    GameTooltip:Hide()
+	GameTooltip:Hide()
+end
+
+function Vehicle:OnEvent()
+	if CanExitVehicle() then
+		if UnitOnTaxi("player") then
+			self.Text:SetText(Language["Land Early"])
+
+			self:SetScript("OnEnter", self.OnEnter)
+			self:SetScript("OnLeave", self.OnLeave)
+		else
+			self.Text:SetText(LEAVE_VEHICLE)
+
+			self:SetScript("OnEnter", nil)
+			self:SetScript("OnLeave", nil)
+		end
+
+		self:Show()
+		self.FadeIn:Play()
+	else
+		self.FadeOut:Play()
+	end
+end
+
+function Vehicle:OnMouseUp()
+	if UnitOnTaxi("player") then
+		TaxiRequestEarlyLanding()
+
+		YxUI:print(Language["Requested early landing."])
+	else
+		VehicleExit()
+	end
+
+	self.FadeOut:Play()
 end
 
 function Vehicle:Load()
-    self:SetSize(34, 34)
-    self:SetPoint('BOTTOM', Y.UIParent, 320, 100)
-    self:CreateBorder()
+	self:SetSize(Settings["minimap-size"] + 8, 22)
+	self:SetFrameStrata("HIGH")
+	self:SetFrameLevel(10)
+	self:SetBackdrop(YxUI.BackdropAndBorder)
+	self:SetBackdropColor(YxUI:HexToRGB(Settings["ui-window-bg-color"]))
+	self:SetBackdropBorderColor(0, 0, 0)
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("UPDATE_BONUS_ACTIONBAR")
+	self:RegisterEvent("UPDATE_MULTI_CAST_ACTIONBAR")
+	self:RegisterEvent("UNIT_ENTERED_VEHICLE")
+	self:RegisterEvent("UNIT_EXITED_VEHICLE")
+	self:RegisterEvent("VEHICLE_UPDATE")
+	self:SetScript("OnMouseUp", self.OnMouseUp)
+	self:SetScript("OnEnter", self.OnEnter)
+	self:SetScript("OnLeave", self.OnLeave)
+	self:SetScript("OnEvent", self.OnEvent)
 
-    self.frameVisibility = '[canexitvehicle]c;[mounted]m;n'
-    RegisterStateDriver(self, 'exit', self.frameVisibility)
+	self.Texture = self:CreateTexture(nil, "ARTWORK")
+	self.Texture:SetPoint("TOPLEFT", self, 1, -1)
+	self.Texture:SetPoint("BOTTOMRIGHT", self, -1, 1)
+	self.Texture:SetTexture(Assets:GetTexture(Settings["ui-header-texture"]))
+	self.Texture:SetVertexColor(YxUI:HexToRGB(Settings["ui-header-texture-color"]))
 
-    self:SetAttribute('_onstate-exit', [[ if CanExitVehicle() then self:Show() else self:Hide() end ]])
-    if (not CanExitVehicle()) then
-        self:Hide()
-    end
+	self.Text = self:CreateFontString(nil, "OVERLAY")
+	self.Text:SetPoint("CENTER", self, 0, -1)
+	YxUI:SetFontInfo(self.Text, Settings["ui-header-font"], Settings["ui-font-size"])
+	self.Text:SetSize(self:GetWidth() - 12, 20)
+	self.Text:SetDrawLayer("OVERLAY", 7)
 
-    local button = CreateFrame('CheckButton', nil, self, 'ActionButtonTemplate, SecureHandlerClickTemplate')
-    button:SetAllPoints()
-    button:RegisterForClicks('AnyUp')
-    button.icon:SetTexture('INTERFACE\\VEHICLES\\UI-Vehicles-Button-Exit-Up')
-    button.icon:SetTexCoord(0.216, 0.784, 0.216, 0.784)
-    button.icon:SetDrawLayer('ARTWORK')
-    button.icon.__lockdown = true
+	self.FadeIn = LibMotion:CreateAnimation(self, "Fade")
+	self.FadeIn:SetEasing("in")
+	self.FadeIn:SetDuration(0.15)
+	self.FadeIn:SetChange(1)
 
-    button:SetScript('OnEnter', self.OnEnter)
-    button:SetScript('OnLeave', self.OnLeave)
-    button:SetScript('OnClick', function(self)
-        if UnitOnTaxi('player') then
-            TaxiRequestEarlyLanding()
-            Y:print(L['Requested early landing.'])
-        else
-            VehicleExit()
-        end
-        self:SetChecked(true)
-    end)
-    button:SetScript('OnShow', function(self)
-        self:SetChecked(false)
-    end)
+	self.FadeOut = LibMotion:CreateAnimation(self, "Fade")
+	self.FadeOut:SetEasing("out")
+	self.FadeOut:SetDuration(0.15)
+	self.FadeOut:SetChange(0)
+	self.FadeOut:SetScript("OnFinished", FadeOnFinished)
 
-    Y:CreateMover(self)
+	if not CanExitVehicle() then
+		self:SetAlpha(0)
+		self:Hide()
+	end
+
+	if Settings["minimap-enable"] then
+		self:SetPoint("TOP", _G["YxUI Minimap"], "BOTTOM", 0, -2)
+	else
+		self:SetPoint("TOP", YxUI.UIParent, 0, -120)
+	end
+
+	YxUI:CreateMover(self)
 end

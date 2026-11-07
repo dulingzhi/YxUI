@@ -26,12 +26,27 @@ DT.Types = {}
 DT.List = {}
 YxUI.ValueColor = "ffffff"
 
--- Returns true when the caller is expected to fill in the tooltip contents.
--- Upstream started guarding tooltip handlers with "if not self:SetTooltip() then
--- return end" so that users who disable data text tooltips never get an empty
--- tooltip frame. Keep the boolean contract in sync with the callers.
+local CharacterDataTexts = {
+    ["Armor"] = true,
+    ["Crit"] = true,
+    ["Durability"] = true,
+    ["Haste"] = true,
+    ["Item Level"] = true,
+    ["Level"] = true,
+    ["Mana Regen"] = true,
+    ["Mastery"] = true,
+    ["Primary Stat"] = true,
+    ["Speed"] = true,
+    ["Versatility"] = true,
+}
+
+if POWER_TYPE_EXPERIENCE then
+    CharacterDataTexts[POWER_TYPE_EXPERIENCE] = true
+end
+
 local SetTooltip = function(anchor)
 	if not Settings["data-text-enable-tooltips"] then
+		anchor.TooltipShown = false
 		GameTooltip:Hide()
 
 		return false
@@ -44,7 +59,7 @@ local SetTooltip = function(anchor)
 		GameTooltip:SetOwner(anchor, "ANCHOR_NONE")
 		GameTooltip:ClearAllPoints()
 
-		if (Position == "TOP") then
+		if Position == "TOP" then
 			GameTooltip:SetPoint("TOP", anchor, "BOTTOM", 0, -8)
 		else
 			GameTooltip:SetPoint("BOTTOM", anchor, "TOP", 0, 8)
@@ -71,16 +86,16 @@ function DT:NewAnchor(name, parent)
 		return
 	end
 
-	if (not parent) then
+	if not parent then
 		parent = YxUI.UIParent
 	end
 
 	local Anchor = CreateFrame("Frame", nil, parent)
+
 	Anchor:SetFrameLevel(parent:GetFrameLevel() + 1)
 	Anchor:SetFrameStrata(parent:GetFrameStrata())
 	Anchor.Name = name
 	Anchor.SetTooltip = SetTooltip
-    parent.Anchor = Anchor
 
 	Anchor.Text = Anchor:CreateFontString(nil, "OVERLAY")
 	YxUI:SetFontInfo(Anchor.Text, Settings["data-text-font"], Settings["data-text-font-size"], Settings["data-text-font-flags"])
@@ -108,8 +123,30 @@ function DT:GetAnchor(name)
 	end
 end
 
+function DT:CreateCharacterClickButton(anchor)
+	local Button = CreateFrame("Button", nil, anchor, "InsecureActionButtonTemplate")
+	Button:SetAllPoints(anchor)
+	Button:SetFrameLevel(anchor:GetFrameLevel() + 1)
+	Button:RegisterForClicks("AnyUp")
+	Button:SetAttribute("useOnKeyDown", false)
+	Button:SetAttribute("type1", "click")
+	Button:SetAttribute("clickbutton1", CharacterMicroButton)
+	Button:SetScript("OnEnter", function()
+		local OnEnter = anchor:GetScript("OnEnter")
+		if OnEnter then OnEnter(anchor) end
+	end)
+	Button:SetScript("OnLeave", function()
+		local OnLeave = anchor:GetScript("OnLeave")
+		if OnLeave then OnLeave(anchor) end
+	end)
+	Button:SetScript("OnMouseDown", function() self.OnMouseDown(anchor) end)
+	Button:SetScript("OnMouseUp", function() self.OnMouseUp(anchor) end)
+	Button:EnableMouse(anchor:IsMouseEnabled())
+	anchor.CharacterClickButton = Button
+end
+
 function DT:SetDataText(anchor, name)
-	if ((not self.Anchors[anchor]) or (not self.Types[name])) then
+	if (not self.Anchors[anchor]) or (not self.Types[name]) then
 		return
 	end
 
@@ -126,14 +163,54 @@ function DT:SetDataText(anchor, name)
 
 	Anchor:Enable()
 
-	Anchor:HookScript("OnMouseDown", self.OnMouseDown)
-	Anchor:HookScript("OnMouseUp", self.OnMouseUp)
+	if YxUI.IsForever then
+		Anchor.CharacterClick = CharacterDataTexts[name] or false
+
+		if Anchor.CharacterClick then
+			Anchor:SetScript("OnMouseUp", nil)
+		end
+
+		if Anchor.CharacterClick and not Anchor.CharacterClickButton then
+			if InCombatLockdown() or not CharacterMicroButton then
+				Anchor.CharacterClickPending = true
+			else
+				self:CreateCharacterClickButton(Anchor)
+			end
+		end
+
+		if Anchor.CharacterClickButton then
+			Anchor.CharacterClickButton:SetShown(Anchor.CharacterClick)
+		end
+	end
+
+	if not Anchor.MouseHooksSet then
+		Anchor:HookScript("OnMouseDown", self.OnMouseDown)
+		Anchor:HookScript("OnMouseUp", self.OnMouseUp)
+		Anchor.MouseHooksSet = true
+	end
 end
 
 function DT:SetTooltipsEnabled(value)
 	for Name, Anchor in next, self.Anchors do
-		if (Anchor:HasScript("OnEnter")) then
-			Anchor:EnableMouse(value)
+		if Anchor:HasScript("OnEnter") or Anchor:HasScript("OnMouseUp") then
+			Anchor:EnableMouse(true)
+		end
+		if Anchor.CharacterClickButton then
+			Anchor.CharacterClickButton:EnableMouse(Anchor:IsMouseEnabled())
+		end
+	end
+
+	if not value then
+		local Owner = GameTooltip:GetOwner()
+
+		for Name, Anchor in next, self.Anchors do
+			Anchor.TooltipShown = false
+
+			if Owner == Anchor then
+				GameTooltip:Hide()
+
+				break
+			end
 		end
 	end
 end
@@ -148,6 +225,23 @@ end
 
 function DT:Load()
 	YxUI.ValueColor = Settings["data-text-classcolor"] and YxUI.ClassColors[YxUI.UserClass].Hex or Settings["data-text-value-color"]
+
+	if YxUI.IsForever then
+		self:RegisterEvent("PLAYER_REGEN_ENABLED")
+		self:SetScript("OnEvent", function(self)
+			for _, Anchor in next, self.Anchors do
+				if Anchor.CharacterClickPending and Anchor.CharacterClick and not Anchor.CharacterClickButton and CharacterMicroButton then
+					self:CreateCharacterClickButton(Anchor)
+				end
+
+				if Anchor.CharacterClickButton then
+					Anchor.CharacterClickButton:SetShown(Anchor.CharacterClick)
+				end
+
+				Anchor.CharacterClickPending = nil
+			end
+		end)
+	end
 
 	if Settings["chat-enable"] then
 		local Width = YxUIChatFrameBottom:GetWidth() / 3
@@ -244,12 +338,15 @@ local UpdateEnableTooltips = function(value)
 	DT:SetTooltipsEnabled(value)
 end
 
+local RefreshGoldCharacters
+
 local ResetOnAccept = function()
 	YxUI:GetModule("Gold"):Reset()
+	if RefreshGoldCharacters then RefreshGoldCharacters() end
 end
 
 local ResetGold = function()
-	YxUI:DisplayPopup(Language["Attention"], Language["Are you sure you would like to reset all stored gold information?"], ACCEPT, ResetOnAccept, CANCEL)
+	YxUI:DisplayPopup(Language["Attention"], Language["Are you sure you want to reset all stored gold information?"], ACCEPT, ResetOnAccept, CANCEL)
 end
 
 local UpdateTimeFormat = function(value)
@@ -257,29 +354,67 @@ local UpdateTimeFormat = function(value)
 	DT:UpdateAllAnchors()
 end
 
-local DeleteGoldData = function(value)
-	if YxUI.GoldData[YxUI.UserRealm] then
-		for name, money in next, YxUI.GoldData[YxUI.UserRealm] do
-			if (string.match(name, "|cff%x%x%x%x%x%x(.*)|r") == value) then
-				YxUI.GoldData[YxUI.UserRealm][name] = nil
+local GoldCharacterDropdown
+local SelectedGoldCharacter = ""
 
-				YxUI:print(format(Language["Deleted stored gold data for %s."], name))
-
-				return
-			end
+local function GoldCharacterList()
+	local list = {[Language["Select Character"]] = ""}
+	local characters = YxUI.GoldData and YxUI.GoldData[YxUI.UserRealm]
+	if characters then
+		for name in pairs(characters) do
+			list[name] = name
 		end
-
-		YxUI:print(format(Language["No character data found for %s."], value))
 	end
+	return list
+end
+
+RefreshGoldCharacters = function()
+	if not GoldCharacterDropdown then return end
+	local list = GoldCharacterList()
+	for label in pairs(GoldCharacterDropdown.Values) do
+		if not list[label] then GoldCharacterDropdown:RemoveSelection(label) end
+	end
+	for label, value in pairs(list) do
+		if GoldCharacterDropdown.Values[label] == nil then
+			GoldCharacterDropdown:CreateSelection(label, value)
+		end
+	end
+	SelectedGoldCharacter = ""
+	GoldCharacterDropdown.Value = ""
+	GoldCharacterDropdown.Current:SetText(Language["Select Character"])
+	GoldCharacterDropdown.Menu.SynchronizedValue = nil
+end
+
+local function DeleteGoldData(name)
+	local characters = YxUI.GoldData and YxUI.GoldData[YxUI.UserRealm]
+	if not characters or characters[name] == nil then return end
+	characters[name] = nil
+	YxUI:print(format(Language["Deleted stored gold data for %s."], name))
+	RefreshGoldCharacters()
+end
+
+local function ConfirmGoldDeletion()
+	if SelectedGoldCharacter == "" then return end
+	local characters = YxUI.GoldData and YxUI.GoldData[YxUI.UserRealm]
+	if not characters or characters[SelectedGoldCharacter] == nil then return end
+	YxUI:DisplayPopup(Language["Attention"], format(Language["Are you sure you want to delete the stored gold data for %s?"], SelectedGoldCharacter), ACCEPT, DeleteGoldData, CANCEL, nil, SelectedGoldCharacter)
+end
+
+local function UpdateDataTextDependencies()
+	YxUI:GetModule("GUI").WidgetCore.UpdateDependencies({
+		["data-text-value-color"] = not Settings["data-text-classcolor"],
+		["data-text-hover-tooltips"] = Settings["data-text-enable-tooltips"],
+	})
 end
 
 local UpdateClassColor = function(value)
 	YxUI.ValueColor = value and YxUI.ClassColors[YxUI.UserClass].Hex or Settings["data-text-value-color"]
 
 	DT:UpdateAllAnchors()
+	UpdateDataTextDependencies()
 end
 
-YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Data Texts"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgetsID("General", "Data Texts", function(left, right)
 	left:CreateHeader(Language["Chat Frame Texts"])
 	left:CreateDropdown("data-text-chat-left", Settings["data-text-chat-left"], DT.List, Language["Set Left Text"], Language["Set the information to be displayed in the left data text anchor"], UpdateChatLeftText)
 	left:CreateDropdown("data-text-chat-middle", Settings["data-text-chat-middle"], DT.List, Language["Set Middle Text"], Language["Set the information to be displayed in the middle data text anchor"], UpdateChatMiddleText)
@@ -290,9 +425,9 @@ YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Data Texts"], fu
 	left:CreateDropdown("data-text-extra-middle", Settings["data-text-extra-middle"], DT.List, Language["Set Middle Text"], Language["Set the information to be displayed in the middle data text anchor"], UpdateWindowMiddleText)
 	left:CreateDropdown("data-text-extra-right", Settings["data-text-extra-right"], DT.List, Language["Set Right Text"], Language["Set the information to be displayed in the right data text anchor"], UpdateWindowRightText)
 
-	left:CreateHeader(Language["Mini Map Texts"])
-	left:CreateDropdown("data-text-minimap-top", Settings["data-text-minimap-top"], DT.List, Language["Set Top Text"], Language["Set the information to be displayed in the top mini map data text anchor"], UpdateMinimapTopText)
-	left:CreateDropdown("data-text-minimap-bottom", Settings["data-text-minimap-bottom"], DT.List, Language["Set Bottom Text"], Language["Set the information to be displayed in the bottom mini map data text anchor"], UpdateMinimapBottomText)
+	left:CreateHeader(Language["Minimap Texts"])
+	left:CreateDropdown("data-text-minimap-top", Settings["data-text-minimap-top"], DT.List, Language["Set Top Text"], Language["Set the information to be displayed in the top minimap data text anchor"], UpdateMinimapTopText)
+	left:CreateDropdown("data-text-minimap-bottom", Settings["data-text-minimap-bottom"], DT.List, Language["Set Bottom Text"], Language["Set the information to be displayed in the bottom minimap data text anchor"], UpdateMinimapBottomText)
 
 	right:CreateHeader(Language["Font"])
 	right:CreateDropdown("data-text-font", Settings["data-text-font"], Assets:GetFontList(), Language["Font"], Language["Set the font of the data texts"], UpdateFont, "Font")
@@ -305,14 +440,35 @@ YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Data Texts"], fu
 	right:CreateSwitch("data-text-classcolor", Settings["data-text-classcolor"], Language["Use Class Color"], Language["Use class color for Value Color"], UpdateClassColor)
 
 	right:CreateHeader(Language["Styling"])
-	right:CreateSwitch("data-text-enable-tooltips", Settings["data-text-enable-tooltips"], Language["Enable Tooltips"], Language["Display tooltip information when hovering over data texts"], UpdateEnableTooltips)
+	right:CreateSwitch("data-text-enable-tooltips", Settings["data-text-enable-tooltips"], Language["Enable Tooltips"], Language["Display tooltip information when hovering over data texts"], function(value) UpdateEnableTooltips(value); UpdateDataTextDependencies() end)
 	right:CreateSwitch("data-text-hover-tooltips", Settings["data-text-hover-tooltips"], Language["Hover Tooltips"], Language["Display tooltip information directly by the data text instead of at the default tooltip location"])
-	right:CreateSwitch("data-text-24-hour", Settings["data-text-24-hour"], Language["Enable 24 Hour Time"], Language["Display time in a 24 hour format"], UpdateTimeFormat)
+	right:CreateSwitch("data-text-24-hour", Settings["data-text-24-hour"], Language["Enable 24 Hour Time"], Language["Display time in a 24-hour format"], UpdateTimeFormat)
 
 	right:CreateHeader(Language["Gold"])
-	right:CreateButton("", Language["Reset"], Language["Reset Gold"], Language["Reset stored information for each characters gold"], ResetGold)
-	right:CreateInput("gold-reset", YxUI.UserName, Language["Delete Character Data"], Language["Remove the stored data for a character. Enter the character name and hit enter."], DeleteGoldData):DisableSaving()
+	GoldCharacterDropdown = right:CreateDropdown("gold-reset", "", GoldCharacterList(), Language["Stored Character"], Language["Select the character whose stored gold data you want to delete"], function(value) SelectedGoldCharacter = value end):DisableSaving()
+	right:CreateButton("", Language["Reset"], Language["Reset Gold"], Language["Reset stored gold information for each character"], ResetGold)
+	right:CreateButton("", Language["Delete"], Language["Delete Character Data"], Language["Delete the selected character's stored gold data"], ConfirmGoldDeletion)
+	UpdateDataTextDependencies()
 
 	--left:CreateHeader(Language["Misc."])
 	--left:CreateSlider("data-text-max-lines", Settings["data-text-max-lines"], 5, 50, 1, "Max Lines", "Set the maximum number of players shown in the guild or friends data text tooltips")
 end)
+YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "Data Texts", {
+	{"data-text-chat-left", UpdateChatLeftText},
+	{"data-text-chat-middle", UpdateChatMiddleText},
+	{"data-text-chat-right", UpdateChatRightText},
+	{"data-text-extra-left", UpdateWindowLeftText},
+	{"data-text-extra-middle", UpdateWindowMiddleText},
+	{"data-text-extra-right", UpdateWindowRightText},
+	{"data-text-minimap-top", UpdateMinimapTopText},
+	{"data-text-minimap-bottom", UpdateMinimapBottomText},
+	{"data-text-font", UpdateFont},
+	{"data-text-font-size", UpdateFont},
+	{"data-text-font-flags", UpdateFont},
+	{"data-text-label-color", function() DT:UpdateAllAnchors() end},
+	{"data-text-value-color", function() DT:UpdateAllAnchors() end},
+	{"data-text-classcolor", UpdateClassColor},
+	{"data-text-enable-tooltips", function(value) UpdateEnableTooltips(value); UpdateDataTextDependencies() end},
+	{"data-text-24-hour", UpdateTimeFormat},
+}, nil)
+

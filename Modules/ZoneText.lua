@@ -4,12 +4,16 @@ local ZT = YxUI:NewModule("Zone Text")
 
 local GetZoneText = GetZoneText
 local GetSubZoneText = GetSubZoneText
-local GetZonePVPInfo = GetZonePVPInfo or C_PvP.GetZonePVPInfo
+local GetZonePVPInfo = GetZonePVPInfo
 local SANCTUARY_TERRITORY = SANCTUARY_TERRITORY
 local FREE_FOR_ALL_TERRITORY = FREE_FOR_ALL_TERRITORY
 local FACTION_CONTROLLED_TERRITORY = FACTION_CONTROLLED_TERRITORY
 local CONTESTED_TERRITORY = CONTESTED_TERRITORY
 local COMBAT_ZONE = COMBAT_ZONE
+
+if C_PvP then
+	GetZonePVPInfo = C_PvP.GetZonePVPInfo
+end
 
 local PVPText = {
 	sanctuary = SANCTUARY_TERRITORY,
@@ -111,7 +115,7 @@ function ZT:CreateFontObjects()
 		SubFrame.FadeOut:SetDuration(0.75)
 		SubFrame.FadeOut:SetChange(0)
 		SubFrame.FadeOut:SetOrder(2)
-		
+
 		ZoneFrame[i] = SubFrame
 	end
 

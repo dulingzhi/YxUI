@@ -2,12 +2,13 @@
 ## Author: Jai
 ## Version: 1.0.0
 ## Title: |cff5C8BCFYxUI|r
-## Notes: Interface replacement for Classic and Season of Mastery
-## SavedVariables: YxUIProfileData, YxUIProfiles, YxUIData, YxUIGold
+## Notes: Interface replacement for Classic
+## SavedVariables: YxUIProfileData, YxUIProfiles, YxUISpecializationProfiles, YxUIData, YxUIGold
+## LoadSavedVariablesFirst: 1
+## IconTexture: Interface\AddOns\YxUI\Media\Textures\YxUIBadgeCrisp
 
 TaintLess.xml
 Modules\Initialize.lua
-Modules\API.lua
 Libs\LibStub.lua
 Libs\CallbackHandler-1.0.lua
 Libs\LibClassicCasterino.lua
@@ -17,7 +18,6 @@ Libs\AceSerializer-3.0.lua
 Libs\ChatThrottleLib.lua
 Libs\LibDeflate.lua
 Libs\LibMotion.lua
-Libs\oUF\oUF_Classic.xml
 Libs\LibQuestXP\LibQuestXPDB.lua
 Libs\LibQuestXP\LibQuestXP.lua
 Libs\LibClassicDurations\LibClassicDurations.xml
@@ -36,8 +36,19 @@ Locales\zhTW.lua
 Modules\Styles.lua
 Modules\Defaults.lua
 Modules\GUI\GUI.lua
-Modules\GUI\Widgets.lua
-Modules\GUI\Border.lua
+Modules\GUI\Pages.lua
+Modules\GUI\Navigation.lua
+Modules\GUI\Frame.lua
+Modules\GUI\Updates.lua
+Modules\GUI\WidgetCore.lua
+Modules\GUI\Dialog.lua
+Modules\GUI\Buttons.lua
+Modules\GUI\Toggles.lua
+Modules\GUI\Inputs.lua
+Modules\GUI\TagBuilder.lua
+Modules\GUI\Dropdowns.lua
+Modules\GUI\Sliders.lua
+Modules\GUI\ColorPicker.lua
 Modules\Profiles.lua
 Modules\Colors.lua
 Modules\Throttle.lua
@@ -45,30 +56,34 @@ Modules\Move.lua
 Modules\General.lua
 Modules\Announcements.lua
 Modules\Fonts.lua
-Modules\Alerts.lua
 Modules\Popup.lua
 Modules\Gold.lua
-Modules\Chat.lua
+Modules\Chat\History.lua
+Modules\Chat\Links.lua
+Modules\Chat\Window.lua
+Modules\Chat\Frames.lua
 Modules\ChatBubbles.lua
-Modules\ChatHistory.lua
 Modules\Experience.lua
 Modules\Reputation.lua
 Modules\ActionBars\ActionBars.lua
+Modules\ActionBars\Buttons.lua
+Modules\ActionBars\Bars.lua
+Modules\ActionBars\TotemBar.lua
 Modules\ActionBars\KeyBinding.lua
-Modules\UnitFrames\Tags.lua
-Modules\UnitFrames\UnitFrames.lua
-Modules\UnitFrames\Player.lua
-Modules\UnitFrames\Target.lua
-Modules\UnitFrames\TargetTarget.lua
-Modules\UnitFrames\Pet.lua
-Modules\UnitFrames\Boss.lua
-Modules\UnitFrames\Party.lua
-Modules\UnitFrames\PartyPets.lua
-Modules\UnitFrames\Raid.lua
-Modules\UnitFrames\RaidPets.lua
-Modules\UnitFrames\NamePlates.lua
-Modules\MiniMap.lua
-Modules\MiniMapButtons.lua
+Modules\UnitFrames\UnitFrames.xml
+Modules\UnitFrames\Frames\Player.lua
+Modules\UnitFrames\Frames\Target.lua
+Modules\UnitFrames\Frames\TargetTarget.lua
+Modules\UnitFrames\Frames\Pet.lua
+Modules\UnitFrames\Frames\Boss.lua
+Modules\UnitFrames\Frames\GroupFrames.lua
+Modules\UnitFrames\Frames\Party.lua
+Modules\UnitFrames\Frames\PartyPets.lua
+Modules\UnitFrames\Frames\Raid.lua
+Modules\UnitFrames\Frames\RaidPets.lua
+Modules\UnitFrames\Frames\NamePlates.lua
+Modules\Minimap.lua
+Modules\MinimapButtons.lua
 Modules\ZoneText.lua
 Modules\Update.lua
 Modules\AuraTemplate.xml
@@ -106,8 +121,6 @@ Modules\Tooltips.lua
 Modules\ActionBars\MicroMenu.lua
 Modules\ActionBars\BagSlots.lua
 Modules\Scale.lua
-Modules\Loot.lua
-Modules\LootRoll.lua
 Modules\DruidMana.lua
 Modules\MirrorTimers.lua
 Modules\ToastFrame.lua
@@ -116,10 +129,13 @@ Modules\Dismount.lua
 Modules\Cooldowns.lua
 Modules\QuestWatch.lua
 Modules\Commands.lua
-Modules\DeleteCheapest.lua
 Modules\BagSearch.lua
 Modules\PVPObjectives.lua
 Modules\Credit.lua
-Modules\Debug.lua
+Modules\API.lua
+Modules\ChatHistory.lua
+Modules\LootRoll.lua
+Modules\GUI\Border.lua
 Modules\Skins\Load.xml
 Modules\Misc\Load.xml
+Modules\Debug.lua

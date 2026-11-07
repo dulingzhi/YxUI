@@ -2,18 +2,7 @@ local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 local Fonts = YxUI:NewModule("Fonts")
 
-local Locale = GetLocale()
 local Font
-
-if (Locale == "koKR") then
-	Font = "Fonts\\2002.TTF"
-elseif (Locale == "zhCN") then
-	Font = "Fonts\\ARKai_T.ttf"
-elseif (Locale == "zhTW") then
-	Font = "Fonts\\bLEI00D.ttf"
-elseif (Locale == "ruRU") then
-	Font = "Fonts\\FRIZQT___CYR.TTF"
-end
 
 Defaults["warning-font"] = "Roboto"
 Defaults["warning-font-size"] = 16
@@ -31,31 +20,52 @@ Defaults["replace-ui-fonts"] = true
 Defaults["replacement-ui-font"] = "Roboto"
 Defaults["ui-font-offset"] = 0
 
+Fonts.OriginalUIFonts = setmetatable({}, {__mode = "k"})
+
 function Fonts:UpdateFont(object)
-	if not object then return end
-
-	local _, Size, Outline = object:GetFont()
-
-	if (Size < 12) then
-		Size = 12
-	end
-
-	object:SetFont(Font, Size + Settings["ui-font-offset"], Outline)
-end
-
-function Fonts:Load()
-	YxUI:SetFontInfo(UIErrorsFrame, Settings["error-font"], Settings["error-font-size"], Settings["error-font-flags"])
-
-	YxUI:SetFontInfo(RaidWarningFrameSlot1, Settings["warning-font"], Settings["warning-font-size"], Settings["warning-font-flags"])
-	YxUI:SetFontInfo(RaidWarningFrameSlot2, Settings["warning-font"], Settings["warning-font-size"], Settings["warning-font-flags"])
-
-	YxUI:SetFontInfo(AutoFollowStatusText, Settings["status-font"], Settings["status-font-size"], Settings["status-font-flags"])
-
-	if (not Settings["replace-ui-fonts"]) then
+	if not object then
 		return
 	end
 
-	Font = Assets:GetFont(Settings["replacement-ui-font"])
+	local original = self.OriginalUIFonts[object]
+	if not original then
+		local path, size, flags = object:GetFont()
+		if not path or not size then
+			return
+		end
+
+		original = {path, size, flags}
+		self.OriginalUIFonts[object] = original
+	end
+
+	if Settings["replace-ui-fonts"] then
+		local size = math.max(original[2], 12) + Settings["ui-font-offset"]
+		local ok, result = pcall(object.SetFont, object, Font, size, original[3] or "")
+		local path, appliedSize = object:GetFont()
+
+		-- Font objects may return nil on success; verify the applied font instead.
+		if not ok or result == false or type(path) ~= "string"
+			or path:lower():gsub("/", "\\") ~= Font:lower():gsub("/", "\\")
+			or appliedSize ~= size then
+			object:SetFont(original[1], original[2], original[3] or "")
+		end
+	else
+		object:SetFont(original[1], original[2], original[3] or "")
+	end
+end
+
+function Fonts:ApplyUIFonts()
+	if not Settings["replace-ui-fonts"] and not self.HasReplacedUIFonts then
+		return
+	end
+
+	if InCombatLockdown() then
+		self:RegisterEvent("PLAYER_REGEN_ENABLED")
+		return
+	end
+
+	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+	Font = Settings["replace-ui-fonts"] and YxUI:GetDisplayFontPath(Settings["replacement-ui-font"]) or nil
 
 	self:UpdateFont(AchievementFont_Small)
 	self:UpdateFont(ChatBubbleFont)
@@ -174,6 +184,23 @@ function Fonts:Load()
 	self:UpdateFont(PVPArenaTextString)
 	self:UpdateFont(PVPInfoTextString)
 	self:UpdateFont(ZoneTextString)
+
+	self.HasReplacedUIFonts = Settings["replace-ui-fonts"]
+end
+
+Fonts:SetScript("OnEvent", function(self, event)
+	if event == "PLAYER_REGEN_ENABLED" then
+		self:ApplyUIFonts()
+	end
+end)
+
+function Fonts:Load()
+	YxUI:SetFontInfo(UIErrorsFrame, Settings["error-font"], Settings["error-font-size"], Settings["error-font-flags"])
+	YxUI:SetFontInfo(RaidWarningFrameSlot1, Settings["warning-font"], Settings["warning-font-size"], Settings["warning-font-flags"])
+	YxUI:SetFontInfo(RaidWarningFrameSlot2, Settings["warning-font"], Settings["warning-font-size"], Settings["warning-font-flags"])
+	YxUI:SetFontInfo(AutoFollowStatusText, Settings["status-font"], Settings["status-font-size"], Settings["status-font-flags"])
+
+	self:ApplyUIFonts()
 end
 
 local UpdateRaidFont = function()
@@ -189,7 +216,11 @@ local UpdateErrorFont = function()
 	YxUI:SetFontInfo(UIErrorsFrame, Settings["error-font"], Settings["error-font-size"], Settings["error-font-flags"])
 end
 
-YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
+local UpdateUIFonts = function()
+	Fonts:ApplyUIFonts()
+end
+
+YxUI:GetModule("GUI"):AddWidgetsID("General", "General", function(left, right)
 	left:CreateHeader(Language["Raid Warnings"])
 	left:CreateDropdown("warning-font", Settings["warning-font"], Assets:GetFontList(), Language["Font"], Language["Set the font of raid warnings"], UpdateRaidFont, "Font")
 	left:CreateSlider("warning-font-size", Settings["warning-font-size"], 8, 32, 1, Language["Font Size"], Language["Set the font size of raid warnings"], UpdateRaidFont)
@@ -206,7 +237,22 @@ YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], funct
 	left:CreateDropdown("error-font-flags", Settings["error-font-flags"], Assets:GetFlagsList(), Language["Font Flags"], Language["Set the font flags of the UI error frame"], UpdateErrorFont)
 
 	left:CreateHeader(Language["Replace UI Fonts"])
-	left:CreateSwitch("replace-ui-fonts", Settings["replace-ui-fonts"], Language["Enable Font Replacement"], Language["Replace default fonts around the UI"], ReloadUI):RequiresReload(true)
-	left:CreateSlider("ui-font-offset", Settings["ui-font-offset"], -2, 6, 2, Language["Size Offset"], Language["Add an offset to the font size"], ReloadUI):RequiresReload(true)
-	left:CreateDropdown("replacement-ui-font", Settings["replacement-ui-font"], Assets:GetFontList(), Language["Font"], Language["Set the font"], ReloadUI, "Font"):RequiresReload(true)
+	left:CreateSwitch("replace-ui-fonts", Settings["replace-ui-fonts"], Language["Enable Font Replacement"], Language["Replace default fonts around the UI"], UpdateUIFonts)
+	left:CreateSlider("ui-font-offset", Settings["ui-font-offset"], -2, 6, 2, Language["Size Offset"], Language["Add an offset to the font size"], UpdateUIFonts)
+	left:CreateDropdown("replacement-ui-font", Settings["replacement-ui-font"], Assets:GetFontList(), Language["Font"], Language["Set the font"], UpdateUIFonts, "Font")
 end)
+YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "General", {
+	{"warning-font", UpdateRaidFont},
+	{"warning-font-size", UpdateRaidFont},
+	{"warning-font-flags", UpdateRaidFont},
+	{"status-font", UpdateStatusFont},
+	{"status-font-size", UpdateStatusFont},
+	{"status-font-flags", UpdateStatusFont},
+	{"error-font", UpdateErrorFont},
+	{"error-font-size", UpdateErrorFont},
+	{"error-font-flags", UpdateErrorFont},
+	{"replace-ui-fonts", UpdateUIFonts},
+	{"ui-font-offset", UpdateUIFonts},
+	{"replacement-ui-font", UpdateUIFonts},
+}, nil)
+

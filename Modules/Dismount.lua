@@ -10,16 +10,16 @@ AutoDismount.Mount = {
 }
 
 AutoDismount.Shapeshift = {
-    [ERR_CANT_INTERACT_SHAPESHIFTED] = true,
-    [ERR_EMBLEMERROR_NOTABARDGEOSET] = true,
-    [ERR_MOUNT_SHAPESHIFTED] = true,
-    [ERR_NO_ITEMS_WHILE_SHAPESHIFTED] = true,
-    [ERR_NOT_WHILE_SHAPESHIFTED] = true,
-    [ERR_TAXIPLAYERSHAPESHIFTED] = true,
-    [SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED] = true,
-    [SPELL_FAILED_NOT_SHAPESHIFT] = true,
-    [SPELL_NOT_SHAPESHIFTED] = true,
-    [SPELL_NOT_SHAPESHIFTED_NOSPACE] = true,
+	[ERR_CANT_INTERACT_SHAPESHIFTED] = true,
+	[ERR_EMBLEMERROR_NOTABARDGEOSET] = true,
+	[ERR_MOUNT_SHAPESHIFTED] = true,
+	[ERR_NO_ITEMS_WHILE_SHAPESHIFTED] = true,
+	[ERR_NOT_WHILE_SHAPESHIFTED] = true,
+	[ERR_TAXIPLAYERSHAPESHIFTED] = true,
+	[SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED] = true,
+	[SPELL_FAILED_NOT_SHAPESHIFT] = true,
+	[SPELL_NOT_SHAPESHIFTED] = true,
+	[SPELL_NOT_SHAPESHIFTED_NOSPACE] = true,
 }
 
 AutoDismount.Stand = {
@@ -30,13 +30,13 @@ function AutoDismount:UI_ERROR_MESSAGE(id, message)
 	if self.Mount[message] then
 		Dismount()
 		UIErrorsFrame:Clear()
-	elseif (self.Shapeshift[message] and not InCombatLockdown()) then
+	elseif self.Shapeshift[message] and not InCombatLockdown() then
 		local ID
 
 		for i = 1, 40 do
 			ID = select(10, UnitBuff("player", i))
 
-			if (ID and ID == 2645) then
+			if ID and ID == 2645 then
 				CancelUnitBuff("player", i)
 				UIErrorsFrame:Clear()
 
@@ -76,7 +76,11 @@ local UpdateEnableDismount = function(value)
 	end
 end
 
-YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgetsID("General", "General", function(left, right)
 	right:CreateHeader(Language["Auto Dismount"])
 	right:CreateSwitch("dismount-enable", Settings["dismount-enable"], Language["Enable Auto Dismount"], Language["Automatically dismount during actions that can't be performed while mounted"], UpdateEnableDismount)
 end)
+YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "General", {
+	{"dismount-enable", UpdateEnableDismount},
+}, nil)
+

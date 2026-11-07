@@ -1,6 +1,6 @@
 local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-if (YxUI.UserClass ~= "DRUID") then
+if YxUI.UserClass ~= "DRUID" then
 	return
 end
 
@@ -21,7 +21,7 @@ function DruidMana:UNIT_POWER_UPDATE()
 	self.Bar:SetMinMaxValues(0, MaxMana)
 
 	self.Progress:SetText(format("%s / %s", YxUI:ShortValue(Mana), YxUI:ShortValue(MaxMana)))
-	self.Percentage:SetText(floor((Mana / MaxMana * 100 + 0.05) * 10) / 10 .. "%")
+	self.Percentage:SetText(MaxMana and MaxMana > 0 and (floor((Mana / MaxMana * 100 + 0.05) * 10) / 10 .. "%") or "0%")
 end
 
 function DruidMana:UNIT_POWER_FREQUENT()
@@ -31,11 +31,11 @@ function DruidMana:UNIT_POWER_FREQUENT()
 	self.Bar:SetValue(Mana)
 
 	self.Progress:SetText(format("%s / %s", YxUI:ShortValue(Mana), YxUI:ShortValue(MaxMana)))
-	self.Percentage:SetText(floor((Mana / MaxMana * 100 + 0.05) * 10) / 10 .. "%")
+	self.Percentage:SetText(MaxMana and MaxMana > 0 and (floor((Mana / MaxMana * 100 + 0.05) * 10) / 10 .. "%") or "0%")
 end
 
 function DruidMana:UPDATE_SHAPESHIFT_FORM()
-	if (UnitPowerType("player") == ManaID) then
+	if UnitPowerType("player") == ManaID then
 		self:Hide()
 	else
 		self:Show()
@@ -126,7 +126,7 @@ end
 
 local UpdateEnableDruidMana = function(value)
 	if value then
-		if (not DruidMana.Bar) then
+		if not DruidMana.Bar then
 			DruidMana:CreateBar()
 		end
 
@@ -136,7 +136,11 @@ local UpdateEnableDruidMana = function(value)
 	end
 end
 
-YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Unit Frames"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgetsID("General", "Unit Frames", function(left, right)
 	right:CreateHeader(Language["Druid Mana"])
 	right:CreateSwitch("unitframes-show-druid-mana", Settings["unitframes-show-druid-mana"], Language["Enable Druid Mana"], Language["Enable a bar displaying your mana while in other forms"], UpdateEnableDruidMana)
 end)
+YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "Unit Frames", {
+	{"unitframes-show-druid-mana", UpdateEnableDruidMana},
+}, nil)
+

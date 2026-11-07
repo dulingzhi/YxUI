@@ -25,15 +25,17 @@ local Channel
 
 Defaults["announcements-enable"] = true
 Defaults["announcements-channel"] = "SELF"
+Defaults["announcements-interrupts"] = true
+Defaults["announcements-spellsteals"] = true
 
 Announcements.Spells = {
 
 }
 
 function Announcements:GetChannelToSend()
-	if ((Settings["announcements-channel"] == "SELF") or (IsBattleground() or IsRatedBattleground())) then
+	if (Settings["announcements-channel"] == "SELF") or (IsBattleground() or IsRatedBattleground()) then
 		return
-	elseif (Settings["announcements-channel"] == "GROUP") then
+	elseif Settings["announcements-channel"] == "GROUP" then
 		if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
 			return "INSTANCE_CHAT"
 		elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
@@ -43,7 +45,7 @@ function Announcements:GetChannelToSend()
 				return "PARTY"
 			end
 		end
-	elseif (Settings["announcements-channel"] == "SAY") then
+	elseif Settings["announcements-channel"] == "SAY" then
 		return "SAY"
 	else
 		return "EMOTE"
@@ -61,12 +63,12 @@ Announcements.Events = {
 		if Channel then
 			SendChatMessage(format(InterruptMessage, target, id, spell), Channel)
 		else
-			YxUI:print(format(InterruptMessage, target, id, spell))
+			print(format(InterruptMessage, target, id, spell))
 		end
 	end,
 
 	--[[["SPELL_DISPEL"] = function(target, id, spell)
-		if (not UnitIsFriend("player", target)) then
+		if not UnitIsFriend("player", target) then
 			SendChatMessage(format(DispelledMessage, target, id, spell), "EMOTE")
 		end
 	end,]]
@@ -77,7 +79,7 @@ Announcements.Events = {
 		if Channel then
 			SendChatMessage(format(StolenMessage, target, id, spell), Channel)
 		else
-			YxUI:print(format(StolenMessage, target, id, spell))
+			print(format(StolenMessage, target, id, spell))
 		end
 	end,
 }
@@ -85,18 +87,20 @@ Announcements.Events = {
 function Announcements:COMBAT_LOG_EVENT_UNFILTERED()
 	_, EventType, _, SourceGUID, _, _, _, _, DestName, _, _, _, _, _, SpellID, SpellName = CombatLogGetCurrentEventInfo()
 
-	if (not self.Events[EventType]) then
+	if not self.Events[EventType]
+		or (EventType == "SPELL_INTERRUPT" and not Settings["announcements-interrupts"])
+		or (EventType == "SPELL_STOLEN" and not Settings["announcements-spellsteals"]) then
 		return
 	end
 
-	if (SourceGUID == MyGUID or SourceGUID == PetGUID) then
+	if SourceGUID == MyGUID or SourceGUID == PetGUID then
 		self.Events[EventType](DestName, SpellID, SpellName)
 	end
 end
 
 function Announcements:GROUP_ROSTER_UPDATE()
-	if (GetNumGroupMembers() > 0) then
-		if (not self:IsEventRegistered("COMBAT_LOG_EVENT_UNFILTERED")) then
+	if GetNumGroupMembers() > 0 then
+		if not self:IsEventRegistered("COMBAT_LOG_EVENT_UNFILTERED") then
 			self:UNIT_PET("player")
 			self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		end
@@ -106,11 +110,11 @@ function Announcements:GROUP_ROSTER_UPDATE()
 end
 
 function Announcements:UNIT_PET(owner)
-	if (owner ~= "player") then
+	if owner ~= "player" then
 		return
 	end
 
-	if (UnitExists("pet") and UnitName("pet") ~= UNKNOWN) then
+	if UnitExists("pet") and UnitName("pet") ~= UNKNOWN then
 		PetGUID = UnitGUID("pet")
 	end
 end
@@ -119,21 +123,40 @@ function Announcements:OnEvent(event, arg)
 	self[event](self, arg)
 end
 
-function Announcements:Load()
-	if (not Settings["announcements-enable"]) then
+function Announcements:SetEnabled(enabled)
+	if YxUI.IsForever or YxUI.IsMidnight then
 		return
 	end
 
-	self:GROUP_ROSTER_UPDATE()
-	self:UNIT_PET("player")
-
-	self:RegisterEvent("UNIT_PET")
-	self:RegisterEvent("GROUP_ROSTER_UPDATE")
-	self:SetScript("OnEvent", self.OnEvent)
+	if enabled then
+		MyGUID = UnitGUID("player") or MyGUID
+		self:UNIT_PET("player")
+		self:SetScript("OnEvent", self.OnEvent)
+		self:RegisterEvent("UNIT_PET")
+		self:RegisterEvent("GROUP_ROSTER_UPDATE")
+		self:GROUP_ROSTER_UPDATE()
+	else
+		self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+		self:UnregisterEvent("GROUP_ROSTER_UPDATE")
+		self:UnregisterEvent("UNIT_PET")
+		self:SetScript("OnEvent", nil)
+	end
 end
 
-YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
+function Announcements:Load()
+	self:SetEnabled(Settings["announcements-enable"])
+end
+
+if not (YxUI.IsForever or YxUI.IsMidnight) then
+YxUI:GetModule("GUI"):AddWidgetsID("General", "General", function(left, right)
 	left:CreateHeader(Language["Interrupt Announcements"])
-	left:CreateSwitch("announcements-enable", Settings["announcements-enable"], Language["Enable Announcements"], Language["Announce to the selected channel when you successfully perform an interrupt spell"], ReloadUI):RequiresReload(true)
+	left:CreateSwitch("announcements-enable", Settings["announcements-enable"], Language["Enable Announcements"], Language["Announce to the selected channel when you successfully perform an interrupt spell"], function(value) Announcements:SetEnabled(value) end)
+	left:CreateSwitch("announcements-interrupts", Settings["announcements-interrupts"], Language["Announce Interrupts"], Language["Announce successful interrupts"])
+	left:CreateSwitch("announcements-spellsteals", Settings["announcements-spellsteals"], Language["Announce Spellsteals"], Language["Announce successfully stolen buffs"])
 	left:CreateDropdown("announcements-channel", Settings["announcements-channel"], {[Language["Self"]] = "SELF", [Language["Say"]] = "SAY", [Language["Group"]] = "GROUP", [Language["Emote"]] = "EMOTE"}, Language["Set Channel"], Language["Set the channel to announce to"])
 end)
+YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "General", {
+	{"announcements-enable", function(value) Announcements:SetEnabled(value) end},
+}, nil)
+
+end

@@ -42,8 +42,8 @@ local GetMouseFocusNew = function()
 	if GetMouseFocus then
 		Focus = GetMouseFocus()
 	elseif GetMouseFoci then
-		Focus = GetMouseFoci()
-		Focus = Focus[1]
+		local Foci = GetMouseFoci()
+		Focus = Foci and Foci[1]
 	end
 
 	if Focus then
@@ -51,9 +51,28 @@ local GetMouseFocusNew = function()
 	end
 end
 
+function KeyBinding:UpdateTarget()
+	local Focus = GetMouseFocusNew()
+	local Name = Focus and Focus.GetName and Focus:GetName()
+	local ButtonName, Number
+	if Name then
+		ButtonName, Number = match(Name, "^(.-)(%d+)$")
+	end
+	local Binding = ButtonName and self.Translate[ButtonName]
+
+	if Binding and Number and self.ValidBindings[Binding] then
+		self.TargetBindingName = Binding .. Number
+		return Focus
+	end
+
+	self.TargetBindingName = nil
+end
+
 function KeyBinding:OnKeyUp(key)
-	if (not IsKeyPressIgnoredForBinding(key) and not self.Filter[key] and self.TargetBindingName) then
-		if (key == "ESCAPE") then
+	self:UpdateTarget()
+
+	if not IsKeyPressIgnoredForBinding(key) and not self.Filter[key] and self.TargetBindingName then
+		if key == "ESCAPE" then
 			local Binding = GetBindingKey(self.TargetBindingName)
 
 			if Binding then
@@ -86,51 +105,21 @@ function KeyBinding:OnKeyUp(key)
 end
 
 function KeyBinding:OnKeyDown(key)
-	local MouseFocus = GetMouseFocusNew()
-
-	if (MouseFocus and MouseFocus.GetName) then
-		local Name = MouseFocus:GetName()
-
-		if (not Name) then
-			return
-		end
-
-		local ButtonName = match(Name, "%D+")
-
-		if self.Translate[ButtonName] then
-			if self.ValidBindings[self.Translate[ButtonName]] then
-				self.TargetBindingName = self.Translate[ButtonName] .. match(Name, "(%d+)$")
-			end
-		end
-	end
+	self:UpdateTarget()
 end
 
 function KeyBinding:OnMouseWheel(delta)
 	local key
 
-	if (delta > 0) then
+	if delta > 0 then
 		key = "MOUSEWHEELUP"
 	else
 		key = "MOUSEWHEELDOWN"
 	end
 
-	local MouseFocus = GetMouseFocusNew()
+	self:UpdateTarget()
 
-	if (MouseFocus and MouseFocus.GetName) then
-		local Name = MouseFocus:GetName()
-
-		if Name then
-			local ButtonName = match(Name, "%D+")
-
-			if self.Translate[ButtonName] then
-				if self.ValidBindings[self.Translate[ButtonName]] then
-					self.TargetBindingName = self.Translate[ButtonName] .. match(Name, "(%d+)$")
-				end
-			end
-		end
-	end
-
-	if (not self.Filter[key] and self.TargetBindingName) then
+	if not self.Filter[key] and self.TargetBindingName then
 		key = format("%s%s%s%s", IsAltKeyDown() and "ALT-" or "", IsControlKeyDown() and "CTRL-" or "", IsShiftKeyDown() and "SHIFT-" or "", key)
 
 		local OldAction = GetBindingAction(key, true)
@@ -154,25 +143,10 @@ function KeyBinding:OnMouseWheel(delta)
 end
 
 function KeyBinding:OnEvent(event, button)
-	local MouseFocus = GetMouseFocusNew()
+	self:UpdateTarget()
 
-	if (MouseFocus and MouseFocus.GetName) then
-		local Name = MouseFocus:GetName()
-
-		if (not Name) then
-			return
-		end
-
-		local ButtonName = match(Name, "%D+")
-		if self.Translate[ButtonName] then
-			if self.ValidBindings[self.Translate[ButtonName]] then
-				self.TargetBindingName = self.Translate[ButtonName] .. match(Name, "(%d+)$")
-			end
-		end
-	end
-
-	if (not self.Filter[button] and self.TargetBindingName) then
-		if (button == "MiddleButton") then
+	if button and not self.Filter[button] and self.TargetBindingName then
+		if button == "MiddleButton" then
 			button = "BUTTON3"
 		end
 
@@ -205,15 +179,20 @@ end
 function KeyBinding:OnUpdate(elapsed)
 	self.Elapsed = self.Elapsed + elapsed
 
-	if (self.Elapsed > 0.05) then
-		local MouseFocus = GetMouseFocusNew()
+	if self.Elapsed > 0.05 then
+		local MouseFocus = self:UpdateTarget()
 
-		if (MouseFocus and MouseFocus.action) then
-			self.Hover:SetPoint("TOPLEFT", MouseFocus, 1, -1)
-			self.Hover:SetPoint("BOTTOMRIGHT", MouseFocus, -1, 1)
+		if MouseFocus then
+			if self.HoveredButton ~= MouseFocus then
+				self.Hover:ClearAllPoints()
+				self.Hover:SetPoint("TOPLEFT", MouseFocus, 1, -1)
+				self.Hover:SetPoint("BOTTOMRIGHT", MouseFocus, -1, 1)
+				self.HoveredButton = MouseFocus
+			end
 			self.Hover:Show()
 		elseif self.Hover:IsShown() then
 			self.Hover:Hide()
+			self.HoveredButton = nil
 		end
 
 		self.Elapsed = 0
@@ -229,7 +208,7 @@ local PopupOnCancel = function()
 end
 
 local OnAccept = function()
-	if YxUI.IsClassic then
+	if YxUI.IsVanilla then
 		AttemptToSaveBindings(GetCurrentBindingSet())
 	else
 		SaveBindings(GetCurrentBindingSet())
@@ -268,6 +247,8 @@ function KeyBinding:Disable()
 	self:SetScript("OnEvent", nil)
 	self.Active = false
 	self.TargetBindingName = nil
+	self.HoveredButton = nil
+	self.Hover:Hide()
 
 	YxUI:ClearPopup()
 end
@@ -300,14 +281,14 @@ local ToggleBindingMode = function()
 end
 
 local SaveChanges = function()
-	YxUI:DisplayPopup(Language["Attention"], Language["Are you sure you would like to save these key binding changes?"], ACCEPT, OnAccept, CANCEL, OnCancel)
+	YxUI:DisplayPopup(Language["Attention"], Language["Are you sure you want to save these key binding changes?"], ACCEPT, OnAccept, CANCEL, OnCancel)
 end
 
 local DiscardChanges = function()
-	YxUI:DisplayPopup(Language["Attention"], Language["Are you sure you would like to discard these key binding changes?"], ACCEPT, ReloadUI, CANCEL)
+	YxUI:DisplayPopup(Language["Attention"], Language["Are you sure you want to discard these key binding changes?"], ACCEPT, ReloadUI, CANCEL)
 end
 
-GUI:AddWidgets(Language["General"], Language["Action Bars"], function(left, right)
+GUI:AddWidgetsID("General", "Action Bars", function(left, right)
 	right:CreateHeader(Language["Key Binding"])
 	right:CreateButton("kb-toggle", Language["Toggle"], Language["Key Bind Mode"], Language["While toggled, you can hover over action buttons and press a key combination to rebind them"], ToggleBindingMode)
 	right:CreateButton("kb-save", ACCEPT, Language["Save Changes"], Language["Save key binding changes"], SaveChanges):Disable()

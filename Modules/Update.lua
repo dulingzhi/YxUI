@@ -4,75 +4,133 @@ local tonumber = tonumber
 local IsInGuild = IsInGuild
 local IsInGroup = IsInGroup
 local IsInRaid = IsInRaid
+local IsInInstance = IsInInstance
+local GetZoneText = GetZoneText
 local GetNumGroupMembers = GetNumGroupMembers
 local LE_PARTY_CATEGORY_HOME = LE_PARTY_CATEGORY_HOME
 local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 
 local AddOnVersion = YxUI.UIVersion
+local AddOnNum = tonumber(YxUI.UIVersion)
 local User = YxUI.UserName .. "-" .. YxUI.UserRealm
-local tinsert = table.insert
-local tremove = table.remove
+local ForeverUser
+local ForeverUserDashed
 local CT = ChatThrottleLib
+
+local function RefreshForeverUser()
+	if YxUI.IsForever then
+		ForeverUser = GetUnitName("player", true) or ForeverUser
+		ForeverUserDashed = ForeverUser and ForeverUser:gsub(" ", "-")
+	end
+end
+
+local function IsOwnSender(sender)
+	if sender == User then
+		return true
+	end
+
+	if not YxUI.IsForever or not ForeverUser or type(sender) ~= "string" then
+		return false
+	end
+
+	return sender == ForeverUser or sender == ForeverUserDashed
+		or sender:sub(1, #ForeverUser + 1) == ForeverUser .. "-"
+		or sender:sub(1, #ForeverUserDashed + 1) == ForeverUserDashed .. "-"
+end
+
+RefreshForeverUser()
+
+local Prefix = "YxUI-Version"
 
 local Update = YxUI:NewModule("Update")
 Update.SentHome = false
 Update.SentInst = false
-Update.Timer = 5
+
+local SendInterval = 5
 
 local Tables = {}
 local Queue = {}
+local QueueHead = 1
+local QueueTail = 0
 
 local Throttle = YxUI:GetModule("Throttle")
 
-local function GetVersionNumber(version)
-    local major, minor, patch = strsplit('.', version)
-    return tonumber(major) * 10000 + tonumber(minor) * 100 + tonumber(patch)
+function Update:ScheduleSend()
+	if self.SendTimer or QueueTail == 0 then
+		return
+	end
+
+	self.SendTimer = C_Timer.NewTimer(SendInterval, function()
+		self.SendTimer = nil
+		self:SendNext()
+	end)
 end
-local AddOnNum = GetVersionNumber(YxUI.UIVersion)
 
 function Update:QueueChannel(channel, target)
-	local Data
+	if not channel then
+		return
+	end
 
-	if (#Tables == 0) then
+	for i = QueueHead, QueueTail do
+		local Data = Queue[i]
+
+		if Data[1] == channel and Data[2] == target then
+			return
+		end
+	end
+
+	local Data
+	local Last = #Tables
+
+	if Last == 0 then
 		Data = {channel, target}
 	else
-		Data = tremove(Tables, 1)
+		Data = Tables[Last]
+		Tables[Last] = nil
 		Data[1] = channel
 		Data[2] = target
 	end
 
-	tinsert(Queue, Data)
-
-	if (not self:GetScript("OnUpdate")) then
-		self:SetScript("OnUpdate", self.OnUpdate)
-	end
+	QueueTail = QueueTail + 1
+	Queue[QueueTail] = Data
+	self:ScheduleSend()
 end
 
-function Update:OnUpdate(elapsed)
-	self.Timer = self.Timer - elapsed
+function Update:SendNext()
+	local Data = Queue[QueueHead]
 
-	if (self.Timer < 0) then
-		local Data = tremove(Queue, 1)
+	if not Data then
+		QueueHead = 1
+		QueueTail = 0
 
-		CT:SendAddonMessage("NORMAL", "YxUI-Version", AddOnVersion, Data[1], Data[2])
-
-		tinsert(Tables, Data)
-
-		self.Timer = 5
-
-		if (#Queue == 0) then
-			self:SetScript("OnUpdate", nil)
-		end
+		return
 	end
+
+	Queue[QueueHead] = nil
+	QueueHead = QueueHead + 1
+
+	if QueueHead > QueueTail then
+		QueueHead = 1
+		QueueTail = 0
+	end
+
+	CT:SendAddonMessage("NORMAL", Prefix, AddOnVersion, Data[1], Data[2])
+
+	Data[1] = nil
+	Data[2] = nil
+	Tables[#Tables + 1] = Data
+
+	self:ScheduleSend()
 end
 
 function Update:PLAYER_ENTERING_WORLD()
-	if (not YxUI.IsMainline and not IsInInstance()) and (not Throttle:IsThrottled("vrsn")) then
+	RefreshForeverUser()
+	if (not YxUI.IsMainline and not IsInInstance()) and (not Throttle:IsThrottled("version")) then
 		C_Timer.After(5, function()
 			self:QueueChannel("YELL")
 		end)
 
-		Throttle:Start("vrsn", 10)
+		Throttle:Start("version", 10)
 	end
 
 	self:GROUP_ROSTER_UPDATE()
@@ -90,63 +148,66 @@ function Update:GROUP_ROSTER_UPDATE()
 	local Home = GetNumGroupMembers(LE_PARTY_CATEGORY_HOME)
 	local Instance = GetNumGroupMembers(LE_PARTY_CATEGORY_INSTANCE)
 
-	if (Home == 0 and self.SentHome) then
+	if Home == 0 and self.SentHome then
 		self.SentHome = false
-	elseif (Instance == 0 and self.SentInst) then
+	end
+
+	if Instance == 0 and self.SentInst then
 		self.SentInst = false
 	end
 
-	if (Instance > 0 and not self.SentInst) then
+	if Instance > 0 and not self.SentInst then
 		self:QueueChannel("INSTANCE_CHAT")
 		self.SentInst = true
-	elseif (Home > 0 and not self.SentHome) then
+	elseif Home > 0 and not self.SentHome then
 		self:QueueChannel(IsInRaid(LE_PARTY_CATEGORY_HOME) and "RAID" or IsInGroup(LE_PARTY_CATEGORY_HOME) and "PARTY")
 		self.SentHome = true
 	end
 end
 
 function Update:CHAT_MSG_ADDON(prefix, message, channel, sender)
-	if (sender == User or prefix ~= "YxUI-Version") then
+	if prefix ~= Prefix or IsOwnSender(sender) then
 		return
 	end
 
-	local version = GetVersionNumber(message)
+	message = tonumber(message)
 
-	if (AddOnNum > version) then -- We have a higher version, share it
+	if not message then
+		return
+	end
+
+	if AddOnNum > message then -- We have a higher version, share it
 		self:QueueChannel(channel)
-	elseif (version > AddOnNum) then -- We're behind!
+	elseif message > AddOnNum then -- We're behind!
 		YxUI:print(Language["You can get an updated version of YxUI at https://www.curseforge.com/wow/addons/hydraui"])
-		print(Language["Join the NetEase DD community for support and feedback https://dd.163.com/i/zY5l3huBtM"])
 
 		YxUI:GetModule("GUI"):CreateUpdateAlert()
 
-		AddOnNum = version
-		AddOnVersion = message
+		AddOnNum = message
+		AddOnVersion = tostring(message)
 	end
 end
 
-function Update:ZONE_CHANGED_NEW_AREA()
-	if UnitOnTaxi("player") then
-		local Zone = GetZoneText()
+function Update:ZoneVersionCheck()
+	if IsInInstance() then
+		return
+	end
 
-		if (Zone ~= self.Zone and not Throttle:IsThrottled("vrsn")) then
-			self:QueueChannel("YELL")
-			self.Zone = Zone
-			Throttle:Start("vrsn", 10)
-		end
+	local Zone = GetZoneText()
+
+	if Zone ~= self.Zone and not Throttle:IsThrottled("version") then
+		self:QueueChannel("YELL")
+		self.Zone = Zone
+		Throttle:Start("version", 10)
 	end
 end
 
 function Update:ZONE_CHANGED()
-	if UnitOnTaxi("player") then
-		local Zone = GetZoneText()
+	self:ZoneVersionCheck()
+end
 
-		if (Zone ~= self.Zone and not Throttle:IsThrottled("vrsn")) then
-			self:QueueChannel("YELL")
-			self.Zone = Zone
-			Throttle:Start("vrsn", 10)
-		end
-	end
+function Update:ZONE_CHANGED_NEW_AREA()
+	self:ZoneVersionCheck()
 end
 
 function Update:OnEvent(event, ...)
@@ -155,15 +216,15 @@ function Update:OnEvent(event, ...)
 	end
 end
 
-if (not YxUI.IsMainline) then
+if not YxUI.IsMainline then
 	Update:RegisterEvent("ZONE_CHANGED")
 	Update:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 end
+
+C_ChatInfo.RegisterAddonMessagePrefix(Prefix)
 
 Update:RegisterEvent("GUILD_ROSTER_UPDATE")
 Update:RegisterEvent("PLAYER_ENTERING_WORLD")
 Update:RegisterEvent("GROUP_ROSTER_UPDATE")
 Update:RegisterEvent("CHAT_MSG_ADDON")
 Update:SetScript("OnEvent", Update.OnEvent)
-
-C_ChatInfo.RegisterAddonMessagePrefix("YxUI-Version")

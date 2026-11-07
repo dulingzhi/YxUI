@@ -1,12 +1,13 @@
 local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
-if YxUI.IsMainline then return end -- Needs a rewrite for TWW
+if YxUI.IsMainline then
+	return -- Needs a rewrite for TWW
+end
 
 local Auras = YxUI:NewModule("Auras")
 
 -- Big thank you to Tukz for allowing me to derive my aura code from Tukui
 
-local select = select
 local unpack = unpack
 local UnitAura = UnitAura
 local GetTime = GetTime
@@ -14,7 +15,6 @@ local GetWeaponEnchantInfo = GetWeaponEnchantInfo
 local GetInventoryItemTexture = GetInventoryItemTexture
 local GetInventoryItemQuality = GetInventoryItemQuality
 local ITEM_QUALITY_COLORS = ITEM_QUALITY_COLORS
-local InCombatLockdown = InCombatLockdown
 
 local DebuffColors = YxUI.DebuffColors
 
@@ -22,7 +22,7 @@ local DebuffColors = YxUI.DebuffColors
 Defaults["auras-enable"] = true
 Defaults["auras-show"] = true
 Defaults["auras-size"] = 30
-Defaults["auras-spacing"] = 5
+Defaults["auras-spacing"] = 2
 Defaults["auras-row-spacing"] = 16
 Defaults["auras-per-row"] = 12
 
@@ -43,40 +43,52 @@ Defaults["auras-duration-align"] = "CENTER"
 
 Auras.Headers = {}
 
-local OnUpdate = function(button, elapsed)
+local UnregisterButton = function(button)
+	YxUI.DurationText:Unregister(button)
+
+	-- Unregister is also called for buttons which were never scheduled.
+	button.ExpirationTime = nil
+	button.TimeLeft = nil
+	button.Dur = nil
+	button.Enchant = nil
+	button.LastDuration = nil
+	button.Duration:SetText("")
+end
+
+local function GetButtonRemaining(button, now)
 	local TimeLeft
 
 	if button.Enchant then
-		local Expiration = select(button.Enchant, GetWeaponEnchantInfo())
-
-		if Expiration then
-			TimeLeft = Expiration / 1e3
-		else
-			TimeLeft = 0
-		end
+		local _, MainHandExpiration, _, _, _, OffHandExpiration = GetWeaponEnchantInfo()
+		local Expiration = button.Enchant == 2 and MainHandExpiration or OffHandExpiration
+		TimeLeft = Expiration and Expiration / 1e3 or 0
 	else
-		TimeLeft = button.TimeLeft - elapsed
+		TimeLeft = button.ExpirationTime - now
 	end
 
 	button.TimeLeft = TimeLeft
+	return TimeLeft
+end
 
-	if (TimeLeft <= 0) then
-		button.TimeLeft = nil
-		button.Duration:SetText("")
+local function ClearButtonDuration(button)
+	button.ExpirationTime = nil
+	button.TimeLeft = nil
+	button.Dur = nil
+	button.Enchant = nil
+	button.LastDuration = nil
+	button.Duration:SetText("")
+end
 
-		if button.Enchant then
-			button.Dur = nil
-		end
+local function FormatButtonDuration(remaining)
+	return YxUI:FormatTime(remaining)
+end
 
-		button:SetScript("OnUpdate", nil)
-	else
-		button.Duration:SetText(YxUI:FormatTime(TimeLeft))
-	end
+local RegisterButton = function(button)
+	YxUI.DurationText:Register(button, button.Duration, FormatButtonDuration, GetButtonRemaining, ClearButtonDuration)
 end
 
 local UpdateTempEnchant = function(button, slot)
 	local Enchant = (slot == 16 and 2) or 6
-	local Expiration = select(Enchant, GetWeaponEnchantInfo())
 	local Icon = GetInventoryItemTexture("player", slot)
 	--[[local Quality = GetInventoryItemQuality("player", slot)
 
@@ -90,19 +102,9 @@ local UpdateTempEnchant = function(button, slot)
 
 	button.Backdrop:SetBackdropBorderColor(0, 0, 0)
 
-	if Expiration then
-		if (not button.Dur) then
-			button.Dur = Expiration / 1e3
-		end
-
-		button.Enchant = Enchant
-		button:SetScript("OnUpdate", OnUpdate)
-	else
-		button.Dur = nil
-		button.Enchant = nil
-		button.TimeLeft = nil
-		button:SetScript("OnUpdate", nil)
-	end
+	button.ExpirationTime = nil
+	button.Enchant = Enchant
+	RegisterButton(button)
 
 	if Icon then
 		button:SetAlpha(1)
@@ -113,9 +115,9 @@ local UpdateTempEnchant = function(button, slot)
 end
 
 local OnAttributeChanged = function(button, attribute, index)
-	if (attribute == "index") then
+	if attribute == "index" then
 		Auras:UpdateAura(button, index)
-	elseif (attribute == "target-slot") then
+	elseif attribute == "target-slot" then
 		UpdateTempEnchant(button, index)
 	end
 end
@@ -132,9 +134,6 @@ YxUIAuraOnEnter = function(self)
 end
 
 YxUISkinAura = function(button)
-    button:CreateBorder()
-    button:StyleButton()
-
 	local Backdrop = CreateFrame("Frame", nil, button, "BackdropTemplate")
 	Backdrop:SetAllPoints(button)
 	Backdrop:SetFrameLevel(button:GetFrameLevel() - 2)
@@ -172,35 +171,28 @@ end
 function Auras:UpdateAura(button, index)
 	local Name, Texture, Count, DType, Duration, ExpirationTime, Caster, IsStealable, ShouldConsolidate, SpellID, CanApplyAura, IsBossDebuff = UnitAura(button:GetParent():GetAttribute("unit"), index, button.Filter) -- button:GetID()
 
-	if (not Name) then
+	if not Name then
+		UnregisterButton(button)
 		return
 	end
 
-	if (Duration > 0 and ExpirationTime) then
-		local TimeLeft = ExpirationTime - GetTime()
-
-		if (not button.TimeLeft) then
-			button.TimeLeft = TimeLeft
-			button:SetScript("OnUpdate", OnUpdate)
-		else
-			button.TimeLeft = TimeLeft
-		end
-
+	if Duration > 0 and ExpirationTime then
+		button.Enchant = nil
+		button.ExpirationTime = ExpirationTime
+		button.TimeLeft = ExpirationTime - GetTime()
 		button.Dur = Duration
+		RegisterButton(button)
 	else
-		button.TimeLeft = nil
-		button.Dur = nil
-		button.Duration:SetText("")
-		button:SetScript("OnUpdate", nil)
+		UnregisterButton(button)
 	end
 
-	if (Count > 1) then
+	if Count > 1 then
 		button.Count:SetText(Count)
 	else
 		button.Count:SetText("")
 	end
 
-	if (button.Filter == "HARMFUL" and DType) then
+	if button.Filter == "HARMFUL" and DType then
 		local Color = DebuffColors[DType] or DebuffColors.none
 
 		button.Backdrop:SetBackdropBorderColor(unpack(Color))
@@ -210,7 +202,7 @@ function Auras:UpdateAura(button, index)
 end
 
 function Auras:Load()
-	if (not Settings["auras-enable"]) then
+	if not Settings["auras-enable"] then
 		return
 	end
 
@@ -437,12 +429,12 @@ local UpdateCountAlignment = function(value)
 	end
 end
 
-YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Auras"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgetsID("General", "Auras", function(left, right)
 	left:CreateHeader(Language["Enable"])
 	left:CreateSwitch("auras-enable", Settings["auras-enable"], Language["Enable Auras Module"], Language["Enable the YxUI auras module"], ReloadUI):RequiresReload(true)
 
 	left:CreateHeader(Language["Display"])
-	left:CreateSwitch("auras-show", Settings["auras-show"], Language["Display Auras"], Language["Display the players buff and debuffs"], UpdateAuraDisplay)
+	left:CreateSwitch("auras-show", Settings["auras-show"], Language["Display Auras"], Language["Display the player's buffs and debuffs"], UpdateAuraDisplay)
 
 	left:CreateHeader(Language["Styling"])
 	left:CreateSlider("auras-size", Settings["auras-size"], 20, 50, 2, Language["Size"], Language["Set the size of auras"], ReloadUI):RequiresReload(true)
@@ -467,3 +459,23 @@ YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Auras"], functio
 	right:CreateDropdown("auras-count-align", Settings["auras-count-align"], {[Language["Left"]] = "LEFT", [Language["Right"]] = "RIGHT", [Language["Center"]] = "CENTER"}, Language["Text Alignment"], Language["Set the alignment direction of the text"], UpdateCountAlignment)
 	right:CreateColorSelection("auras-count-color", Settings["auras-count-color"], Language["Color"], Language["Set the color of the aura count"], UpdateCountColor)
 end)
+YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "Auras", {
+	{"auras-show", UpdateAuraDisplay},
+	{"auras-spacing", UpdateAuraSpacing},
+	{"auras-row-spacing", UpdateAuraRowSpacing},
+	{"auras-per-row", UpdateAurasPerRow},
+	{"auras-font", UpdateAuraFont},
+	{"auras-font-size", UpdateAuraFont},
+	{"auras-font-flags", UpdateAuraFont},
+	{"auras-duration-xoffset", UpdateDurationPosition},
+	{"auras-duration-yoffset", UpdateDurationPosition},
+	{"auras-duration-align", UpdateDurationAlignment},
+	{"auras-duration-color", UpdateDurationColor},
+	{"auras-count-xoffset", UpdateCountPosition},
+	{"auras-count-yoffset", UpdateCountPosition},
+	{"auras-count-align", UpdateCountAlignment},
+	{"auras-count-color", UpdateCountColor},
+}, nil)
+
+
+YxUI:GetModule("GUI"):RegisterReloadSettings({"auras-enable", "auras-size"})

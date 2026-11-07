@@ -59,7 +59,7 @@ function TH:ApplyStyle()
 	for i = 1, TalkingHeadFrame.PortraitFrame:GetNumRegions() do
 		local Region = select(i, TalkingHeadFrame.PortraitFrame:GetRegions())
 
-		if (Region:GetObjectType() == "Texture") then
+		if Region:GetObjectType() == "Texture" then
 			Region:Hide()
 			Region:SetTexture(nil)
 		end
@@ -68,7 +68,7 @@ function TH:ApplyStyle()
 	for i = 1, TalkingHeadFrame.MainFrame:GetNumRegions() do
 		local Region = select(i, TalkingHeadFrame.MainFrame:GetRegions())
 
-		if (Region:GetObjectType() == "Texture") then
+		if Region:GetObjectType() == "Texture" then
 			Region:Hide()
 			Region:SetTexture(nil)
 		end
@@ -77,7 +77,7 @@ function TH:ApplyStyle()
 	for i = 1, TalkingHeadFrame:GetNumRegions() do
 		local Region = select(i, TalkingHeadFrame:GetRegions())
 
-		if (Region:GetObjectType() == "Texture") then
+		if Region:GetObjectType() == "Texture" then
 			Region:Hide()
 			Region:SetTexture(nil)
 		end
@@ -125,9 +125,39 @@ function TH:ApplyStyle()
 	TalkingHeadFrame.BG:SetFrameStrata("LOW")
 end
 
+function TH:UpdateVisibility()
+	if not self.Mover or not TalkingHeadFrame then
+		return
+	end
+
+	if InCombatLockdown() then
+		self:RegisterEvent("PLAYER_REGEN_ENABLED")
+		return
+	end
+
+	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+
+	if Settings["hide-th"] then
+		TalkingHeadFrame:SetParent(self.Hide)
+	elseif not self.Styled then
+		self:ApplyStyle()
+		self.Styled = true
+	else
+		TalkingHeadFrame:SetParent(YxUI.UIParent)
+		TalkingHeadFrame:ClearAllPoints()
+		TalkingHeadFrame:SetPoint("CENTER", self.Mover, 0, 0)
+	end
+end
+
+TH:SetScript("OnEvent", function(self, event)
+	if event == "PLAYER_REGEN_ENABLED" then
+		self:UpdateVisibility()
+	end
+end)
+
 function TH:Load()
 	for i = 1, #AlertFrame.alertFrameSubSystems do
-		if (AlertFrame.alertFrameSubSystems[i] and AlertFrame.alertFrameSubSystems[i].anchorFrame == TalkingHeadFrame) then
+		if AlertFrame.alertFrameSubSystems[i] and AlertFrame.alertFrameSubSystems[i].anchorFrame == TalkingHeadFrame then
 			tremove(AlertFrame.alertFrameSubSystems, i)
 		end
 	end
@@ -144,14 +174,14 @@ function TH:Load()
 
 	YxUI:CreateMover(self.Mover)
 
-	if Settings["hide-th"] then
-		TalkingHeadFrame:SetParent(self.Hide)
-	else
-		self:ApplyStyle()
-	end
+	self:UpdateVisibility()
 end
 
-YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["General"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgetsID("General", "General", function(left, right)
 	right:CreateHeader(Language["Talking Head"])
-	right:CreateSwitch("hide-th", Settings["hide-th"], Language["Hide Talking Head Frame"], Language["Hide the talking head frame, and stop it from showing."], ReloadUI):RequiresReload(true)
+	right:CreateSwitch("hide-th", Settings["hide-th"], Language["Hide Talking Head Frame"], Language["Hide the talking head frame and prevent it from reappearing."], function() TH:UpdateVisibility() end)
 end)
+YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "General", {
+	{"hide-th", function() TH:UpdateVisibility() end},
+}, nil)
+

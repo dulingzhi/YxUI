@@ -1,7 +1,31 @@
 local AddonName, Namespace = ...
 local YxUI, Language, Assets, Settings, Defaults = Namespace:get()
-local oUF = Namespace.oUF
 local R, G, B
+
+-- Shared unit-frame palette remains private to YxUI rather than using the
+-- addon namespace as a library-style data registry.
+local UnitFrameColors = {
+	class = {}, reaction = {}, power = {}, debuff = {},
+	threat = {}, smooth = {{1, 0, 0}, {1, 1, 0}, {0, 1, 0}},
+}
+
+function YxUI:ColorGradient(current, maximum, ...)
+	if maximum == 0 then
+		return 0, 0, 0
+	end
+	local percentage = current / maximum
+	if percentage >= 1 then
+		local count = select("#", ...)
+		return select(count - 2, ...)
+	elseif percentage <= 0 then
+		return ...
+	end
+	local count = select("#", ...) / 3
+	local segment, relative = math.modf(percentage * (count - 1))
+	local index = segment * 3 + 1
+	local r1, g1, b1, r2, g2, b2 = select(index, ...)
+	return r1 + (r2-r1)*relative, g1 + (g2-g1)*relative, b1 + (b2-b1)*relative
+end
 
 -- Class Colors
 Defaults["color-death-knight"] = "C41E3A"
@@ -104,8 +128,8 @@ Defaults["color-totem-water"] = "45B0E5"
 Defaults["color-totem-air"] = "B3E5FC"
 
 -- Other
-Defaults["color-tapped"] = "999999"
-Defaults["color-disconnected"] = "999999"
+Defaults["color-tapped"] = "A6A6A6"
+Defaults["color-disconnected"] = "A6A6A6"
 
 YxUI.ClassColors = {}
 YxUI.ReactionColors = {}
@@ -119,7 +143,7 @@ YxUI.TotemColors = {}
 function YxUI:SetColorEntry(t, key, hex)
 	R, G, B = self:HexToRGB(hex)
 
-	if (not t[key]) then
+	if not t[key] then
 		t[key] = {}
 	end
 
@@ -227,14 +251,18 @@ function YxUI:UpdateColors()
 	self:UpdateDebuffColors()
 	self:UpdateComboColors()
 
-	if (not self.IsMainline) then
+	if not self.IsMainline then
 		self:UpdateHappinessColors()
 		self:UpdateTotemColors()
 	end
 end
 
-function YxUI:UpdateoUFColors()
-	local Colors = Namespace.oUF.colors
+function YxUI:GetUnitFrameColors()
+	return UnitFrameColors
+end
+
+function YxUI:UpdateUnitFrameColors()
+	local Colors = UnitFrameColors
 
 	Colors.class = YxUI.ClassColors
 	Colors.reaction = YxUI.ReactionColors
@@ -243,99 +271,129 @@ function YxUI:UpdateoUFColors()
 	Colors.tapped = {YxUI:HexToRGB(Settings["color-tapped"])}
 	Colors.disconnected = {YxUI:HexToRGB(Settings["color-disconnected"])}
 	Colors.health = {YxUI:HexToRGB(Settings["ui-header-texture-color"])}
+	Colors.threat[0] = nil
+	Colors.threat[1] = {1, 1, 0}
+	Colors.threat[2] = {1, 1, 0}
+	Colors.threat[3] = {1, 0, 0}
 end
 
-YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Colors"], function(left, right)
+local function UpdateComboPointColors()
+	YxUI:UpdateComboColors()
+
+	local player = YxUI.UnitFrames and YxUI.UnitFrames.player
+	local resource = player and player.ClassResource
+	if resource and resource.UpdateColors then
+		resource:UpdateColors()
+	end
+end
+
+local function UpdateClassColorCache() YxUI:UpdateClassColors() end
+local function UpdatePowerColorCache()
+	YxUI:UpdatePowerColors()
+	local player = YxUI.UnitFrames and YxUI.UnitFrames.player
+	local resource = player and player.ClassResource
+	if resource and resource.RefreshColors then
+		resource:RefreshColors()
+	end
+end
+local function UpdateZoneColorCache() YxUI:UpdateZoneColors() end
+local function UpdateReactionColorCache() YxUI:UpdateReactionColors() end
+local function UpdateDebuffColorCache() YxUI:UpdateDebuffColors() end
+local function UpdateHappinessColorCache() YxUI:UpdateHappinessColors() end
+local function UpdateTotemColorCache() YxUI:UpdateTotemColors() end
+local function UpdateMiscUnitFrameColors() YxUI:UpdateUnitFrameColors() end
+
+YxUI:GetModule("GUI"):AddWidgetsID("General", "Colors", function(left, right)
 	left:CreateHeader(Language["Class Colors"])
-	left:CreateColorSelection("color-death-knight", Settings["color-death-knight"], Language["Death Knight"], "")
-	left:CreateColorSelection("color-demon-hunter", Settings["color-demon-hunter"], Language["Demon Hunter"], "")
-	left:CreateColorSelection("color-druid", Settings["color-druid"], Language["Druid"], "")
-	left:CreateColorSelection("color-evoker", Settings["color-evoker"], Language["Evoker"], "")
-	left:CreateColorSelection("color-hunter", Settings["color-hunter"], Language["Hunter"], "")
-	left:CreateColorSelection("color-mage", Settings["color-mage"], Language["Mage"], "")
-	left:CreateColorSelection("color-monk", Settings["color-monk"], Language["Monk"], "")
-	left:CreateColorSelection("color-paladin", Settings["color-paladin"], Language["Paladin"], "")
-	left:CreateColorSelection("color-priest", Settings["color-priest"], Language["Priest"], "")
-	left:CreateColorSelection("color-rogue", Settings["color-rogue"], Language["Rogue"], "")
-	left:CreateColorSelection("color-shaman", Settings["color-shaman"], Language["Shaman"], "")
-	left:CreateColorSelection("color-warlock", Settings["color-warlock"], Language["Warlock"], "")
-	left:CreateColorSelection("color-warrior", Settings["color-warrior"], Language["Warrior"], "")
+	left:CreateColorSelection("color-death-knight", Settings["color-death-knight"], Language["Death Knight"], "", UpdateClassColorCache)
+	left:CreateColorSelection("color-demon-hunter", Settings["color-demon-hunter"], Language["Demon Hunter"], "", UpdateClassColorCache)
+	left:CreateColorSelection("color-druid", Settings["color-druid"], Language["Druid"], "", UpdateClassColorCache)
+	left:CreateColorSelection("color-evoker", Settings["color-evoker"], Language["Evoker"], "", UpdateClassColorCache)
+	left:CreateColorSelection("color-hunter", Settings["color-hunter"], Language["Hunter"], "", UpdateClassColorCache)
+	left:CreateColorSelection("color-mage", Settings["color-mage"], Language["Mage"], "", UpdateClassColorCache)
+	left:CreateColorSelection("color-monk", Settings["color-monk"], Language["Monk"], "", UpdateClassColorCache)
+	left:CreateColorSelection("color-paladin", Settings["color-paladin"], Language["Paladin"], "", UpdateClassColorCache)
+	left:CreateColorSelection("color-priest", Settings["color-priest"], Language["Priest"], "", UpdateClassColorCache)
+	left:CreateColorSelection("color-rogue", Settings["color-rogue"], Language["Rogue"], "", UpdateClassColorCache)
+	left:CreateColorSelection("color-shaman", Settings["color-shaman"], Language["Shaman"], "", UpdateClassColorCache)
+	left:CreateColorSelection("color-warlock", Settings["color-warlock"], Language["Warlock"], "", UpdateClassColorCache)
+	left:CreateColorSelection("color-warrior", Settings["color-warrior"], Language["Warrior"], "", UpdateClassColorCache)
 
 	right:CreateHeader(Language["Power Colors"])
-	right:CreateColorSelection("color-mana", Settings["color-mana"], Language["Mana"], "")
-	right:CreateColorSelection("color-rage", Settings["color-rage"], Language["Rage"], "")
-	right:CreateColorSelection("color-energy", Settings["color-energy"], Language["Energy"], "")
-	right:CreateColorSelection("color-essence", Settings["color-essence"], Language["Essence"], "")
-	right:CreateColorSelection("color-focus", Settings["color-focus"], Language["Focus"], "")
+	right:CreateColorSelection("color-mana", Settings["color-mana"], Language["Mana"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-rage", Settings["color-rage"], Language["Rage"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-energy", Settings["color-energy"], Language["Energy"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-essence", Settings["color-essence"], Language["Essence"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-focus", Settings["color-focus"], Language["Focus"], "", UpdatePowerColorCache)
 	--right:CreateColorSelection("color-combo-points", Settings["color-combo-points"], Language["Combo Points"], "")
-	right:CreateColorSelection("color-soul-shards", Settings["color-soul-shards"], Language["Soul Shards"], "")
-	right:CreateColorSelection("color-insanity", Settings["color-insanity"], Language["Insanity"], "")
-	right:CreateColorSelection("color-fury", Settings["color-fury"], Language["Fury"], "")
-	right:CreateColorSelection("color-chi", Settings["color-chi"], Language["Chi"], "")
-	right:CreateColorSelection("color-maelstrom", Settings["color-maelstrom"], Language["Maelstrom"], "")
-	right:CreateColorSelection("color-arcane-charges", Settings["color-arcane-charges"], Language["Arcane Charges"], "")
-	right:CreateColorSelection("color-holy-power", Settings["color-holy-power"], Language["Holy Power"], "")
-	right:CreateColorSelection("color-lunar-power", Settings["color-lunar-power"], Language["Lunar Power"], "")
-	right:CreateColorSelection("color-runic-power", Settings["color-runic-power"], Language["Runic Power"], "")
-	right:CreateColorSelection("color-runes", Settings["color-runes"], Language["Runes"], "")
-	right:CreateColorSelection("color-fuel", Settings["color-fuel"], Language["Fuel"], "")
-	right:CreateColorSelection("color-ammo-slot", Settings["color-ammo-slot"], Language["Ammo Slot"], "")
+	right:CreateColorSelection("color-soul-shards", Settings["color-soul-shards"], Language["Soul Shards"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-insanity", Settings["color-insanity"], Language["Insanity"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-fury", Settings["color-fury"], Language["Fury"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-chi", Settings["color-chi"], Language["Chi"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-maelstrom", Settings["color-maelstrom"], Language["Maelstrom"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-arcane-charges", Settings["color-arcane-charges"], Language["Arcane Charges"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-holy-power", Settings["color-holy-power"], Language["Holy Power"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-lunar-power", Settings["color-lunar-power"], Language["Lunar Power"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-runic-power", Settings["color-runic-power"], Language["Runic Power"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-runes", Settings["color-runes"], Language["Runes"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-fuel", Settings["color-fuel"], Language["Fuel"], "", UpdatePowerColorCache)
+	right:CreateColorSelection("color-ammo-slot", Settings["color-ammo-slot"], Language["Ammo Slot"], "", UpdatePowerColorCache)
 
 	left:CreateHeader(Language["Zone Colors"])
-	left:CreateColorSelection("color-sanctuary", Settings["color-sanctuary"], Language["Sanctuary"], "")
-	left:CreateColorSelection("color-arena", Settings["color-arena"], Language["Arena"], "")
-	left:CreateColorSelection("color-hostile", Settings["color-hostile"], Language["Hostile"], "")
-	left:CreateColorSelection("color-combat", Settings["color-combat"], Language["Combat"], "")
-	left:CreateColorSelection("color-contested", Settings["color-contested"], Language["Contested"], "")
-	left:CreateColorSelection("color-friendly", Settings["color-friendly"], Language["Friendly"], "")
-	left:CreateColorSelection("color-other", Settings["color-other"], Language["Other"], "")
+	left:CreateColorSelection("color-sanctuary", Settings["color-sanctuary"], Language["Sanctuary"], "", UpdateZoneColorCache)
+	left:CreateColorSelection("color-arena", Settings["color-arena"], Language["Arena"], "", UpdateZoneColorCache)
+	left:CreateColorSelection("color-hostile", Settings["color-hostile"], Language["Hostile"], "", UpdateZoneColorCache)
+	left:CreateColorSelection("color-combat", Settings["color-combat"], Language["Combat"], "", UpdateZoneColorCache)
+	left:CreateColorSelection("color-contested", Settings["color-contested"], Language["Contested"], "", UpdateZoneColorCache)
+	left:CreateColorSelection("color-friendly", Settings["color-friendly"], Language["Friendly"], "", UpdateZoneColorCache)
+	left:CreateColorSelection("color-other", Settings["color-other"], Language["Other"], "", UpdateZoneColorCache)
 
 	right:CreateHeader(Language["Reaction Colors"])
-	right:CreateColorSelection("color-reaction-8", Settings["color-reaction-8"], Language["Exalted"], "")
-	right:CreateColorSelection("color-reaction-7", Settings["color-reaction-7"], Language["Revered"], "")
-	right:CreateColorSelection("color-reaction-6", Settings["color-reaction-6"], Language["Honored"], "")
-	right:CreateColorSelection("color-reaction-5", Settings["color-reaction-5"], Language["Friendly"], "")
-	right:CreateColorSelection("color-reaction-4", Settings["color-reaction-4"], Language["Neutral"], "")
-	right:CreateColorSelection("color-reaction-3", Settings["color-reaction-3"], Language["Unfriendly"], "")
-	right:CreateColorSelection("color-reaction-2", Settings["color-reaction-2"], Language["Hostile"], "")
-	right:CreateColorSelection("color-reaction-1", Settings["color-reaction-1"], Language["Hated"], "")
+	right:CreateColorSelection("color-reaction-8", Settings["color-reaction-8"], Language["Exalted"], "", UpdateReactionColorCache)
+	right:CreateColorSelection("color-reaction-7", Settings["color-reaction-7"], Language["Revered"], "", UpdateReactionColorCache)
+	right:CreateColorSelection("color-reaction-6", Settings["color-reaction-6"], Language["Honored"], "", UpdateReactionColorCache)
+	right:CreateColorSelection("color-reaction-5", Settings["color-reaction-5"], Language["Friendly"], "", UpdateReactionColorCache)
+	right:CreateColorSelection("color-reaction-4", Settings["color-reaction-4"], Language["Neutral"], "", UpdateReactionColorCache)
+	right:CreateColorSelection("color-reaction-3", Settings["color-reaction-3"], Language["Unfriendly"], "", UpdateReactionColorCache)
+	right:CreateColorSelection("color-reaction-2", Settings["color-reaction-2"], Language["Hostile"], "", UpdateReactionColorCache)
+	right:CreateColorSelection("color-reaction-1", Settings["color-reaction-1"], Language["Hated"], "", UpdateReactionColorCache)
 
 	right:CreateHeader(Language["Debuff Colors"])
-	right:CreateColorSelection("color-curse", Settings["color-curse"], Language["Curse"], "")
-	right:CreateColorSelection("color-disease", Settings["color-disease"], Language["Disease"], "")
-	right:CreateColorSelection("color-magic", Settings["color-magic"], Language["Magic"], "")
-	right:CreateColorSelection("color-poison", Settings["color-poison"], Language["Poison"], "")
-	right:CreateColorSelection("color-none", Settings["color-none"], Language["None"], "")
+	right:CreateColorSelection("color-curse", Settings["color-curse"], Language["Curse"], "", UpdateDebuffColorCache)
+	right:CreateColorSelection("color-disease", Settings["color-disease"], Language["Disease"], "", UpdateDebuffColorCache)
+	right:CreateColorSelection("color-magic", Settings["color-magic"], Language["Magic"], "", UpdateDebuffColorCache)
+	right:CreateColorSelection("color-poison", Settings["color-poison"], Language["Poison"], "", UpdateDebuffColorCache)
+	right:CreateColorSelection("color-none", Settings["color-none"], Language["None"], "", UpdateDebuffColorCache)
 
-	if (not YxUI.IsMainline) then
+	if not YxUI.IsMainline then
 		right:CreateHeader(Language["Pet Happiness Colors"])
-		right:CreateColorSelection("color-happiness-3", Settings["color-happiness-3"], Language["Happy"], "")
-		right:CreateColorSelection("color-happiness-2", Settings["color-happiness-2"], Language["Content"], "")
-		right:CreateColorSelection("color-happiness-1", Settings["color-happiness-1"], Language["Unhappy"], "")
+		right:CreateColorSelection("color-happiness-3", Settings["color-happiness-3"], Language["Happy"], "", UpdateHappinessColorCache)
+		right:CreateColorSelection("color-happiness-2", Settings["color-happiness-2"], Language["Content"], "", UpdateHappinessColorCache)
+		right:CreateColorSelection("color-happiness-1", Settings["color-happiness-1"], Language["Unhappy"], "", UpdateHappinessColorCache)
 
 		left:CreateHeader(Language["Totem Colors"])
-		left:CreateColorSelection("color-totem-fire", Settings["color-totem-fire"], Language["Fire"], "")
-		left:CreateColorSelection("color-totem-earth", Settings["color-totem-earth"], Language["Earth"], "")
-		left:CreateColorSelection("color-totem-water", Settings["color-totem-water"], Language["Water"], "")
-		left:CreateColorSelection("color-totem-air", Settings["color-totem-air"], Language["Air"], "")
+		left:CreateColorSelection("color-totem-fire", Settings["color-totem-fire"], Language["Fire"], "", UpdateTotemColorCache)
+		left:CreateColorSelection("color-totem-earth", Settings["color-totem-earth"], Language["Earth"], "", UpdateTotemColorCache)
+		left:CreateColorSelection("color-totem-water", Settings["color-totem-water"], Language["Water"], "", UpdateTotemColorCache)
+		left:CreateColorSelection("color-totem-air", Settings["color-totem-air"], Language["Air"], "", UpdateTotemColorCache)
 	end
 
 	left:CreateHeader(Language["Combo Points Colors"])
-	left:CreateColorSelection("color-combo-1", Settings["color-combo-1"], Language["Combo Point 1"], Language["Set the color of combo point 1"], ReloadUI):RequiresReload(true)
-	left:CreateColorSelection("color-combo-2", Settings["color-combo-2"], Language["Combo Point 2"], Language["Set the color of combo point 2"], ReloadUI):RequiresReload(true)
-	left:CreateColorSelection("color-combo-3", Settings["color-combo-3"], Language["Combo Point 3"], Language["Set the color of combo point 3"], ReloadUI):RequiresReload(true)
-	left:CreateColorSelection("color-combo-4", Settings["color-combo-4"], Language["Combo Point 4"], Language["Set the color of combo point 4"], ReloadUI):RequiresReload(true)
-	left:CreateColorSelection("color-combo-5", Settings["color-combo-5"], Language["Combo Point 5"], Language["Set the color of combo point 5"], ReloadUI):RequiresReload(true)
-	left:CreateColorSelection("color-combo-6", Settings["color-combo-6"], Language["Combo Point 6"], Language["Set the color of combo point 6"], ReloadUI):RequiresReload(true)
-	left:CreateColorSelection("color-combo-7", Settings["color-combo-7"], Language["Combo Point 7"], Language["Set the color of combo point 7"], ReloadUI):RequiresReload(true)
+	left:CreateColorSelection("color-combo-1", Settings["color-combo-1"], Language["Combo Point 1"], Language["Set the color of combo point 1"], UpdateComboPointColors)
+	left:CreateColorSelection("color-combo-2", Settings["color-combo-2"], Language["Combo Point 2"], Language["Set the color of combo point 2"], UpdateComboPointColors)
+	left:CreateColorSelection("color-combo-3", Settings["color-combo-3"], Language["Combo Point 3"], Language["Set the color of combo point 3"], UpdateComboPointColors)
+	left:CreateColorSelection("color-combo-4", Settings["color-combo-4"], Language["Combo Point 4"], Language["Set the color of combo point 4"], UpdateComboPointColors)
+	left:CreateColorSelection("color-combo-5", Settings["color-combo-5"], Language["Combo Point 5"], Language["Set the color of combo point 5"], UpdateComboPointColors)
 
-	if YxUI.IsMainline then
-		left:CreateColorSelection("color-combo-charged", Settings["color-combo-charged"], Language["Charged Combo Point"], Language["Set the color of the charged combo point provided from the Kyrian Covenant"], ReloadUI):RequiresReload(true)
+	if YxUI.IsMainline and not YxUI.IsForever then
+		left:CreateColorSelection("color-combo-6", Settings["color-combo-6"], Language["Combo Point 6"], Language["Set the color of combo point 6"], UpdateComboPointColors)
+		left:CreateColorSelection("color-combo-7", Settings["color-combo-7"], Language["Combo Point 7"], Language["Set the color of combo point 7"], UpdateComboPointColors)
+		left:CreateColorSelection("color-combo-charged", Settings["color-combo-charged"], Language["Charged Combo Point"], Language["Set the color of the charged combo point provided from the Kyrian Covenant"], UpdateComboPointColors)
 	end
 
 	right:CreateHeader(Language["Misc Colors"])
-	right:CreateColorSelection("color-tapped", Settings["color-tapped"], Language["Tagged"], "")
-	right:CreateColorSelection("color-disconnected", Settings["color-disconnected"], Language["Disconnected"], "")
+	right:CreateColorSelection("color-tapped", Settings["color-tapped"], Language["Tagged"], "", UpdateMiscUnitFrameColors)
+	right:CreateColorSelection("color-disconnected", Settings["color-disconnected"], Language["Disconnected"], "", UpdateMiscUnitFrameColors)
 
 	left:CreateHeader(Language["Casting"])
 	left:CreateColorSelection("color-casting-start", Settings["color-casting-start"], Language["Casting"], "")
@@ -343,3 +401,73 @@ YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Colors"], functi
 	left:CreateColorSelection("color-casting-interrupted", Settings["color-casting-interrupted"], Language["Interrupted"], "")
 	left:CreateColorSelection("color-casting-uninterruptible", Settings["color-casting-uninterruptible"], Language["Uninterruptible"], "")
 end)
+YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "Colors", {
+	{"color-death-knight", UpdateClassColorCache},
+	{"color-demon-hunter", UpdateClassColorCache},
+	{"color-druid", UpdateClassColorCache},
+	{"color-evoker", UpdateClassColorCache},
+	{"color-hunter", UpdateClassColorCache},
+	{"color-mage", UpdateClassColorCache},
+	{"color-monk", UpdateClassColorCache},
+	{"color-paladin", UpdateClassColorCache},
+	{"color-priest", UpdateClassColorCache},
+	{"color-rogue", UpdateClassColorCache},
+	{"color-shaman", UpdateClassColorCache},
+	{"color-warlock", UpdateClassColorCache},
+	{"color-warrior", UpdateClassColorCache},
+	{"color-mana", UpdatePowerColorCache},
+	{"color-rage", UpdatePowerColorCache},
+	{"color-energy", UpdatePowerColorCache},
+	{"color-essence", UpdatePowerColorCache},
+	{"color-focus", UpdatePowerColorCache},
+	{"color-soul-shards", UpdatePowerColorCache},
+	{"color-insanity", UpdatePowerColorCache},
+	{"color-fury", UpdatePowerColorCache},
+	{"color-chi", UpdatePowerColorCache},
+	{"color-maelstrom", UpdatePowerColorCache},
+	{"color-arcane-charges", UpdatePowerColorCache},
+	{"color-holy-power", UpdatePowerColorCache},
+	{"color-lunar-power", UpdatePowerColorCache},
+	{"color-runic-power", UpdatePowerColorCache},
+	{"color-runes", UpdatePowerColorCache},
+	{"color-fuel", UpdatePowerColorCache},
+	{"color-ammo-slot", UpdatePowerColorCache},
+	{"color-sanctuary", UpdateZoneColorCache},
+	{"color-arena", UpdateZoneColorCache},
+	{"color-hostile", UpdateZoneColorCache},
+	{"color-combat", UpdateZoneColorCache},
+	{"color-contested", UpdateZoneColorCache},
+	{"color-friendly", UpdateZoneColorCache},
+	{"color-other", UpdateZoneColorCache},
+	{"color-reaction-8", UpdateReactionColorCache},
+	{"color-reaction-7", UpdateReactionColorCache},
+	{"color-reaction-6", UpdateReactionColorCache},
+	{"color-reaction-5", UpdateReactionColorCache},
+	{"color-reaction-4", UpdateReactionColorCache},
+	{"color-reaction-3", UpdateReactionColorCache},
+	{"color-reaction-2", UpdateReactionColorCache},
+	{"color-reaction-1", UpdateReactionColorCache},
+	{"color-curse", UpdateDebuffColorCache},
+	{"color-disease", UpdateDebuffColorCache},
+	{"color-magic", UpdateDebuffColorCache},
+	{"color-poison", UpdateDebuffColorCache},
+	{"color-none", UpdateDebuffColorCache},
+	{"color-happiness-3", not YxUI.IsMainline and UpdateHappinessColorCache or nil},
+	{"color-happiness-2", not YxUI.IsMainline and UpdateHappinessColorCache or nil},
+	{"color-happiness-1", not YxUI.IsMainline and UpdateHappinessColorCache or nil},
+	{"color-totem-fire", not YxUI.IsMainline and UpdateTotemColorCache or nil},
+	{"color-totem-earth", not YxUI.IsMainline and UpdateTotemColorCache or nil},
+	{"color-totem-water", not YxUI.IsMainline and UpdateTotemColorCache or nil},
+	{"color-totem-air", not YxUI.IsMainline and UpdateTotemColorCache or nil},
+	{"color-combo-1", UpdateComboPointColors},
+	{"color-combo-2", UpdateComboPointColors},
+	{"color-combo-3", UpdateComboPointColors},
+	{"color-combo-4", UpdateComboPointColors},
+	{"color-combo-5", UpdateComboPointColors},
+	{"color-combo-6", YxUI.IsMainline and not YxUI.IsForever and UpdateComboPointColors or nil},
+	{"color-combo-7", YxUI.IsMainline and not YxUI.IsForever and UpdateComboPointColors or nil},
+	{"color-combo-charged", YxUI.IsMainline and not YxUI.IsForever and UpdateComboPointColors or nil},
+	{"color-tapped", UpdateMiscUnitFrameColors},
+	{"color-disconnected", UpdateMiscUnitFrameColors},
+}, nil)
+

@@ -21,6 +21,16 @@ local GetNumLoadedAddOns = function()
 	return NumLoaded
 end
 
+local GetNumLoadedPlugins = function()
+	local Count = 0
+
+	for _ in next, YxUI.Plugins do
+		Count = Count + 1
+	end
+
+	return Count
+end
+
 local GetClient = function()
 	if IsWindowsClient() then
 		return Language["Windows"]
@@ -34,7 +44,7 @@ end
 local CountMovedFrames = function()
 	local Profile = YxUI:GetActiveProfile()
 
-	if (not Profile.Move) then
+	if not Profile.Move then
 		return 0
 	end
 
@@ -56,7 +66,14 @@ if YxUI.IsMainline then
 	end
 
 	GetSpecInfo = function()
-		return select(2, GetSpecializationInfo(GetSpecialization()))
+		if YxUI.IsForever then
+			local API = C_SpecializationInfo
+			local Index = API and API.GetSpecialization and API.GetSpecialization()
+			return (Index and API.GetSpecializationInfo and select(2, API.GetSpecializationInfo(Index))) or NOT_APPLICABLE
+		end
+
+		local Index = GetSpecialization and GetSpecialization()
+		return (Index and GetSpecializationInfo and select(2, GetSpecializationInfo(Index))) or NOT_APPLICABLE
 	end
 elseif YxUI.IsCata then
 	GetQuests = function()
@@ -72,10 +89,10 @@ elseif YxUI.IsCata then
 		local HighestPoints = 0
 
 		for i = 1, 5 do -- Default UI uses 5 here for some reason? Just going to roll with it right now even though it makes no sense to me
-			ID, Name, Desc, Icon, PointsSpent = GetTalentTabInfo(i)
+			local ID, Name, Desc, Icon, PointsSpent = GetTalentTabInfo(i)
 
 			if Name then
-				if (PointsSpent > HighestPoints) then
+				if PointsSpent > HighestPoints then
 					MainSpec = Name
 					HighestPoints = PointsSpent
 				end
@@ -100,10 +117,10 @@ else
 		local HighestPoints = 0
 
 		for i = 1, 5 do -- Default UI uses 5 here for some reason? Just going to roll with it right now even though it makes no sense to me
-			Name, Texture, PointsSpent = GetTalentTabInfo(i)
+			local Name, Texture, PointsSpent = GetTalentTabInfo(i)
 
-			if Name then
-				if (PointsSpent > HighestPoints) then
+			if Name and type(PointsSpent) == "number" then
+				if PointsSpent > HighestPoints then
 					MainSpec = Name
 					HighestPoints = PointsSpent
 				end
@@ -133,10 +150,8 @@ local OnShow = function()
 	Debug:RegisterEvent("QUEST_LOG_UPDATE")
 	Debug:RegisterEvent("CVAR_UPDATE")
 	Debug:RegisterEvent("CHARACTER_POINTS_CHANGED")
-
-	if (UnitLevel("player") > 59) then
-		Debug:RegisterEvent("PLAYER_LEVEL_UP")
-	end
+	Debug:RegisterEvent("ADDON_LOADED")
+	Debug:RegisterEvent("PLAYER_LEVEL_UP")
 
 	Debug:SetScript("OnEvent", Debug.OnEvent)
 end
@@ -145,7 +160,7 @@ local OnHide = function()
 	Debug:UnregisterAllEvents()
 end
 
-GUI:AddWidgets(Language["Info"], Language["Debug"], function(left, right)
+GUI:AddWidgetsID("Info", "Debug", function(left, right)
 	left:HookScript("OnShow", OnShow)
 	left:HookScript("OnHide", OnHide)
 
@@ -178,10 +193,10 @@ GUI:AddWidgets(Language["Info"], Language["Debug"], function(left, right)
 	right:CreateDoubleLine("dbg-quests", Language["Quests"], GetQuests())
 	right:CreateDoubleLine("dbg-trial", Language["Trial Account"], IsTrialAccount() and YES or NO)
 
-	right:CreateHeader(Language["AddOns Information"])
-	right:CreateDoubleLine("dbg-total-addons", Language["Total AddOns"], C_AddOns.GetNumAddOns())
-	right:CreateDoubleLine("dbg-loaded-addons", Language["Loaded AddOns"], GetNumLoadedAddOns())
-	right:CreateDoubleLine("dbg-loaded-plugins", Language["Loaded Plugins"], #YxUI.Plugins)
+	right:CreateHeader(Language["Add-on Information"])
+	right:CreateDoubleLine("dbg-total-addons", Language["Total Add-ons"], C_AddOns.GetNumAddOns())
+	right:CreateDoubleLine("dbg-loaded-addons", Language["Loaded Add-ons"], GetNumLoadedAddOns())
+	right:CreateDoubleLine("dbg-loaded-plugins", Language["Loaded Plugins"], GetNumLoadedPlugins())
 end)
 
 function Debug:DISPLAY_SIZE_CHANGED()
@@ -194,8 +209,8 @@ function Debug:UI_SCALE_CHANGED()
 	GUI:GetWidget("dbg-suggested-scale").Right:SetText((768 / select(2, GetPhysicalScreenSize())))
 end
 
-function Debug:PLAYER_LEVEL_UP()
-	GUI:GetWidget("dbg-level").Right:SetText(UnitLevel("player"))
+function Debug:PLAYER_LEVEL_UP(level)
+	GUI:GetWidget("dbg-level").Right:SetText(level or UnitLevel("player"))
 end
 
 function Debug:QUEST_LOG_UPDATE()
@@ -203,12 +218,12 @@ function Debug:QUEST_LOG_UPDATE()
 end
 
 function Debug:ADDON_LOADED()
-    local get = GetLoadedAddOns or GetNumLoadedAddOns
-	GUI:GetWidget("dbg-loaded-addons").Right:SetText(get())
+	GUI:GetWidget("dbg-loaded-addons").Right:SetText(GetNumLoadedAddOns())
+	GUI:GetWidget("dbg-loaded-plugins").Right:SetText(GetNumLoadedPlugins())
 end
 
 function Debug:CVAR_UPDATE(cvar)
-	if (cvar == "scriptErrors") then
+	if cvar == "scriptErrors" then
 		GUI:GetWidget("dbg-show-errors").Right:SetText(GetCVar("scriptErrors") == "1" and Language["Enabled"] or Language["Disabled"])
 	end
 end
@@ -221,8 +236,8 @@ Debug.ZONE_CHANGED = UpdateZoneInfo
 Debug.ZONE_CHANGED_INDOORS = UpdateZoneInfo
 Debug.ZONE_CHANGED_NEW_AREA = UpdateZoneInfo
 
-function Debug:OnEvent(event)
+function Debug:OnEvent(event, ...)
 	if self[event] then
-		self[event](self)
+		self[event](self, ...)
 	end
 end

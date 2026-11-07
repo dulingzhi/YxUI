@@ -3,44 +3,54 @@ local YxUI, Language, Assets, Settings = select(2, ...):get()
 local Gold = YxUI:GetModule("Gold")
 
 local GetMoney = GetMoney
-local GetCoinTextureString = GetCoinTextureString or C_CurrencyInfo.GetCoinTextureString
+local floor = math.floor
+local GetCoinTextureString = GetCoinTextureString
+
+if C_CurrencyInfo then
+	GetCoinTextureString = C_CurrencyInfo.GetCoinTextureString
+end
 
 local OnEnter = function(self)
-	self:SetTooltip()
+	if not self:SetTooltip() then
+		return
+	end
 
 	local TrashValue = select(2, YxUI:GetTrashValue())
 	local ServerInfo, ServerTotalGold = Gold:GetServerInfo()
-	local Change = Gold:GetSessionStats()
+	local Change, _, Earned, Spent, Elapsed = Gold:GetSessionStats()
 
 	GameTooltip:AddLine(YxUI.UserRealm)
 	GameTooltip:AddLine(" ")
 
-	if (#ServerInfo > 1) then
-		--GameTooltip:AddDoubleLine(Language["Total"], YxUI:CopperToGold(ServerTotalGold), 1, 0.82, 0, 1, 1, 1)
+	if #ServerInfo > 1 then
 		GameTooltip:AddDoubleLine(Language["Total"], GetCoinTextureString(ServerTotalGold), 1, 0.82, 0, 1, 1, 1)
 		GameTooltip:AddLine(" ")
 	end
 
 	for i = 1, #ServerInfo do
-		--GameTooltip:AddDoubleLine(ServerInfo[i][1], YxUI:CopperToGold(ServerInfo[i][2]), 1, 1, 1, 1, 1, 1)
 		GameTooltip:AddDoubleLine(ServerInfo[i][1], GetCoinTextureString(ServerInfo[i][2]), 1, 1, 1, 1, 1, 1)
 	end
 
-	if (Change ~= 0) then
+	if Earned > 0 or Spent > 0 then
 		GameTooltip:AddLine(" ")
-
-		if (Change > 0) then
-			--GameTooltip:AddDoubleLine(Language["Session:"], YxUI:CopperToGold(Change), 1, 1, 1, 0.4, 1, 0.4)
+		if Earned > 0 then
+			GameTooltip:AddDoubleLine("Earned", GetCoinTextureString(Earned), 1, 1, 1, 0.4, 1, 0.4)
+		end
+		if Spent > 0 then
+			GameTooltip:AddDoubleLine("Spent", GetCoinTextureString(Spent), 1, 1, 1, 1, 0.4, 0.4)
+		end
+		if Change >= 0 then
 			GameTooltip:AddDoubleLine(Language["Session:"], GetCoinTextureString(Change), 1, 1, 1, 0.4, 1, 0.4)
 		else
-			--GameTooltip:AddDoubleLine(Language["Session:"], YxUI:CopperToGold(Change * -1), 1, 1, 1, 1, 0.4, 0.4)
-			GameTooltip:AddDoubleLine(Language["Session:"], GetCoinTextureString(Change * -1), 1, 1, 1, 1, 0.4, 0.4)
+			GameTooltip:AddDoubleLine(Language["Session:"], GetCoinTextureString(-Change), 1, 1, 1, 1, 0.4, 0.4)
+		end
+		if Elapsed >= 60 and Earned > 0 then
+			GameTooltip:AddDoubleLine("Gold per hour (earned)", GetCoinTextureString(floor(Earned * 3600 / Elapsed)), 1, 1, 1, 1, 1, 1)
 		end
 	end
 
-	if (TrashValue > 0) then
+	if TrashValue > 0 then
 		GameTooltip:AddLine(" ")
-		--GameTooltip:AddDoubleLine(Language["|cFF9D9D9D[Poor quality]|r item value:"], YxUI:CopperToGold(TrashValue), 1, 1, 1, 1, 1, 1)
 		GameTooltip:AddDoubleLine(Language["|cFF9D9D9D[Poor quality]|r item value:"], GetCoinTextureString(TrashValue), 1, 1, 1, 1, 1, 1)
 	end
 

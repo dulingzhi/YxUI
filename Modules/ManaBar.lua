@@ -2,7 +2,7 @@ local YxUI, Language, Assets, Settings, Defaults = select(2, ...):get()
 
 local Load = {DRUID = 1, PRIEST = 1, SHAMAN = 1}
 
-if (not Load[YxUI.UserClass]) then
+if not Load[YxUI.UserClass] then
 	return
 end
 
@@ -21,30 +21,28 @@ local UnitPowerType = UnitPowerType
 
 local ManaBar = YxUI:NewModule("Mana Bar")
 local ManaID = Enum.PowerType.Mana
+local TalentGroupEvent = (YxUI.IsMists or YxUI.IsMainline) and "PLAYER_SPECIALIZATION_CHANGED" or "ACTIVE_TALENT_GROUP_CHANGED"
 
-function ManaBar:UNIT_POWER_UPDATE()
+local function UpdateMana(self)
 	local Mana = UnitPower("player", ManaID)
 	local MaxMana = UnitPowerMax("player", ManaID)
 
-	self.Bar:SetValue(Mana)
 	self.Bar:SetMinMaxValues(0, MaxMana)
-
-	self.Progress:SetText(format("%s / %s", YxUI:ShortValue(Mana), YxUI:ShortValue(MaxMana)))
-	self.Percentage:SetText(floor((Mana / MaxMana * 100 + 0.05) * 10) / 10 .. "%")
-end
-
-function ManaBar:UNIT_POWER_FREQUENT()
-	local Mana = UnitPower("player", ManaID)
-	local MaxMana = UnitPowerMax("player", ManaID)
-
 	self.Bar:SetValue(Mana)
-
 	self.Progress:SetText(format("%s / %s", YxUI:ShortValue(Mana), YxUI:ShortValue(MaxMana)))
-	self.Percentage:SetText(floor((Mana / MaxMana * 100 + 0.05) * 10) / 10 .. "%")
+
+	if YxUI.IsMainline and ((issecretvalue(Mana) and not canaccessvalue(Mana)) or (issecretvalue(MaxMana) and not canaccessvalue(MaxMana))) then
+		self.Percentage:SetText("")
+	else
+		self.Percentage:SetText(MaxMana and MaxMana > 0 and (floor((Mana / MaxMana * 100 + 0.05) * 10) / 10 .. "%") or "0%")
+	end
 end
+
+ManaBar.UNIT_POWER_UPDATE = UpdateMana
+ManaBar.UNIT_POWER_FREQUENT = UpdateMana
 
 function ManaBar:UPDATE_SHAPESHIFT_FORM()
-	if (UnitPowerType("player") == ManaID) then
+	if UnitPowerType("player") == ManaID then
 		self:Hide()
 	else
 		self:Show()
@@ -52,14 +50,19 @@ function ManaBar:UPDATE_SHAPESHIFT_FORM()
 end
 
 function ManaBar:ACTIVE_TALENT_GROUP_CHANGED()
-	local SpecID = GetSpecializationInfo(GetSpecialization())
-
-	if (SpecID and Visibility[YxUI.UserClass][SpecID]) then
-		self:Show()
-	else
-		self:Hide()
+	if YxUI.UserClass == "DRUID" then
+		self:UPDATE_SHAPESHIFT_FORM()
+		return
 	end
+
+	local Index = GetSpecialization()
+	local SpecID = Index and GetSpecializationInfo(Index)
+	local AllowedSpecs = Visibility[YxUI.UserClass]
+
+	self:SetShown(AllowedSpecs and SpecID and AllowedSpecs[SpecID] and true or false)
 end
+
+ManaBar.PLAYER_SPECIALIZATION_CHANGED = ManaBar.ACTIVE_TALENT_GROUP_CHANGED
 
 function ManaBar:CreateBar()
 	self:SetSize(Settings["unitframes-player-width"], Settings["unitframes-player-power-height"] + 2)
@@ -115,14 +118,16 @@ function ManaBar:Enable()
 	self:RegisterEvent("UNIT_POWER_UPDATE")
 	self:RegisterEvent("UNIT_POWER_FREQUENT")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+	self:RegisterEvent(TalentGroupEvent)
 	self:SetScript("OnEvent", self.OnEvent)
 
 	self:UNIT_POWER_UPDATE()
 
-	if (YxUI.UserClass == "DRUID") then
+	if YxUI.UserClass == "DRUID" then
 		self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
 	end
+
+	self:ACTIVE_TALENT_GROUP_CHANGED()
 end
 
 function ManaBar:Disable()
@@ -142,7 +147,7 @@ function ManaBar:Load()
 		self:CreateBar()
 		self:Enable()
 
-		if (YxUI.UserClass == "DRUID") then
+		if YxUI.UserClass == "DRUID" then
 			self:UPDATE_SHAPESHIFT_FORM()
 		else
 			self:ACTIVE_TALENT_GROUP_CHANGED()
@@ -152,7 +157,7 @@ end
 
 local UpdateEnableManaBar = function(value)
 	if value then
-		if (not ManaBar.Bar) then
+		if not ManaBar.Bar then
 			ManaBar:CreateBar()
 		end
 
@@ -162,7 +167,11 @@ local UpdateEnableManaBar = function(value)
 	end
 end
 
-YxUI:GetModule("GUI"):AddWidgets(Language["General"], Language["Unit Frames"], function(left, right)
+YxUI:GetModule("GUI"):AddWidgetsID("General", "Unit Frames", function(left, right)
 	right:CreateHeader(Language["Mana Bar"])
-	right:CreateSwitch("unitframes-show-mana-bar", Settings["unitframes-show-mana-bar"], Language["Enable Mana Bar"], Language["Enable a mana bar for Druids/Priests/Shaman"], UpdateEnableManaBar)
+	right:CreateSwitch("unitframes-show-mana-bar", Settings["unitframes-show-mana-bar"], Language["Enable Mana Bar"], Language["Enable a mana bar for druids, priests, and shamans"], UpdateEnableManaBar)
 end)
+YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "Unit Frames", {
+	{"unitframes-show-mana-bar", UpdateEnableManaBar},
+}, nil)
+

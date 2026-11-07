@@ -738,7 +738,7 @@ local function RenderTagText(fontString, binding, unit, realUnit)
 	if binding.hasName then
 		local name = GetDisplayName(realUnit or unit)
 		if not (YxUI.IsMainline and issecretvalue and issecretvalue(name) and not canaccessvalue(name)) and type(name) == "string" then
-			if name ~= binding.adaptiveName or fontString.__yxuiAdaptiveDirty then
+			if name ~= binding.adaptiveName or fontString.__hydraAdaptiveDirty then
 				local IsPlate = type(unit) == "string" and unit:find("^nameplate") ~= nil
 				local Prefix = IsPlate and "nameplates" or "unitframes"
 				YxUI:AdaptFontForText(fontString, name, Settings[Prefix .. "-font"], Settings[Prefix .. "-font-size"], Settings[Prefix .. "-font-flags"])

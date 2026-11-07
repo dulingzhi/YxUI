@@ -164,6 +164,7 @@ ClientInfo["WoW"] = function(name, id)
 	end
 
 	local ProjectName = ProjectIDToName[WoWProjectID] or CINEMATIC_NAME_1
+
 	return ProjectName, NameInfo, Area
 end
 

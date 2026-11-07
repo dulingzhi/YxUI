@@ -1,18 +1,24 @@
 local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetMinimapZoneText = GetMinimapZoneText
-local GetZonePVPInfo = GetZonePVPInfo or C_PvP.GetZonePVPInfo
+local IsModernZonePVP = C_PvP and type(C_PvP.GetZonePVPInfo) == "function"
+local GetZonePVPInfo = IsModernZonePVP and C_PvP.GetZonePVPInfo or GetZonePVPInfo
 
 local OnEnter = function(self)
-	self:SetTooltip()
+	if not self:SetTooltip() then
+		return
+	end
 
 	local ZoneText = GetRealZoneText()
 	local SubZoneText = GetMinimapZoneText()
 	local PVPType, IsFFA, Faction = GetZonePVPInfo()
+	if IsModernZonePVP then
+		IsFFA = PVPType == "arena"
+	end
 	local Color = YxUI.ZoneColors[PVPType or "other"]
 	local Label
 
-	if (ZoneText and ZoneText ~= SubZoneText) then
+	if ZoneText and ZoneText ~= SubZoneText then
 		Label = format("%s - %s", SubZoneText, ZoneText)
 	else
 		Label = ZoneText
@@ -20,9 +26,9 @@ local OnEnter = function(self)
 
 	GameTooltip:AddLine(Label, Color[1], Color[2], Color[3])
 
-	if (PVPType == "friendly" or PVPType == "hostile") then
+	if PVPType == "friendly" or PVPType == "hostile" then
 		GameTooltip:AddLine(format(FACTION_CONTROLLED_TERRITORY, Faction), Color[1], Color[2], Color[3])
-	elseif (PVPType == "sanctuary") then
+	elseif PVPType == "sanctuary" then
 		GameTooltip:AddLine(SANCTUARY_TERRITORY, Color[1], Color[2], Color[3])
 	elseif IsFFA then
 		GameTooltip:AddLine(FREE_FOR_ALL_TERRITORY, Color[1], Color[2], Color[3])
