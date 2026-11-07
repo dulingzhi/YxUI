@@ -163,7 +163,7 @@ if EditModeManagerFrame then
 
 	-- Prevent users from opening the Edit Mode panel
 	EditModeManagerFrame:HookScript('OnShow', function(self)
-		self:Hide()
+		-- self:Hide()
 	end)
 end
 

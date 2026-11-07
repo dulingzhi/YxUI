@@ -7,14 +7,36 @@ local OnEnter
 
 if YxUI.IsMainline then
 	OnEnter = function(self)
-		self:SetTooltip()
+		if not self:SetTooltip() then
+			return
+		end
 
 		local Base, EffectiveArmor = UnitArmor("player")
-		local ArmorReduction = PaperDollFrame_GetArmorReduction(EffectiveArmor, UnitEffectiveLevel("player"))
-		local AgainstTarget = PaperDollFrame_GetArmorReductionAgainstTarget(EffectiveArmor)
+		local AttackerLevel = UnitEffectiveLevel("player")
+		local ArmorSecret = issecretvalue and issecretvalue(EffectiveArmor)
+		local ArmorReduction, AgainstTarget
 
-		GameTooltip:AddLine(format("%s %s", Label, YxUI:Comma(EffectiveArmor)), 1, 1, 1)
-		GameTooltip:AddLine(format(STAT_ARMOR_TOOLTIP, ArmorReduction), nil, nil, nil, true)
+		if not ArmorSecret and not (issecretvalue and issecretvalue(AttackerLevel)) then
+			local Effectiveness = C_PaperDollInfo.GetArmorEffectiveness(EffectiveArmor, AttackerLevel)
+			if not (issecretvalue and issecretvalue(Effectiveness)) then
+				ArmorReduction = Effectiveness * 100
+			end
+
+			local TargetEffectiveness = C_PaperDollInfo.GetArmorEffectivenessAgainstTarget(EffectiveArmor)
+			if TargetEffectiveness and not (issecretvalue and issecretvalue(TargetEffectiveness)) then
+				AgainstTarget = TargetEffectiveness * 100
+			end
+		end
+
+		if ArmorSecret then
+			GameTooltip:AddLine(Label, 1, 1, 1)
+		else
+			GameTooltip:AddLine(format("%s %s", Label, YxUI:Comma(EffectiveArmor)), 1, 1, 1)
+		end
+
+		if ArmorReduction then
+			GameTooltip:AddLine(format(STAT_ARMOR_TOOLTIP, ArmorReduction), nil, nil, nil, true)
+		end
 
 		if AgainstTarget then
 			GameTooltip:AddLine(format(STAT_ARMOR_TARGET_TOOLTIP, AgainstTarget))
@@ -24,7 +46,9 @@ if YxUI.IsMainline then
 	end
 else
 	OnEnter = function(self)
-		self:SetTooltip()
+		if not self:SetTooltip() then
+			return
+		end
 
 		local Base, EffectiveArmor = UnitArmor("player")
 		local Level = UnitLevel("player")
@@ -51,7 +75,7 @@ local OnMouseUp = function()
 end
 
 local Update = function(self, event, unit)
-	if (unit and unit ~= "player") then
+	if unit and unit ~= "player" then
 		return
 	end
 

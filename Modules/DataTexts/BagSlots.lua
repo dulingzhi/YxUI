@@ -4,6 +4,7 @@ local GetNumSlots
 local GetNumFreeSlots
 local ContainerToInventoryID
 local GetItemInfo = GetItemInfo or C_Item.GetItemInfo
+local GetCoinTextureString = (C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString) or GetCoinTextureString
 local NUM_BAG_SLOTS = NUM_BAG_SLOTS
 local Label = Language["Bags"]
 
@@ -18,7 +19,9 @@ else
 end
 
 local OnEnter = function(self)
-	self:SetTooltip()
+	if not self:SetTooltip() then
+		return
+	end
 
 	GameTooltip:AddLine(Language["Inventory"])
 	GameTooltip:AddLine(" ")
@@ -30,7 +33,7 @@ local OnEnter = function(self)
 			local FreeSlots = GetNumFreeSlots(i)
 			local Name = "|cFFFFFFFF[" .. BACKPACK_TOOLTIP .. "]|r"
 
-			if (i > 0) then
+			if i > 0 then
 				Name = GetInventoryItemLink("player", ContainerToInventoryID(i))
 
 				if Name then
@@ -46,7 +49,7 @@ local OnEnter = function(self)
 
 	local Total, Profit = YxUI:GetTrashValue()
 
-	if (Total > 0) then
+	if Total > 0 then
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddDoubleLine(Language["|cFF9D9D9D[Poor quality]|r item value:"], GetCoinTextureString(Profit), 1, 1, 1, 1, 1, 1)
 	end

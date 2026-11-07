@@ -2,18 +2,109 @@ local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local select = select
 local GetMaxNumQuestsCanAccept = C_QuestLog.GetMaxNumQuestsCanAccept
+local GetQuestDifficultyColor = GetQuestDifficultyColor
 local Label = QUESTS_LABEL
+local DungeonLabel = TRACKER_HEADER_DUNGEON or "Dungeon"
+local EliteLabel = ELITE or "Elite"
+local DungeonQuestTagID = Enum and Enum.QuestTag and Enum.QuestTag.Dungeon or 81
+local EliteQuestTagID = Enum and Enum.QuestTag and Enum.QuestTag.Elite or 1
+local GetQuestTagInfo = C_QuestLog.GetQuestTagInfo or GetQuestTagInfo
 
-local GetNumQuests
+local GetNumQuests, GetQuestInfo
 
 if YxUI.IsMainline then
 	GetNumQuests = C_QuestLog.GetNumQuestLogEntries
+	GetQuestInfo = C_QuestLog.GetInfo
 else
 	GetNumQuests = GetNumQuestLogEntries
+	GetQuestInfo = function(Index)
+		local Title, Level, _, IsHeader, _, IsComplete, _, QuestID = GetQuestLogTitle(Index)
+
+		return {
+			title = Title,
+			level = Level,
+			isHeader = IsHeader,
+			isComplete = IsComplete,
+			questID = QuestID,
+		}
+	end
+end
+
+local GetQuestTags = function(QuestID)
+	if not GetQuestTagInfo or not QuestID then
+		return false, false
+	end
+
+	local TagInfo = GetQuestTagInfo(QuestID)
+
+	if type(TagInfo) == "table" then
+		return TagInfo.tagID == DungeonQuestTagID, TagInfo.isElite or TagInfo.tagID == EliteQuestTagID
+	end
+
+	return TagInfo == DungeonQuestTagID, TagInfo == EliteQuestTagID
 end
 
 local OnMouseUp = function()
 	ToggleFrame(YxUI.IsMainline and QuestMapFrame or QuestLogFrame)
+end
+
+local OnEnter = function(self)
+	if not self:SetTooltip() then
+		return
+	end
+
+	local Header
+	local HasQuest
+
+	for Index = 1, GetNumQuests() do
+		local Info = GetQuestInfo(Index)
+
+		if Info and Info.isHeader then
+			Header = Info.title
+		elseif Info then
+			if Header then
+				if HasQuest then
+					GameTooltip:AddLine(" ")
+				end
+
+				GameTooltip:AddLine(Header, 0.6, 0.6, 0.6)
+				Header = nil
+			end
+
+			local Color = GetQuestDifficultyColor(Info.level)
+			local QuestText = format("[%s] %s", Info.level, Info.title)
+			local IsComplete = Info.isComplete == true or Info.isComplete == 1
+			local IsDungeon, IsElite = GetQuestTags(Info.questID)
+			local Status = {}
+			local DifficultyColor = YxUI:RGBToHex(Color.r, Color.g, Color.b)
+
+			if IsDungeon then
+				Status[#Status + 1] = format("|cFF%s%s|r", DifficultyColor, DungeonLabel)
+			end
+
+			if IsElite then
+				Status[#Status + 1] = format("|cFF%s%s|r", DifficultyColor, EliteLabel)
+			end
+
+			if IsComplete then
+				Status[#Status + 1] = format("|cFF00FF00%s|r", COMPLETE)
+			end
+
+			if #Status > 0 then
+				GameTooltip:AddDoubleLine(QuestText, table.concat(Status, ", "), Color.r, Color.g, Color.b, 1, 1, 1)
+			else
+				GameTooltip:AddLine(QuestText, Color.r, Color.g, Color.b)
+			end
+
+			HasQuest = true
+		end
+	end
+
+	GameTooltip:Show()
+end
+
+local OnLeave = function()
+	GameTooltip:Hide()
 end
 
 local Update = function(self)
@@ -24,6 +115,8 @@ local OnEnable = function(self)
 	self:RegisterEvent("QUEST_LOG_UPDATE")
 	self:SetScript("OnEvent", Update)
 	self:SetScript("OnMouseUp", OnMouseUp)
+	self:SetScript("OnEnter", OnEnter)
+	self:SetScript("OnLeave", OnLeave)
 
 	self:Update()
 end
@@ -32,6 +125,8 @@ local OnDisable = function(self)
 	self:UnregisterEvent("QUEST_LOG_UPDATE")
 	self:SetScript("OnEvent", nil)
 	self:SetScript("OnMouseUp", nil)
+	self:SetScript("OnEnter", nil)
+	self:SetScript("OnLeave", nil)
 
 	self.Text:SetText("")
 end

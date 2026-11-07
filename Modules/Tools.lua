@@ -224,6 +224,18 @@ function YxUI:print(...)
     end
 end
 
+-- Adaptive fonts
+-- The shipped fonts only cover Latin plus a few extra scripts. Unit frame tags
+-- set them to arbitrary player/NPC names, so a name written in Cyrillic, Greek,
+-- CJK or Vietnamese would render as boxes. AdaptFontForText keeps per-object
+-- state and swaps in a font that covers the detected script, falling back to the
+-- configured font whenever the fallback is unavailable.
+--
+-- Declared before SetFontInfo because SetFontInfo invalidates this cache.
+local AdaptiveFonts = setmetatable({}, {
+    __mode = 'k'
+})
+
 function YxUI:SetFontInfo(object, font, size, flags)
     if (not object) then
         return
@@ -239,6 +251,166 @@ function YxUI:SetFontInfo(object, font, size, flags)
         object:SetShadowColor(0, 0, 0)
         object:SetShadowOffset(1, -1)
     end
+
+    -- Any previously adapted font string is stale now and has to be re-evaluated
+    -- the next time its text is set.
+    if AdaptiveFonts[object] then
+        AdaptiveFonts[object].Dirty = true
+        object.__yxuiAdaptiveDirty = true
+    end
+end
+
+-- Adaptive fonts
+
+local ScriptFonts = {
+    koKR = 'Fonts\\2002.TTF',
+    zhCN = 'Fonts\\ARKai_T.ttf',
+    zhTW = 'Fonts\\blei00d.TTF',
+    ruRU = 'Fonts\\FRIZQT___CYR.TTF',
+    greek = Assets:GetFont('Noto Sans'),
+    vietnamese = Assets:GetFont('Noto Sans')
+}
+
+local SupportedScripts = {
+    ['Roboto'] = {
+        ruRU = true,
+        greek = true,
+        vietnamese = true
+    },
+    ['Noto Sans'] = {
+        ruRU = true,
+        greek = true,
+        vietnamese = true
+    },
+    ['Expressway'] = {
+        ruRU = true
+    },
+    ['PT Sans'] = {
+        ruRU = true
+    }
+}
+
+local IsRestrictedText = function(text)
+    return YxUI.IsMainline and issecretvalue and issecretvalue(text) and
+               (not canaccessvalue or not canaccessvalue(text))
+end
+
+local ChineseScript = function(self, locale)
+    if (locale == 'zhCN' or locale == 'zhTW') then
+        return locale
+    end
+
+    if (self.UserLocale == 'zhCN' or self.UserLocale == 'zhTW') then
+        return self.UserLocale
+    end
+
+    if (self.ClientLocale == 'zhCN' or self.ClientLocale == 'zhTW') then
+        return self.ClientLocale
+    end
+
+    return 'zhCN'
+end
+
+local GetTextScript = function(self, text, locale)
+    if (not text:find('[\128-\255]')) then
+        return
+    end
+
+    local i, Length = 1, #text
+
+    while (i <= Length) do
+        local A = text:byte(i)
+
+        if (A >= 0xC2 and A <= 0xDF and i < Length) then
+            local B = text:byte(i + 1)
+
+            if (B >= 0x80 and B <= 0xBF) then
+                local Code = (A - 0xC0) * 64 + B - 0x80
+
+                if (Code >= 0x0400 and Code <= 0x052F) then
+                    return 'ruRU'
+                elseif (Code >= 0x0370 and Code <= 0x03FF) then
+                    return 'greek'
+                end
+            end
+
+            i = i + 2
+        elseif (A >= 0xE0 and A <= 0xEF and i + 2 <= Length) then
+            local B, C = text:byte(i + 1, i + 2)
+
+            if (B >= 0x80 and B <= 0xBF and C >= 0x80 and C <= 0xBF) then
+                local Code = (A - 0xE0) * 4096 + (B - 0x80) * 64 + C - 0x80
+
+                if ((Code >= 0x1100 and Code <= 0x11FF) or (Code >= 0x3130 and Code <= 0x318F) or (Code >= 0xAC00 and Code <= 0xD7AF)) then
+                    return 'koKR'
+                elseif ((Code >= 0x3400 and Code <= 0x9FFF) or (Code >= 0xF900 and Code <= 0xFAFF)) then
+                    return ChineseScript(self, locale)
+                elseif (Code >= 0x1EA0 and Code <= 0x1EF9) then
+                    return 'vietnamese'
+                end
+            end
+
+            i = i + 3
+        else
+            i = i + 1
+        end
+    end
+end
+
+function YxUI:AdaptFontForText(object, text, font, size, flags, locale)
+    if (not object) or IsRestrictedText(text) or type(text) ~= 'string' then
+        return
+    end
+
+    local State = AdaptiveFonts[object]
+    local SameStyle = State and State.Font == font and State.Size == size and State.Flags == flags and State.Locale == locale
+
+    if (SameStyle and State.Text == text and not State.Dirty) then
+        return State.Applied
+    end
+
+    local Script = GetTextScript(self, text, locale)
+    local Coverage = SupportedScripts[font]
+    local Path = Script and not (Coverage and Coverage[Script]) and ScriptFonts[Script]
+    local Applied
+
+    if Path then
+        if (SameStyle and State.Path == Path and not State.Dirty) then
+            Applied = State.Applied
+        else
+            local Ok, Result = pcall(object.SetFont, object, Path, size, flags or '')
+
+            Applied = Ok and Result == true
+
+            if (not Applied) then
+                self:SetFontInfo(object, font, size, flags)
+            end
+        end
+    else
+        self:SetFontInfo(object, font, size, flags)
+    end
+
+    if (not State) then
+        State = {}
+        AdaptiveFonts[object] = State
+    end
+
+    State.Text, State.Font, State.Size, State.Flags = text, font, size, flags
+    State.Locale, State.Path, State.Applied, State.Dirty = locale, Path, Applied, nil
+
+    object.__yxuiAdaptiveDirty = nil
+
+    return Path and Applied
+end
+
+function YxUI:SetFontForText(object, text, font, size, flags, locale)
+    if (not object) then
+        return
+    end
+
+    self:SetFontInfo(object, font, size, flags)
+
+    return self:AdaptFontForText(object, text, font, size, flags, locale)
 end
 
 -- Backdrops

@@ -1,18 +1,22 @@
 local addon, ns = ...
-local YxUI, Language, Assets, Settings = ns:get()
+local YxUI, Language, _, Settings = ns:get()
+local UF = YxUI:GetModule("Unit Frames")
 
-local oUF = ns.oUF or oUF
-local Events = oUF.Tags.Events
-local Methods = oUF.Tags.Methods
+-- Tags belong to YxUI.  Keeping these registries local is important: unit buttons created by the native core must not silently depend on a third-party tag element being enabled (or even loaded).
+local Events, Methods = {}, {}
 
 local format = string.format
 local floor = math.floor
 local sub = string.sub
+local gsub = string.gsub
 local len = string.len
 local byte = string.byte
 local tonumber = tonumber
 local GetQuestDifficultyColor = GetQuestDifficultyColor
 local UnitName = UnitName
+local GetDisplayName = YxUI.IsForever and function(unit)
+	return GetUnitName(unit, true)
+end or UnitName
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
 local UnitPowerType = UnitPowerType
@@ -24,10 +28,8 @@ local UnitIsGhost = UnitIsGhost
 local UnitIsDead = UnitIsDead
 local UnitClass = UnitClass
 local UnitLevel = UnitLevel
-local UnitEffectiveLevel = UnitEffectiveLevel
 local UnitClassification = UnitClassification
 local UnitReaction = UnitReaction
-local UnitIsEnemy = UnitIsEnemy
 local UnitIsAFK = UnitIsAFK
 local IsResting = IsResting
 local GetPetHappiness = GetPetHappiness
@@ -59,38 +61,46 @@ local GetColor = function(p, r1, g1, b1, r2, g2, b2)
 end
 
 local UTF8Sub = function(str, stop) -- utf8 sub derived from tukui
-	if (not str) then
+	if not str then
 		return str
 	end
 
+	stop = tonumber(stop)
+	if not stop or stop < 1 then
+		return str
+	end
+	stop = floor(stop)
+
 	local Bytes = len(str)
 
-	if (Bytes <= stop) then
+	if Bytes <= stop then
 		return str
 	else
 		local Len, Pos = 0, 1
 
-		while (Pos <= Bytes) do
+		while Pos <= Bytes do
 			Len = Len + 1
 
 			local c = byte(str, Pos)
 
-			if (c > 0 and c <= 127) then
+			if c > 0 and c <= 127 then
 				Pos = Pos + 1
-			elseif (c >= 192 and c <= 223) then
+			elseif c >= 192 and c <= 223 then
 				Pos = Pos + 2
-			elseif (c >= 224 and c <= 239) then
+			elseif c >= 224 and c <= 239 then
 				Pos = Pos + 3
-			elseif (c >= 240 and c <= 247) then
+			elseif c >= 240 and c <= 247 then
 				Pos = Pos + 4
+			else
+				Pos = Pos + 1
 			end
 
-			if (Len == stop) then
+			if Len == stop then
 				break
 			end
 		end
 
-		if (Len == stop and Pos <= Bytes) then
+		if Len == stop and Pos <= Bytes then
 			return sub(str, 1, Pos - 1)
 		else
 			return str
@@ -99,6 +109,10 @@ local UTF8Sub = function(str, stop) -- utf8 sub derived from tukui
 end
 
 -- Tags
+Methods["Space"] = function()
+	return " "
+end
+
 Events["ColorStop"] = "PLAYER_ENTERING_WORLD"
 Methods["ColorStop"] = function()
 	return "|r"
@@ -106,31 +120,33 @@ end
 
 Events["Resting"] = "PLAYER_UPDATE_RESTING"
 Methods["Resting"] = function(unit)
-	if (unit == "player" and IsResting()) then
+	if unit == "player" and IsResting() then
 		return "zZz"
+	end
+end
+
+local function GetStatus(unit)
+	if UnitIsDead(unit) then
+		return "|cFFEE4D4D" .. DEAD .. "|r"
+	elseif UnitIsGhost(unit) then
+		return "|cFFEEEEEE" .. Language["Ghost"] .. "|r"
+	elseif not UnitIsConnected(unit) then
+		return "|cFFEEEEEE" .. PLAYER_OFFLINE .. "|r"
+	elseif UnitIsAFK(unit) then
+		return "|cFFEEEEEE" .. AFK .. "|r"
 	end
 end
 
 Events["Status"] = HealthEvent .. "UNIT_CONNECTION PLAYER_FLAGS_CHANGED PARTY_MEMBER_ENABLE PARTY_MEMBER_DISABLE"
 Methods["Status"] = function(unit)
-	if UnitIsDead(unit) then
-		return "|cFFEE4D4D" .. DEAD .. "|r"
-	elseif UnitIsGhost(unit) then
-		return "|cFFEEEEEE" .. Language["Ghost"] .. "|r"
-	elseif (not UnitIsConnected(unit)) then
-		return "|cFFEEEEEE" .. PLAYER_OFFLINE .. "|r"
-	elseif UnitIsAFK(unit) then
-		return "|cFFEEEEEE" .. AFK .. "|r"
-	end
-
-	return ""
+	return GetStatus(unit) or ""
 end
 
 Events["Level"] = "UNIT_LEVEL PLAYER_LEVEL_UP UNIT_CLASSIFICATION_CHANGED"
 Methods["Level"] = function(unit)
 	local Level = UnitLevel(unit)
 
-	if (Level == -1) then
+	if Level == -1 then
 		if UnitIsPlayer(unit) then
 			return "??"
 		else
@@ -145,7 +161,7 @@ Events["LevelPlus"] = "UNIT_LEVEL PLAYER_LEVEL_UP UNIT_CLASSIFICATION_CHANGED"
 Methods["LevelPlus"] = function(unit)
 	local Class = UnitClassification(unit)
 
-	if (Class == "worldboss") then
+	if Class == "worldboss" then
 		return "Boss"
 	else
 		local Plus = Methods["Plus"](unit)
@@ -178,13 +194,7 @@ Methods["ShortClassification"] = function(unit)
 end
 
 Events["Plus"] = "UNIT_LEVEL PLAYER_LEVEL_UP UNIT_CLASSIFICATION_CHANGED"
-Methods["Plus"] = function(unit)
-	local Class = UnitClassification(unit)
-
-	if ShortClasses[Class] then
-		return ShortClasses[Class]
-	end
-end
+Methods["Plus"] = Methods["ShortClassification"]
 
 Events["Health"] = HealthEvent .. "UNIT_MAXHEALTH"
 Methods["Health"] = UnitHealth
@@ -195,14 +205,39 @@ Methods["Health:Short"] = function(unit)
 end
 
 Events["HealthPercent"] = HealthEvent .. "UNIT_MAXHEALTH"
-Methods["HealthPercent"] = function(unit)
-	local Current = UnitHealth(unit)
-	local Max = UnitHealthMax(unit)
+if YxUI.IsForever then
+	Methods["HealthPercent"] = function(unit)
+		return UnitHealthPercent(unit, true, CurveConstants.ScaleTo100)
+	end
+elseif YxUI.IsMainline then
+	local PercentOptions = {
+		breakpointData = {
+			{breakpoint = 0, abbreviation = "", significandDivisor = 0.1, fractionDivisor = 10, abbreviationIsGlobal = false},
+		},
+	}
 
-	if (Max == 0) then
-		return 0
-	else
-		return floor((Current / Max * 100 + 0.05) * 10) / 10 .. "%"
+	Methods["HealthPercent"] = function(unit)
+		local Current = UnitHealth(unit)
+		local Max = UnitHealthMax(unit)
+
+		if (issecretvalue(Current) and not canaccessvalue(Current)) or (issecretvalue(Max) and not canaccessvalue(Max)) then
+			return AbbreviateNumbers(UnitHealthPercent(unit, false, CurveConstants.ScaleTo100), PercentOptions) .. "%"
+		elseif Max == 0 then
+			return 0
+		else
+			return floor((Current / Max * 100 + 0.05) * 10) / 10 .. "%"
+		end
+	end
+else
+	Methods["HealthPercent"] = function(unit)
+		local Current = UnitHealth(unit)
+		local Max = UnitHealthMax(unit)
+
+		if Max == 0 then
+			return 0
+		else
+			return floor((Current / Max * 100 + 0.05) * 10) / 10 .. "%"
+		end
 	end
 end
 
@@ -224,63 +259,51 @@ end
 
 Events["HealthDeficit"] = HealthEvent .. "UNIT_MAXHEALTH PLAYER_FLAGS_CHANGED UNIT_CONNECTION PARTY_MEMBER_ENABLE PARTY_MEMBER_DISABLE"
 Methods["HealthDeficit"] = function(unit)
-	if UnitIsDead(unit) then
-		return "|cFFEE4D4D" .. DEAD .. "|r"
-	elseif UnitIsGhost(unit) then
-		return "|cFFEEEEEE" .. Language["Ghost"] .. "|r"
-	elseif (not UnitIsConnected(unit)) then
-		return "|cFFEEEEEE" .. PLAYER_OFFLINE .. "|r"
-	elseif UnitIsAFK(unit) then
-		return "|cFFEEEEEE" .. AFK .. "|r"
+	local status = GetStatus(unit)
+
+	if status then
+		return status
 	end
 
 	local Current = UnitHealth(unit)
 	local Max = UnitHealthMax(unit)
 	local Deficit = Max - Current
 
-	if ((Deficit ~= 0) or (Current ~= Max)) then
+	if (Deficit ~= 0) or (Current ~= Max) then
 		return "-" .. Deficit
 	end
 end
 
 Events["HealthDeficit:Short"] = HealthEvent .. "UNIT_MAXHEALTH PLAYER_FLAGS_CHANGED UNIT_CONNECTION PARTY_MEMBER_ENABLE PARTY_MEMBER_DISABLE"
 Methods["HealthDeficit:Short"] = function(unit)
-	if UnitIsDead(unit) then
-		return "|cFFEE4D4D" .. DEAD .. "|r"
-	elseif UnitIsGhost(unit) then
-		return "|cFFEEEEEE" .. Language["Ghost"] .. "|r"
-	elseif (not UnitIsConnected(unit)) then
-		return "|cFFEEEEEE" .. PLAYER_OFFLINE .. "|r"
-	elseif UnitIsAFK(unit) then
-		return "|cFFEEEEEE" .. AFK .. "|r"
+	local status = GetStatus(unit)
+
+	if status then
+		return status
 	end
 
 	local Current = UnitHealth(unit)
 	local Max = UnitHealthMax(unit)
 	local Deficit = Max - Current
 
-	if ((Deficit ~= 0) or (Current ~= Max)) then
+	if (Deficit ~= 0) or (Current ~= Max) then
 		return "-" .. YxUI:ShortValue(Deficit)
 	end
 end
 
 Events["GroupStatus"] = HealthEvent .. "UNIT_MAXHEALTH UNIT_CONNECTION PLAYER_FLAGS_CHANGED PARTY_MEMBER_ENABLE PARTY_MEMBER_DISABLE"
 Methods["GroupStatus"] = function(unit)
-	if UnitIsDead(unit) then
-		return "|cFFEE4D4D" .. DEAD .. "|r"
-	elseif UnitIsGhost(unit) then
-		return "|cFFEEEEEE" .. Language["Ghost"] .. "|r"
-	elseif (not UnitIsConnected(unit)) then
-		return "|cFFEEEEEE" .. PLAYER_OFFLINE .. "|r"
-	elseif UnitIsAFK(unit) then
-		return "|cFFEEEEEE" .. AFK .. "|r"
+	local status = GetStatus(unit)
+
+	if status then
+		return status
 	end
 
 	local Current = UnitHealth(unit)
 	local Max = UnitHealthMax(unit)
 	local Color = Methods["HealthColor"](unit)
 
-	if (Max == 0) then
+	if Max == 0 then
 		return Color .. "0|r"
 	else
 		return Color .. floor(Current / Max * 100 + 0.5) .. "|r"
@@ -292,24 +315,107 @@ Methods["HealthColor"] = function(unit)
 	local Current = UnitHealth(unit)
 	local Max = UnitHealthMax(unit)
 
-	if (Current and Max > 0) then
+	if Current and Max > 0 then
 		return "|cFF" .. YxUI:RGBToHex(GetColor(Current / Max, 0.905, 0.298, 0.235, 0.17, 0.77, 0.4))
 	else
 		return "|cFF" .. YxUI:RGBToHex(0.18, 0.8, 0.443)
 	end
 end
 
+-- Retail health can be secret in combat. These are separate implementations so classic clients retain the direct paths above without per-update checks.
+if YxUI.IsMainline then
+	Methods["Health"] = function(unit)
+		return YxUI:Comma(UnitHealth(unit))
+	end
+
+	Methods["HealthValues"] = function(unit)
+		local Current, Max = UnitHealth(unit), UnitHealthMax(unit)
+		return YxUI:Comma(Current) .. " / " .. YxUI:Comma(Max)
+	end
+
+	Methods["HealthDeficit"] = function(unit)
+		local status = GetStatus(unit)
+
+		if status then
+			return status
+		end
+
+		local Current, Max = UnitHealth(unit), UnitHealthMax(unit)
+		if (issecretvalue(Current) and not canaccessvalue(Current)) or (issecretvalue(Max) and not canaccessvalue(Max)) then
+			return ""
+		end
+		local Deficit = Max - Current
+		if (Deficit ~= 0) or (Current ~= Max) then
+			return "-" .. YxUI:Comma(Deficit)
+		end
+	end
+
+	Methods["HealthDeficit:Short"] = function(unit)
+		local status = GetStatus(unit)
+
+		if status then
+			return status
+		end
+
+		local Current, Max = UnitHealth(unit), UnitHealthMax(unit)
+		if (issecretvalue(Current) and not canaccessvalue(Current)) or (issecretvalue(Max) and not canaccessvalue(Max)) then
+			return ""
+		end
+		local Deficit = Max - Current
+		if (Deficit ~= 0) or (Current ~= Max) then
+			return "-" .. YxUI:ShortValue(Deficit)
+		end
+	end
+
+	Methods["GroupStatus"] = function(unit)
+		local status = GetStatus(unit)
+
+		if status then
+			return status
+		end
+
+		local Current, Max = UnitHealth(unit), UnitHealthMax(unit)
+		if (issecretvalue(Current) and not canaccessvalue(Current)) or (issecretvalue(Max) and not canaccessvalue(Max)) then
+			return ""
+		end
+		local Color = Methods["HealthColor"](unit)
+		if Max == 0 then
+			return Color .. "0|r"
+		end
+		return Color .. floor(Current / Max * 100 + 0.5) .. "|r"
+	end
+
+	Methods["HealthColor"] = function(unit)
+		local Current, Max = UnitHealth(unit), UnitHealthMax(unit)
+		if (issecretvalue(Current) and not canaccessvalue(Current)) or (issecretvalue(Max) and not canaccessvalue(Max)) then
+			return "|cFF" .. YxUI:RGBToHex(0.18, 0.8, 0.443)
+		elseif Current and Max > 0 then
+			return "|cFF" .. YxUI:RGBToHex(GetColor(Current / Max, 0.905, 0.298, 0.235, 0.17, 0.77, 0.4))
+		else
+			return "|cFF" .. YxUI:RGBToHex(0.18, 0.8, 0.443)
+		end
+	end
+end
+
 Events["Power"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_POWER_UPDATE"
 Methods["Power"] = function(unit)
-	if (UnitPower(unit) ~= 0) then
-		return UnitPower(unit)
+	local Current = UnitPower(unit)
+
+	if YxUI.IsMainline and issecretvalue(Current) and not canaccessvalue(Current) then
+		return Current
+	elseif Current ~= 0 then
+		return Current
 	end
 end
 
 Events["Power:Short"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_POWER_UPDATE"
 Methods["Power:Short"] = function(unit)
-	if (UnitPower(unit) ~= 0) then
-		return YxUI:ShortValue(UnitPower(unit))
+	local Current = UnitPower(unit)
+
+	if YxUI.IsMainline and issecretvalue(Current) and not canaccessvalue(Current) then
+		return YxUI:ShortValue(Current)
+	elseif Current ~= 0 then
+		return YxUI:ShortValue(Current)
 	end
 end
 
@@ -318,7 +424,9 @@ Methods["PowerValues"] = function(unit)
 	local Current = UnitPower(unit)
 	local Max = UnitPowerMax(unit)
 
-	if (Max ~= 0) then
+	if YxUI.IsMainline and ((issecretvalue(Current) and not canaccessvalue(Current)) or (issecretvalue(Max) and not canaccessvalue(Max))) then
+		return YxUI:Comma(Current) .. " / " .. YxUI:Comma(Max)
+	elseif Max ~= 0 then
 		return Current .. " / " .. Max
 	end
 end
@@ -328,21 +436,28 @@ Methods["PowerValues:Short"] = function(unit)
 	local Current = UnitPower(unit)
 	local Max = UnitPowerMax(unit)
 
-	if (Max ~= 0) then
+	if YxUI.IsMainline and ((issecretvalue(Current) and not canaccessvalue(Current)) or (issecretvalue(Max) and not canaccessvalue(Max))) then
+		return YxUI:ShortValue(Current) .. " / " .. YxUI:ShortValue(Max)
+	elseif Max ~= 0 then
 		return YxUI:ShortValue(Current) .. " / " .. YxUI:ShortValue(Max)
 	end
 end
 
 Events["PowerPercent"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_POWER_UPDATE"
 Methods["PowerPercent"] = function(unit)
-	if (UnitPower(unit) ~= 0) then
-		return floor((UnitPower(unit) / UnitPowerMax(unit) * 100 + 0.05) * 10) / 10 .. "%"
+	local Current = UnitPower(unit)
+	local Max = UnitPowerMax(unit)
+
+	if YxUI.IsMainline and ((issecretvalue(Current) and not canaccessvalue(Current)) or (issecretvalue(Max) and not canaccessvalue(Max))) then
+		return ""
+	elseif Current ~= 0 and Max and Max > 0 then
+		return floor((Current / Max * 100 + 0.05) * 10) / 10 .. "%"
 	end
 end
 
 Events["PowerColor"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_POWER_UPDATE UNIT_DISPLAYPOWER"
 Methods["PowerColor"] = function(unit)
-	local PowerType, PowerToken = UnitPowerType(unit)
+	local _, PowerToken = UnitPowerType(unit)
 
 	if YxUI.PowerColors[PowerToken] then
 		return format("|cFF%s", YxUI.PowerColors[PowerToken].Hex)
@@ -353,83 +468,25 @@ end
 
 Events["Name"] = "UNIT_NAME_UPDATE UNIT_PET"
 Methods["Name"] = function(unit, realunit, arg)
-	local Name = UnitName(realunit or unit)
+	local Name = GetDisplayName(realunit or unit)
 
 	if Name then
-		return UTF8Sub(Name, tonumber(arg))
+		return UTF8Sub(Name, arg)
 	end
 end
 
--- Deprecated as of April 8th, 2022
-Events["Name4"] = "UNIT_NAME_UPDATE UNIT_PET"
-Methods["Name4"] = function(unit)
-	local Name = UnitName(unit)
+-- Keep the fixed-length names used by older saved tag strings. Unlike Name,
+-- these tags always use the displayed unit rather than the original vehicle unit.
+for _, limit in ipairs({4, 5, 8, 10, 14, 15, 20, 30}) do
+	local tagName = "Name" .. limit
 
-	if Name then
-		return UTF8Sub(Name, 4)
-	end
-end
+	Events[tagName] = "UNIT_NAME_UPDATE UNIT_PET"
+	Methods[tagName] = function(unit)
+		local name = UnitName(unit)
 
-Events["Name5"] = "UNIT_NAME_UPDATE UNIT_PET"
-Methods["Name5"] = function(unit)
-	local Name = UnitName(unit)
-
-	if Name then
-		return UTF8Sub(Name, 5)
-	end
-end
-
-Events["Name8"] = "UNIT_NAME_UPDATE UNIT_PET"
-Methods["Name8"] = function(unit)
-	local Name = UnitName(unit)
-
-	if Name then
-		return UTF8Sub(Name, 8)
-	end
-end
-
-Events["Name10"] = "UNIT_NAME_UPDATE UNIT_PET"
-Methods["Name10"] = function(unit)
-	local Name = UnitName(unit)
-
-	if Name then
-		return UTF8Sub(Name, 10)
-	end
-end
-
-Events["Name14"] = "UNIT_NAME_UPDATE UNIT_PET"
-Methods["Name14"] = function(unit)
-	local Name = UnitName(unit)
-
-	if Name then
-		return UTF8Sub(Name, 14)
-	end
-end
-
-Events["Name15"] = "UNIT_NAME_UPDATE UNIT_PET"
-Methods["Name15"] = function(unit)
-	local Name = UnitName(unit)
-
-	if Name then
-		return UTF8Sub(Name, 15)
-	end
-end
-
-Events["Name20"] = "UNIT_NAME_UPDATE UNIT_PET"
-Methods["Name20"] = function(unit)
-	local Name = UnitName(unit)
-
-	if Name then
-		return UTF8Sub(Name, 20)
-	end
-end
-
-Events["Name30"] = "UNIT_NAME_UPDATE UNIT_PET"
-Methods["Name30"] = function(unit)
-	local Name = UnitName(unit)
-
-	if Name then
-		return UTF8Sub(Name, 30)
+		if name then
+			return UTF8Sub(name, limit)
+		end
 	end
 end
 
@@ -481,7 +538,7 @@ end
 
 Events["PetColor"] = "UNIT_HAPPINESS UNIT_LEVEL PLAYER_LEVEL_UP UNIT_PET UNIT_FACTION"
 Methods["PetColor"] = function(unit)
-	if (YxUI.UserClass == "HUNTER") then
+	if YxUI.UserClass == "HUNTER" then
 		return Methods["HappinessColor"](unit)
 	else
 		return Methods["Reaction"](unit)
@@ -490,7 +547,7 @@ end
 
 Events["HappinessColor"] = "UNIT_HAPPINESS UNIT_PET"
 Methods["HappinessColor"] = function(unit)
-	if (unit == "pet") then
+	if unit == "pet" then
 		local Happiness = GetPetHappiness()
 
 		if Happiness then
@@ -505,7 +562,7 @@ end
 
 Events["PartyIndex"] = "GROUP_ROSTER_UPDATE"
 Methods["PartyIndex"] = function(unit)
-	local Header = _G["YxUI Party"]
+	local Header = YxUI.UnitFrames["party"]
 
 	if Header and Header:GetAttribute("isTesting") then
 		if TestPartyIndex >= 5 then
@@ -525,7 +582,7 @@ end
 
 Events["RaidIndex"] = "GROUP_ROSTER_UPDATE"
 Methods["RaidIndex"] = function(unit)
-	local Header = _G["YxUI Raid"]
+	local Header = YxUI.UnitFrames["raid"]
 
 	if Header and Header:GetAttribute("isTesting") then
 		if TestRaidIndex >= 25 then
@@ -546,12 +603,257 @@ Methods["RaidGroup"] = function(unit)
 	for i = 1, MAX_RAID_MEMBERS do
 		Unit, Rank, Group = GetRaidRosterInfo(i)
 
-		if (not Unit) then
+		if not Unit then
 			break
 		end
 
-		if (Unit == Name) then
+		if Unit == Name then
 			return Group
 		end
 	end
 end
+
+-- Compile profile tags such as [prefix$>Tag<$suffix(arg,arg)] into descriptors; the prefix and suffix require a non-empty result, while ordinary text is copied verbatim.
+local function ParseTag(token)
+	local body = sub(token, 2, -2)
+	local prefix, suffix = "", ""
+	local before, rest = body:match("^(.-)%$>(.*)$")
+	if before then
+		prefix, body = before, rest
+	end
+	local name, after = body:match("^(.-)<%$(.*)$")
+	if name then
+		body, suffix = name, after
+	end
+	local tagName, argumentString = body:match("^([^%(]+)%((.*)%)$")
+	tagName = tagName or body
+	local arguments = {}
+	if argumentString and argumentString ~= "" then
+		for argument in argumentString:gmatch("[^,]+") do
+			arguments[#arguments + 1] = argument
+		end
+	end
+	return {name = tagName, prefix = prefix, suffix = suffix, arguments = arguments}
+end
+
+-- Escape fixed text once when binding a tag, rather than on every unit event.
+local function Compile(tagString)
+	local parts, subscriptions, cursor = {}, {}, 1
+	while true do
+		local first, last = tagString:find("%b[]", cursor)
+		if not first then
+			if cursor <= #tagString then
+				parts[#parts + 1] = gsub(sub(tagString, cursor), "%%", "%%%%")
+			end
+			break
+		end
+		if first > cursor then
+			parts[#parts + 1] = gsub(sub(tagString, cursor, first - 1), "%%", "%%%%")
+		end
+		local descriptor = ParseTag(sub(tagString, first, last))
+		local valueFormat = (YxUI.IsForever and descriptor.name == "HealthPercent") and "%.1f%%" or "%s"
+		descriptor.format = gsub(descriptor.prefix, "%%", "%%%%") .. valueFormat .. gsub(descriptor.suffix, "%%", "%%%%")
+		parts[#parts + 1] = descriptor
+		local declarations = Events[descriptor.name]
+		if declarations then
+			for event in declarations:gmatch("%S+") do
+				subscriptions[event] = true
+			end
+		end
+		cursor = last + 1
+	end
+	return parts, subscriptions
+end
+
+-- The visual editor selects from this registry; old saved tokens remain supported.
+function UF.IsRegisteredTag(token)
+	return Methods[ParseTag(token).name] ~= nil
+end
+
+function UF.GetTagNames()
+	local names = {}
+	for name in pairs(Methods) do
+		names[#names + 1] = name
+	end
+	table.sort(names)
+
+	return names
+end
+
+function UF.GetTagReference()
+	local names = UF.GetTagNames()
+	local lines, line = {}, ""
+	for i = 1, #names do
+		local name = names[i]
+		if #line + #name + 2 > 60 then
+			lines[#lines + 1] = line
+			line = name
+		else
+			line = line == "" and name or (line .. ", " .. name)
+		end
+	end
+	if line ~= "" then
+		lines[#lines + 1] = line
+	end
+
+	return table.concat(lines, "\n")
+end
+
+local function FormatTagString(binding, unit, realUnit)
+	local output, values = binding.output, binding.values
+	for i = 1, #binding.parts do
+		local part = binding.parts[i]
+		if type(part) == "string" then
+			output[#output + 1] = part
+		else
+			local method = Methods[part.name]
+			local value = method and method(unit, realUnit, unpack(part.arguments))
+			-- Secret values cannot be compared or coerced by addon code, but
+			-- SetFormattedText is allowed to display them. Keep the value as a
+			-- formatting argument so prefixes and suffixes still work in combat.
+			local secret = YxUI.IsMainline and issecretvalue(value) and not canaccessvalue(value)
+			if secret or (value ~= nil and value ~= "") then
+				output[#output + 1] = part.format
+				values[#values + 1] = value
+			end
+		end
+	end
+	local text = table.concat(output)
+
+	for i = #output, 1, -1 do
+		output[i] = nil
+	end
+
+	return text, values
+end
+
+local function RenderTagText(fontString, binding, unit, realUnit)
+	local output, values = FormatTagString(binding, unit, realUnit)
+	if #values > 0 then
+		fontString:SetFormattedText(output, unpack(values))
+	else
+		fontString:SetText(output)
+	end
+
+	if binding.hasName then
+		local name = GetDisplayName(realUnit or unit)
+		if not (YxUI.IsMainline and issecretvalue and issecretvalue(name) and not canaccessvalue(name)) and type(name) == "string" then
+			if name ~= binding.adaptiveName or fontString.__yxuiAdaptiveDirty then
+				local IsPlate = type(unit) == "string" and unit:find("^nameplate") ~= nil
+				local Prefix = IsPlate and "nameplates" or "unitframes"
+				YxUI:AdaptFontForText(fontString, name, Settings[Prefix .. "-font"], Settings[Prefix .. "-font-size"], Settings[Prefix .. "-font-flags"])
+				binding.adaptiveName = name
+			end
+		end
+	end
+
+	-- Do not retain unit values (including retail secrets) between updates.
+	for i = #values, 1, -1 do
+		values[i] = nil
+	end
+end
+
+local function UpdateBinding(frame, binding)
+	RenderTagText(binding.fontString, binding, frame.unit, binding.fontString.overrideUnit and frame.realUnit)
+end
+
+-- The editor renders draft text without changing the unit's active tag bindings.
+function UF.PreviewTag(fontString, tagString, unit)
+	local parts = Compile(tagString or "")
+	RenderTagText(fontString, {parts = parts, output = {}, values = {}}, unit)
+end
+
+local function TagEvent(frame, event, unit)
+	if unit and unit ~= frame.unit and unit ~= frame.realUnit then
+		return
+	end
+	local bindings = frame.__tagEvents[event]
+
+	if bindings then
+		for i = 1, #bindings do
+			UpdateBinding(frame, bindings[i])
+		end
+	end
+end
+
+function UF.Tag(frame, fontString, tagString)
+	-- Rebinding a font string replaces its previous lifecycle and subscriptions.
+	if fontString.__tagBinding then
+		UF.Untag(fontString.__owner, fontString)
+	end
+
+	frame.__tags = frame.__tags or {}
+	frame.__tagEvents = frame.__tagEvents or {}
+	local parts, subscriptions = Compile(tagString or "")
+	local hasName = false
+	for i = 1, #parts do
+		local part = parts[i]
+		if type(part) == "table" and (part.name == "Name" or part.name:match("^Name%d+$")) then
+			hasName = true
+			break
+		end
+	end
+	local binding = {fontString = fontString, tagString = tagString, parts = parts, subscriptions = subscriptions, output = {}, values = {}, hasName = hasName}
+	frame.__tags[#frame.__tags + 1] = binding
+	fontString.__owner, fontString.__tagBinding = frame, binding
+
+	for event in next, subscriptions do
+		local bindings = frame.__tagEvents[event]
+
+		if not bindings then
+			bindings = {}
+			frame.__tagEvents[event] = bindings
+			-- UNIT_* events carry a unit; the remaining declarations are shared.
+			frame:RegisterEvent(event, TagEvent, not event:match("^UNIT_"))
+		end
+
+		bindings[#bindings + 1] = binding
+	end
+
+	UpdateBinding(frame, binding)
+end
+
+function UF.Untag(frame, fontString)
+	local binding = fontString.__tagBinding
+
+	if not binding or fontString.__owner ~= frame then
+		return
+	end
+
+	for event in next, binding.subscriptions do
+		local bindings = frame.__tagEvents[event]
+
+		for i = #bindings, 1, -1 do
+			if bindings[i] == binding then
+				table.remove(bindings, i)
+				break
+			end
+		end
+
+		if #bindings == 0 then
+			frame.__tagEvents[event] = nil
+			frame:UnregisterEvent(event, TagEvent)
+		end
+	end
+
+	for i = #frame.__tags, 1, -1 do
+		if frame.__tags[i] == binding then
+			table.remove(frame.__tags, i)
+			break
+		end
+	end
+
+	fontString.__owner, fontString.__tagBinding = nil, nil
+end
+
+function UF.UpdateTags(frame, event)
+	if not frame.__tags then
+		return
+	end
+	for i = 1, #frame.__tags do
+		UpdateBinding(frame, frame.__tags[i])
+	end
+end
+
+UF.TagEvents = Events
+UF.TagMethods = Methods

@@ -12,19 +12,33 @@ MirrorTimers.Colors = {
 	["FEIGNDEATH"] = "FFB200",
 }
 
+local function UpdateText(Bar, Value)
+	local tick = Value > 5 and math.floor(Value) or math.floor(Value * 10 + 0.5)
+	if tick == Bar.LastTimeTick then
+		return
+	end
+	Bar.LastTimeTick = tick
+	local Text
+
+	if Value > 0 then
+		Text = format("%s (%s)", Bar.Label, YxUI:FormatTime(Value))
+	else
+		Text = format("%s", Bar.Label)
+	end
+
+	if Text ~= Bar.LastText then
+		Bar.LastText = Text
+		Bar.Text:SetText(Text)
+	end
+end
+
 function MirrorTimers:OnUpdate()
 	if self.Paused then
 		return
 	end
 
 	self.Value = GetMirrorTimerProgress(self.Timer) / 1000
-
-	if (self.Value > 0) then
-		self.Text:SetText(format("%s (%s)", self.Label, YxUI:FormatTime(self.Value)))
-	else
-		self.Text:SetText(format("%s", self.Label))
-	end
-
+	UpdateText(self, self.Value)
 	self:SetValue(self.Value)
 end
 
@@ -37,6 +51,7 @@ function MirrorTimers:MIRROR_TIMER_PAUSE(ispaused)
 end
 
 function MirrorTimers:MIRROR_TIMER_STOP()
+	self.Bar.LastText = nil
 	self.Bar:Hide()
 end
 
@@ -51,12 +66,14 @@ MirrorTimers.MirrorTimer_Show = function(timer, value, maxvalue, scale, paused, 
 	MirrorTimers.Bar.Value = value
 	MirrorTimers.Bar.Timer = timer
 	MirrorTimers.Bar.Label = label
+	MirrorTimers.Bar.LastText = nil
+	MirrorTimers.Bar.LastTimeTick = nil
 
 	MirrorTimers.Bar:SetMinMaxValues(0, maxvalue / 1000)
 	MirrorTimers.Bar:SetValue(value)
 	MirrorTimers.Bar:SetStatusBarColor(YxUI:HexToRGB(MirrorTimers.Colors[timer]))
 	MirrorTimers.BarBG:SetVertexColor(YxUI:HexToRGB(MirrorTimers.Colors[timer]))
-	MirrorTimers.Bar.Text:SetText(format("%s (%s)", label, YxUI:FormatTime(value / 1000)))
+	UpdateText(MirrorTimers.Bar, value / 1000)
 	MirrorTimers.Bar:Show()
 end
 

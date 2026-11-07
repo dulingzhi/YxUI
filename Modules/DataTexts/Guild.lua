@@ -6,9 +6,11 @@ local GetGuildInfo = GetGuildInfo
 local GetGuildRosterInfo = GetGuildRosterInfo
 local GetNumGuildMembers = GetNumGuildMembers
 local GetQuestDifficultyColor = GetQuestDifficultyColor
+local GetCVar = GetCVar
 local select = select
 local format = format
 local match = string.match
+local StripRealm = not YxUI.IsForever
 local Label = GUILD
 
 local MaxCharacters = 30
@@ -18,24 +20,16 @@ local StatusLabels = {
 	[2] = "|cFFFF6666" .. CHAT_FLAG_DND .. "|r",
 }
 
-local OnUpdate = function(self, elapsed)
-	self.Elapsed = self.Elapsed + elapsed
-
-	if (self.Elapsed > 10) then
-		GuildRoster()
-
-		self.Elapsed = 0
-	end
-end
-
 local OnEnter = function(self)
-	if (not IsInGuild()) then
+	if not self:SetTooltip() then
+		return
+	end
+
+	if not IsInGuild() then
 		return
 	end
 
 	self:RegisterEvent("MODIFIER_STATE_CHANGED")
-
-	self:SetTooltip()
 
 	GuildRoster()
 
@@ -45,14 +39,14 @@ local OnEnter = function(self)
 	local Name, Rank, RankIndex, Level, ClassName, Zone, Note, OfficerNote, Online, Status, Class
 	local Color, LevelColor
 
-	if (not NumOnlineAndMobile) then
+	if not NumOnlineAndMobile then
 		NumOnlineAndMobile = NumOnline
 	end
 
 	GameTooltip:AddDoubleLine(GuildName, format("%s/%s", NumOnlineAndMobile, NumTotal), nil, nil, nil, 1, 1, 1)
 	GameTooltip:AddLine(" ")
 
-	if (GuildMessage and GuildMessage ~= "") then
+	if GuildMessage and GuildMessage ~= "" then
 		GameTooltip:AddLine(GUILD_MOTD_LABEL2)
 		GameTooltip:AddLine(GuildMessage, 1, 1, 1, true)
 		GameTooltip:AddLine(" ")
@@ -71,14 +65,16 @@ local OnEnter = function(self)
 	end
 
 	for i = 1, NumTotal do
-		if (Count == Limit) then
+		if Count == Limit then
 			break
 		end
 
 		Name, Rank, RankIndex, Level, ClassName, Zone, Note, OfficerNote, Online, Status, Class = GetGuildRosterInfo(i)
 
-		if (Name and Online) then
-			Name = match(Name, "(%S+)-%S+")
+		if Name and Online then
+			if StripRealm then
+				Name = match(Name, "^(.+)%-[^%-]+$") or Name
+			end
 			Color = RAID_CLASS_COLORS[Class].colorStr
 			LevelColor = GetQuestDifficultyColor(Level)
 			LevelColor = YxUI:RGBToHex(LevelColor.r, LevelColor.g, LevelColor.b)
@@ -92,7 +88,7 @@ local OnEnter = function(self)
 			if IsModifierKeyDown() then
 				GameTooltip:AddDoubleLine(Name, Rank, nil, nil, nil, 1, 1, 1)
 			else
-				if (Zone == CurrentZone or Zone == CurrentText) then
+				if Zone == CurrentZone or Zone == CurrentText then
 					Zone = format("|cFF33FF33%s|r", Zone)
 				end
 
@@ -103,17 +99,12 @@ local OnEnter = function(self)
 		end
 	end
 
-	if (NumOnlineAndMobile > MaxCharacters) then
+	if NumOnlineAndMobile > MaxCharacters then
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(NumOnlineAndMobile - MaxCharacters .. Language[" more characters not shown"], 1, 1, 1)
 	end
 
 	self.TooltipShown = true
-
-	if (not self:GetScript("OnUpdate")) then
-		self.Elapsed = 0
-		self:SetScript("OnUpdate", OnUpdate)
-	end
 
 	GameTooltip:Show()
 end
@@ -122,20 +113,16 @@ local OnLeave = function(self)
 	GameTooltip:Hide()
 	self:UnregisterEvent("MODIFIER_STATE_CHANGED")
 	self.TooltipShown = false
-
-	if self:GetScript("OnUpdate") then
-		self:SetScript("OnUpdate", nil)
-	end
 end
 
 local Update = function(self, event)
-	if (not IsInGuild()) then
+	if not IsInGuild() then
 		self.Text:SetText(Language["No Guild"])
 
 		return
 	end
 
-	if (event == "MODIFIER_STATE_CHANGED") then
+	if event == "MODIFIER_STATE_CHANGED" then
 		GameTooltip:ClearLines()
 		OnEnter(self)
 	else
@@ -148,7 +135,7 @@ local Update = function(self, event)
 
 		local Total, Online, OnlineAndMobile = GetNumGuildMembers()
 
-		if (not OnlineAndMobile) then
+		if not OnlineAndMobile then
 			OnlineAndMobile = Online
 		end
 
@@ -166,7 +153,11 @@ local OnMouseUp = function()
 	elseif YxUI.IsCata or YxUI.IsMists then
 		ToggleGuildFrame()
 	else
-		ToggleFriendsFrame(3)
+		if GetCVar("useClassicGuildUI") == "1" then
+			ToggleGuildFrame()
+		else
+			ToggleCommunitiesFrame()
+		end
 	end
 end
 
@@ -188,15 +179,12 @@ local OnDisable = function(self)
 	self:UnregisterEvent("GUILD_RANKS_UPDATE")
 	self:UnregisterEvent("PLAYER_GUILD_UPDATE")
 	self:UnregisterEvent("GUILD_MOTD")
+	self:UnregisterEvent("MODIFIER_STATE_CHANGED")
 	self:SetScript("OnEvent", nil)
 	self:SetScript("OnEnter", nil)
 	self:SetScript("OnLeave", nil)
 	self:SetScript("OnMouseUp", nil)
-	self:SetScript("OnUpdate", nil)
-
-	if self.Elapsed then
-		self.Elapsed = 0
-	end
+	self.TooltipShown = false
 
 	self.Text:SetText("")
 end

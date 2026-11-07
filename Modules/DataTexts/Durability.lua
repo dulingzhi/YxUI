@@ -1,10 +1,10 @@
 local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local Slots = {1, 3, 5, 9, 10, 6, 7, 8, 16, 17, 18}
-local GetRepairAllCost = GetRepairAllCost
 local GetInventoryItemLink = GetInventoryItemLink
 local GetInventoryItemTexture = GetInventoryItemTexture
 local GetInventoryItemDurability = GetInventoryItemDurability
+local GetCoinTextureString = (C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString) or GetCoinTextureString
 local floor = math.floor
 local format = format
 local Label = Language["Durability"]
@@ -12,22 +12,28 @@ local Label = Language["Durability"]
 local ScanTooltip = CreateFrame("GameTooltip", nil, UIParent, "GameTooltipTemplate")
 
 local OnEnter = function(self)
-	self:SetTooltip()
+	if not self:SetTooltip() then
+		return
+	end
 
 	local TotalCost = 0
-	local Current, Max, HasItem, HasCooldown, RepairCost
+	local Current, Max
 
 	for i = 1, #Slots do
 		Current, Max = GetInventoryItemDurability(Slots[i])
 
-		if Current then
-			if (C_TooltipInfo and C_TooltipInfo.GetInventoryItem) then
-				HasItem, HasCooldown, RepairCost = C_TooltipInfo.GetInventoryItem("player", Slots[i], true)
+		if Current and Max and Max > 0 then
+			local RepairCost
+
+			if C_TooltipInfo and C_TooltipInfo.GetInventoryItem then
+				local Data = C_TooltipInfo.GetInventoryItem("player", Slots[i], true)
+				RepairCost = Data and Data.repairCost
 			else
-				HasItem, HasCooldown, RepairCost = ScanTooltip:SetInventoryItem("player", Slots[i], true)
+				local HasItem, _, Cost = ScanTooltip:SetInventoryItem("player", Slots[i], true)
+				RepairCost = HasItem and Cost
 			end
 
-			if (HasItem and RepairCost) then
+			if type(RepairCost) == "number" and RepairCost > 0 then
 				TotalCost = TotalCost + RepairCost
 			end
 		end
@@ -41,12 +47,12 @@ local OnEnter = function(self)
 	for i = 1, #Slots do
 		Current, Max = GetInventoryItemDurability(Slots[i])
 
-		if Current then
+		if Current and Max and Max > 0 then
 			GameTooltip:AddDoubleLine(format("|T%s:14:14:0:0:64:64:4:60:4:60|t  %s", GetInventoryItemTexture("player", Slots[i]), GetInventoryItemLink("player", Slots[i])), format("%s%%", floor(Current / Max * 100)), 1, 1, 1, 1, 1, 1)
 		end
 	end
 
-	if (TotalCost > 0) then
+	if TotalCost > 0 then
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(format("%s %s", REPAIR_COST, GetCoinTextureString(TotalCost)), 1, 1, 1)
 	end
@@ -73,23 +79,26 @@ local Update = function(self)
 	for i = 1, #Slots do
 		Current, Max = GetInventoryItemDurability(Slots[i])
 
-		if Current then
+		if Current and Max and Max > 0 then
 			Total = Total + (Current / Max)
 			Count = Count + 1
 		end
 	end
 
-	local Percent = floor(Total / Count * 100)
+	local Percent
 
-	if (Count > 0) then
+	if Count > 0 then
+		Percent = floor(Total / Count * 100)
 		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s%%|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Percent)
 	else
-		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%sN/A|r", Settings["data-text-label-color"], Label, YxUI.ValueColor)
+		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, NOT_APPLICABLE)
 	end
 
-	if (25 > Percent and not self.Anim:IsPlaying()) then
-		self.Anim:Play()
-	elseif (Percent > 25 and self.Anim:IsPlaying()) then
+	if Percent and Percent < 25 then
+		if not self.Anim:IsPlaying() then
+			self.Anim:Play()
+		end
+	elseif self.Anim:IsPlaying() then
 		self.Anim:Stop()
 		self.Anim:SetChange(0.5)
 		self.Highlight:SetAlpha(0)
@@ -104,12 +113,13 @@ end
 local OnEnable = function(self)
 	self:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
 	self:RegisterEvent("MERCHANT_SHOW")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:SetScript("OnEvent", Update)
 	self:SetScript("OnEnter", OnEnter)
 	self:SetScript("OnLeave", OnLeave)
 	self:SetScript("OnMouseUp", OnMouseUp)
 
-	if (not self.Anim) then
+	if not self.Anim then
 		self.Anim = LibMotion:CreateAnimation(self.Highlight, "Fade")
 		self.Anim:SetEasing("inout")
 		self.Anim:SetDuration(1.2)
@@ -121,8 +131,15 @@ local OnEnable = function(self)
 end
 
 local OnDisable = function(self)
+	if self.Anim and self.Anim:IsPlaying() then
+		self.Anim:Stop()
+		self.Anim:SetChange(0.5)
+		self.Highlight:SetAlpha(0)
+	end
+
 	self:UnregisterEvent("UPDATE_INVENTORY_DURABILITY")
 	self:UnregisterEvent("MERCHANT_SHOW")
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:SetScript("OnEvent", nil)
 	self:SetScript("OnEnter", nil)
 	self:SetScript("OnLeave", nil)

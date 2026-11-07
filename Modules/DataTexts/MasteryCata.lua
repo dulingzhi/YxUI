@@ -14,7 +14,9 @@ local OnMouseUp = function()
 end
 
 local OnEnter = function(self)
-	self:SetTooltip()
+	if not self:SetTooltip() then
+		return
+	end
 
 	local _, Class = UnitClass("player")
 	local Mastery = GetMastery()
@@ -22,16 +24,30 @@ local OnEnter = function(self)
 	local MasteryKnown = IsSpellKnown(CLASS_MASTERY_SPELLS[Class])
 	local TalentTree = GetPrimaryTalentTree()
 
-	local Title = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_MASTERY).." "..format("%.2F", Mastery)..FONT_COLOR_CODE_CLOSE
+	local Title = HIGHLIGHT_FONT_COLOR_CODE
+		.. format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_MASTERY)
+		.. " "
+		.. format("%.2F", Mastery)
+		.. FONT_COLOR_CODE_CLOSE
 
-	if (Bonus > 0) then
-		Title = Title..HIGHLIGHT_FONT_COLOR_CODE.." ("..format("%.2F", Mastery-Bonus)..FONT_COLOR_CODE_CLOSE..GREEN_FONT_COLOR_CODE.."+"..format("%.2F", Bonus)..FONT_COLOR_CODE_CLOSE..HIGHLIGHT_FONT_COLOR_CODE..")";
+	if Bonus > 0 then
+		Title = Title
+			.. HIGHLIGHT_FONT_COLOR_CODE
+			.. " ("
+			.. format("%.2F", Mastery - Bonus)
+			.. FONT_COLOR_CODE_CLOSE
+			.. GREEN_FONT_COLOR_CODE
+			.. "+"
+			.. format("%.2F", Bonus)
+			.. FONT_COLOR_CODE_CLOSE
+			.. HIGHLIGHT_FONT_COLOR_CODE
+			.. ")"
 	end
 
 	GameTooltip:SetText(Title)
 
 
-	if (MasteryKnown and TalentTree) then
+	if MasteryKnown and TalentTree then
 		local Spell, Spell2 = GetTalentTreeMasterySpells(TalentTree)
 
 		if Spell then
@@ -64,7 +80,7 @@ local OnLeave = function()
 end
 
 local Update = function(self, event, unit)
-	if (unit and unit ~= "player") then
+	if unit and unit ~= "player" then
 		return
 	end
 

@@ -7,6 +7,9 @@ local tinsert = table.insert
 local tremove = table.remove
 
 local SessionChange = 0
+local SessionEarned = 0
+local SessionSpent = 0
+local SessionStart = GetTime()
 local Sorted = {}
 local TablePool = {}
 local CurrentUser
@@ -28,7 +31,7 @@ function Gold:GetTable()
 end
 
 function Gold:GetSessionStats()
-	return SessionChange, GetMoney()
+	return SessionChange, GetMoney(), SessionEarned, SessionSpent, GetTime() - SessionStart
 end
 
 function Gold:GetServerInfo()
@@ -60,7 +63,14 @@ end
 function Gold:OnEvent()
 	local CurrentValue = GetMoney()
 
-	SessionChange = SessionChange + (CurrentValue - YxUI.GoldData[YxUI.UserRealm][CurrentUser])
+	local Delta = CurrentValue - YxUI.GoldData[YxUI.UserRealm][CurrentUser]
+	SessionChange = SessionChange + Delta
+
+	if Delta > 0 then
+		SessionEarned = SessionEarned + Delta
+	elseif Delta < 0 then
+		SessionSpent = SessionSpent - Delta
+	end
 
 	YxUI.GoldData[YxUI.UserRealm][CurrentUser] = CurrentValue
 end
@@ -75,7 +85,7 @@ end
 function Gold:Load()
 	YxUI:BindSavedVariable("YxUIGold", "GoldData")
 
-	if (not YxUI.GoldData[YxUI.UserRealm]) then
+	if not YxUI.GoldData[YxUI.UserRealm] then
 		YxUI.GoldData[YxUI.UserRealm] = {}
 	end
 

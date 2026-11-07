@@ -9,7 +9,7 @@ local OnMouseUp = function(self, button)
 		return print(ERR_NOT_IN_COMBAT)
 	end
 
-	if (ToggleCalendar and button == "LeftButton") then
+	if ToggleCalendar and button == "LeftButton" then
 		ToggleCalendar()
 	else
 		TimeManager_Toggle()
@@ -17,10 +17,12 @@ local OnMouseUp = function(self, button)
 end
 
 local OnEnter = function(self)
-	self:SetTooltip()
+	if not self:SetTooltip() then
+		return
+	end
 
 	local HomeLatency, WorldLatency = select(3, GetNetStats())
-	local Framerate = floor(GetFramerate())
+	local Framerate = floor(GetFramerate() + 0.5)
 	local LocalTime = GameTime_GetLocalTime(true)
 
 	GameTooltip:AddLine(TIMEMANAGER_TOOLTIP_LOCALTIME, 1, 0.7, 0)
@@ -40,37 +42,39 @@ local OnLeave = function()
 	GameTooltip:Hide()
 end
 
-local Update = function(self, elapsed)
-	self.Elapsed = self.Elapsed + elapsed
+local Update = function(self)
+	local Time = GameTime_GetGameTime(true)
 
-	if (self.Elapsed > 10) then
-		local Time = GameTime_GetGameTime(true)
+	Time = gsub(Time, "%a+", format("|cFF%s%s|r", YxUI.ValueColor, "%1"))
 
-		Time = gsub(Time, "%a+", format("|cFF%s%s|r", YxUI.ValueColor, "%1"))
-
-		self.Text:SetText(Time)
-
-		self.Elapsed = 0
-	end
+	self.Text:SetText(Time)
 end
 
 local OnEnable = function(self)
-	self.Elapsed = 0
-	self:SetScript("OnUpdate", Update)
 	self:SetScript("OnEnter", OnEnter)
 	self:SetScript("OnLeave", OnLeave)
 	self:SetScript("OnMouseUp", OnMouseUp)
 
-	self:Update(11)
+	if self.Ticker then
+		self.Ticker:Cancel()
+	end
+
+	self.Ticker = C_Timer.NewTicker(10, function()
+		Update(self)
+	end)
+
+	Update(self)
 end
 
 local OnDisable = function(self)
-	self:SetScript("OnUpdate", nil)
+	if self.Ticker then
+		self.Ticker:Cancel()
+		self.Ticker = nil
+	end
+
 	self:SetScript("OnEnter", nil)
 	self:SetScript("OnLeave", nil)
 	self:SetScript("OnMouseUp", nil)
-	self.Elapsed = 0
-
 	self.Text:SetText("")
 end
 

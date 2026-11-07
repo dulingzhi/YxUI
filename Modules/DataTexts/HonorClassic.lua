@@ -4,19 +4,21 @@ local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
 local Label = HONOR
 
 local OnEnter = function(self)
-	self:SetTooltip()
+	if not self:SetTooltip() then
+		return
+	end
 
 	local HK = GetPVPSessionStats()
 	local Rank = UnitPVPRank("player")
 
-	if (Rank > 0) then
+	if Rank > 0 then
 		local Name, Number = GetPVPRankInfo(Rank, "player")
 
 		GameTooltip:AddDoubleLine(Name, format("%s %s", RANK, Number), 1, 1, 1, 1, 1, 1)
 	end
 
-	if (HK > 0) then
-		if (Rank > 0) then
+	if HK > 0 then
+		if Rank > 0 then
 			GameTooltip:AddLine(" ")
 		end
 
@@ -26,8 +28,8 @@ local OnEnter = function(self)
 
 	local LHK = GetPVPLifetimeStats()
 
-	if (LHK > 0) then
-		if (HK > 0) then
+	if LHK > 0 then
+		if HK > 0 then
 			GameTooltip:AddLine(" ")
 		end
 
@@ -59,7 +61,7 @@ local OnLeave = function()
 end
 
 local OnMouseUp = function()
-	if YxUI.IsClassic then
+	if YxUI.IsVanilla then
 		ToggleCharacter("HonorFrame")
 	elseif YxUI.IsWrath then
 		TogglePVPFrame()

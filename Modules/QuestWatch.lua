@@ -19,8 +19,8 @@ local Postmove = function()
 	QuestWatchFrame:SetPoint("TOPLEFT", Quest.Mover, "TOPLEFT", 0, 0)
 
 	QuestTimerFrame:ClearAllPoints()
-	QuestTimerFrame:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 60)
-	QuestTimerFrame:SetPoint("TOPRIGHT", self, "TOPRIGHT", 0, 60)
+	QuestTimerFrame:SetPoint("TOPLEFT", Quest.Mover, "TOPLEFT", 0, 60)
+	QuestTimerFrame:SetPoint("TOPRIGHT", Quest.Mover, "TOPRIGHT", 0, 60)
 end
 
 function Quest:StyleFrame()
@@ -60,9 +60,9 @@ function Quest:StyleFrame()
 	for i = 1, QuestTimerFrame:GetNumRegions() do
 		Region = select(i, QuestTimerFrame:GetRegions())
 
-		if (Region:GetObjectType() == "Texture") then
+		if Region:GetObjectType() == "Texture" then
 			Region:SetTexture(nil)
-		elseif (Region:GetObjectType() == "FontString") then
+		elseif Region:GetObjectType() == "FontString" then
 			YxUI:SetFontInfo(Region, Settings["ui-header-font"], 12)
 		end
 	end

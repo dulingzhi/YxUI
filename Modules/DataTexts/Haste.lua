@@ -13,7 +13,9 @@ local OnMouseUp = function()
 end
 
 local OnEnter = function(self)
-	self:SetTooltip()
+	if not self:SetTooltip() then
+		return
+	end
 
 	GameTooltip:AddLine(Label, 1, 1, 1)
 
@@ -33,7 +35,7 @@ local OnLeave = function()
 end
 
 local Update = function(self, event, unit)
-	if (unit and unit ~= "player") then
+	if unit and unit ~= "player" then
 		return
 	end
 

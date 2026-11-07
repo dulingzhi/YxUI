@@ -26,7 +26,17 @@ DT.Types = {}
 DT.List = {}
 YxUI.ValueColor = "ffffff"
 
+-- Returns true when the caller is expected to fill in the tooltip contents.
+-- Upstream started guarding tooltip handlers with "if not self:SetTooltip() then
+-- return end" so that users who disable data text tooltips never get an empty
+-- tooltip frame. Keep the boolean contract in sync with the callers.
 local SetTooltip = function(anchor)
+	if not Settings["data-text-enable-tooltips"] then
+		GameTooltip:Hide()
+
+		return false
+	end
+
 	if Settings["data-text-hover-tooltips"] then
 		local X, Y = anchor:GetCenter()
 		local Position = (Y > YxUI.UIParent:GetHeight() / 2) and "TOP" or "BOTTOM"
@@ -42,6 +52,8 @@ local SetTooltip = function(anchor)
 	else
 		GameTooltip_SetDefaultAnchor(GameTooltip, anchor)
 	end
+
+	return true
 end
 
 function DT:OnMouseDown()

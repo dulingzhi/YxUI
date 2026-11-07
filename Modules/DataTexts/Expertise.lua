@@ -4,7 +4,9 @@ local GetExpertisePercent = GetExpertisePercent
 local Label = STAT_EXPERTISE
 
 local OnEnter = function(self)
-	self:SetTooltip()
+	if not self:SetTooltip() then
+		return
+	end
 
 	local Expertise, OffhandExpertise = GetExpertise()
 	local Speed, OffhandSpeed = UnitAttackSpeed("player")
@@ -46,7 +48,7 @@ local OnMouseUp = function()
 end
 
 local Update = function(self, event, unit)
-	if (unit and unit ~= "player") then
+	if unit and unit ~= "player" then
 		return
 	end
 

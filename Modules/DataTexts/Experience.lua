@@ -7,11 +7,19 @@ local OnMouseUp = function()
 end
 
 local OnEnter = function(self)
-	self:SetTooltip()
+	if not self:SetTooltip() then
+		return
+	end
 
 	local Rested = GetXPExhaustion()
 	local XP = UnitXP("player")
 	local Max = UnitXPMax("player")
+	if not Max or Max <= 0 then
+		GameTooltip:AddLine(LEVEL .. " " .. UnitLevel("player"))
+		GameTooltip:AddLine(GUILD_RECRUITMENT_MAXLEVEL)
+		GameTooltip:Show()
+		return
+	end
 
 	local Percent = floor((XP / Max * 100 + 0.05) * 10) / 10
 	local Remaining = Max - XP
@@ -42,15 +50,20 @@ local OnLeave = function()
 end
 
 local Update = function(self)
-	if (UnitLevel("player") == MAX_PLAYER_LEVEL) then
+	if UnitLevel("player") == MAX_PLAYER_LEVEL then
 		self:Disable()
 		self.Text:SetText(GUILD_RECRUITMENT_MAXLEVEL)
 
 		return
 	end
 
-    local XP = UnitXP("player")
-    local MaxXP = UnitXPMax("player")
+	local XP = UnitXP("player")
+	local MaxXP = UnitXPMax("player")
+	if not MaxXP or MaxXP <= 0 then
+		self.Text:SetText(GUILD_RECRUITMENT_MAXLEVEL)
+		return
+	end
+
 	local Value = "|cff" .. YxUI.ValueColor .. floor((XP / MaxXP * 100 + 0.05) * 10) / 10 .. "%|r"
 
 	self.Text:SetFormattedText(Message, Value)

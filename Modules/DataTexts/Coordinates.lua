@@ -2,18 +2,25 @@ local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetBestMapForUnit = C_Map.GetBestMapForUnit
 local GetPlayerMapPosition = C_Map.GetPlayerMapPosition
+local IsModernZonePVP = C_PvP and type(C_PvP.GetZonePVPInfo) == "function"
+local GetZonePVPInfo = IsModernZonePVP and C_PvP.GetZonePVPInfo or GetZonePVPInfo
 
 local OnEnter = function(self)
-	self:SetTooltip()
+	if not self:SetTooltip() then
+		return
+	end
 
 	-- Location
 	local ZoneText = GetRealZoneText()
 	local SubZoneText = GetMinimapZoneText()
 	local PVPType, IsFFA, Faction = GetZonePVPInfo()
+	if IsModernZonePVP then
+		IsFFA = PVPType == "arena"
+	end
 	local Color = YxUI.ZoneColors[PVPType or "other"]
 	local Label
 
-	if (ZoneText ~= SubZoneText) then
+	if ZoneText ~= SubZoneText then
 		Label = format("%s - %s", ZoneText, SubZoneText)
 	else
 		Label = ZoneText
@@ -21,9 +28,9 @@ local OnEnter = function(self)
 
 	GameTooltip:AddLine(Label, Color[1], Color[2], Color[3])
 
-	if (PVPType == "friendly" or PVPType == "hostile") then
+	if PVPType == "friendly" or PVPType == "hostile" then
 		GameTooltip:AddLine(format(FACTION_CONTROLLED_TERRITORY, Faction), Color[1], Color[2], Color[3])
-	elseif (PVPType == "sanctuary") then
+	elseif PVPType == "sanctuary" then
 		GameTooltip:AddLine(SANCTUARY_TERRITORY, Color[1], Color[2], Color[3])
 	elseif IsFFA then
 		GameTooltip:AddLine(FREE_FOR_ALL_TERRITORY, Color[1], Color[2], Color[3])
@@ -43,12 +50,12 @@ local OnEnter = function(self)
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(Language["Coordinates"])
 			GameTooltip:AddLine(format("%.2f, %.2f", X * 100, Y * 100), 1, 1, 1)
-
-			self.TooltipShown = true
-
-			GameTooltip:Show()
 		end
 	end
+
+	self.TooltipShown = true
+
+	GameTooltip:Show()
 end
 
 local OnLeave = function(self)
@@ -56,45 +63,48 @@ local OnLeave = function(self)
 	self.TooltipShown = false
 end
 
-local Update = function(self, elapsed)
-	self.Elapsed = self.Elapsed + elapsed
+local Update = function(self)
+	local MapID = GetBestMapForUnit("player")
+	local Position = MapID and GetPlayerMapPosition(MapID, "player")
 
-	if (self.Elapsed > 0.5) then
-		local MapID = GetBestMapForUnit("player")
+	if Position then
+		local X, Y = Position:GetXY()
 
-		if MapID then
-			local Position = GetPlayerMapPosition(MapID, "player")
+		self.Text:SetFormattedText("|cFF%s%.2f|r, |cFF%s%.2f|r", YxUI.ValueColor, X * 100, YxUI.ValueColor, Y * 100)
+	else
+		self.Text:SetText("--, --")
+	end
 
-			if Position then
-				local X, Y = GetPlayerMapPosition(MapID, "player"):GetXY()
-
-				self.Text:SetFormattedText("|cFF%s%.2f|r, |cFF%s%.2f|r", YxUI.ValueColor, X * 100, YxUI.ValueColor, Y * 100)
-
-				if self.TooltipShown then
-					GameTooltip:ClearLines()
-					OnEnter(self)
-				end
-			end
-		end
-
-		self.Elapsed = 0
+	if self.TooltipShown then
+		GameTooltip:ClearLines()
+		OnEnter(self)
 	end
 end
 
 local OnEnable = function(self)
-	self.Elapsed = 0
-	self:SetScript("OnUpdate", Update)
 	self:SetScript("OnEnter", OnEnter)
 	self:SetScript("OnLeave", OnLeave)
 
-	self:Update(1)
+	if self.Ticker then
+		self.Ticker:Cancel()
+	end
+
+	self.Ticker = C_Timer.NewTicker(0.5, function()
+		Update(self)
+	end)
+
+	Update(self)
 end
 
 local OnDisable = function(self)
-	self:SetScript("OnUpdate", nil)
+	if self.Ticker then
+		self.Ticker:Cancel()
+		self.Ticker = nil
+	end
+
 	self:SetScript("OnEnter", nil)
 	self:SetScript("OnLeave", nil)
-	self.Elapsed = 0
+	self.TooltipShown = false
 
 	self.Text:SetText("")
 end

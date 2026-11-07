@@ -3,17 +3,30 @@ local YxUI, Language, Assets, Settings = select(2, ...):get()
 local Label = MAIL_LABEL
 
 local OnEnter = function(self)
-	self:SetTooltip()
+	if not self:SetTooltip() then
+		return
+	end
 
-	local One, Two, Three = GetLatestThreeSenders()
+	local Senders = {GetLatestThreeSenders()}
+	local HasSender
 
-	if One then
-		GameTooltip:AddLine(HAVE_MAIL_FROM)
+	for Index = 1, 3 do
+		local Sender = Senders[Index]
 
-		GameTooltip:AddLine(One, 1, 1, 1)
-		GameTooltip:AddLine(Two, 1, 1, 1)
-		GameTooltip:AddLine(Three, 1, 1, 1)
+		if Sender and Sender ~= "" then
+			if not HasSender then
+				GameTooltip:AddLine(HAVE_MAIL_FROM)
+			end
 
+			GameTooltip:AddLine(Sender, 1, 1, 1)
+			HasSender = true
+		end
+	end
+
+	if HasSender then
+		GameTooltip:Show()
+	elseif HasNewMail() then
+		GameTooltip:AddLine(HAVE_MAIL)
 		GameTooltip:Show()
 	end
 end
@@ -38,7 +51,7 @@ local Update = function(self, event)
 		Result = Result + 1
 	end
 
-	if (HasNewMail() and Result == 0) then
+	if HasNewMail() and Result == 0 then
 		Result = Result + 1
 	end
 

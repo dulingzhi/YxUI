@@ -1,40 +1,23 @@
 local YxUI, Language, Assets, Settings = select(2, ...):get()
 
-local GetContainerNumSlots = GetContainerNumSlots
-local GetContainerNumFreeSlots = GetContainerNumFreeSlots
-local NUM_BAG_SLOTS = NUM_BAG_SLOTS
-local select = select
+local GetShardCount = C_Item and C_Item.GetItemCount or GetItemCount
 local Label = SOUL_SHARDS_POWER
 
 local Update = function(self)
-	local ShardCount = 0
+	local Count = GetShardCount(6265, false) or 0
 
-	for Bag = 0, NUM_BAG_SLOTS do
-		local NumSlots = GetContainerNumSlots(Bag)
-
-		for Slot = 1, NumSlots do
-			local ID = GetContainerItemID(Bag, Slot)
-
-			if (ID and ID == 6265) then
-				local Count = select(2, GetContainerItemInfo(Bag, Slot))
-
-				ShardCount = ShardCount + Count
-			end
-		end
-	end
-
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, ShardCount)
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, Settings["color-soul-shards"], Count)
 end
 
 local OnEnable = function(self)
-	self:RegisterEvent("BAG_UPDATE")
+	self:RegisterEvent("BAG_UPDATE_DELAYED")
 	self:SetScript("OnEvent", Update)
 
 	self:Update()
 end
 
 local OnDisable = function(self)
-	self:UnregisterEvent("BAG_UPDATE")
+	self:UnregisterEvent("BAG_UPDATE_DELAYED")
 	self:SetScript("OnEvent", nil)
 
 	self.Text:SetText("")

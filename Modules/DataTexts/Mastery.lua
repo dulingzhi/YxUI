@@ -14,7 +14,9 @@ local OnMouseUp = function()
 end
 
 local OnEnter = function(self)
-	self:SetTooltip()
+	if not self:SetTooltip() then
+		return
+	end
 
 	local Mastery, Bonus = GetMasteryEffect()
 	local MasteryBonus = GetCombatRatingBonus(CR_MASTERY) * Bonus
@@ -23,7 +25,7 @@ local OnEnter = function(self)
 	if Spec then
 		local MasterySpell, MasterySpell2 = GetSpecializationMasterySpells(Spec)
 
-		if (MasterySpell) then
+		if MasterySpell then
 			GameTooltip:AddSpellByID(MasterySpell)
 		end
 
@@ -48,7 +50,7 @@ local OnLeave = function()
 end
 
 local Update = function(self, event, unit)
-	if (unit and unit ~= "player") then
+	if unit and unit ~= "player" then
 		return
 	end
 
