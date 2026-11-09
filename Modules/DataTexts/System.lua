@@ -8,16 +8,33 @@ local FPSLabel = Language["FPS"]
 local MSLabel = Language["MS"]
 
 local OnEnter = function(self)
-	if not self:SetTooltip() then
-		return
+	if not self:SetTooltip() then return end
+
+	GameTooltip:AddLine(SYSTEM or "System", 1, 0.82, 0)
+	GameTooltip:AddLine(" ")
+	local fps = GetFramerate()
+	if fps and (not issecretvalue or not issecretvalue(fps)) then
+		GameTooltip:AddDoubleLine(FPSLabel, format("%d", floor(fps + 0.5)), 1, 1, 1, 1, 1, 1)
 	end
 
-	local HomeLatency, WorldLatency = select(3, GetNetStats())
+	local bandwidthIn, bandwidthOut, home, world = GetNetStats()
+	if home and (not issecretvalue or not issecretvalue(home)) then
+		GameTooltip:AddDoubleLine(HOME or "Home", format("%d ms", home), 1, 1, 1, 1, 1, 1)
+	end
+	if world and (not issecretvalue or not issecretvalue(world)) then
+		GameTooltip:AddDoubleLine(WORLD or "World", format("%d ms", world), 1, 1, 1, 1, 1, 1)
+	end
+	if bandwidthIn and bandwidthOut and (not issecretvalue or (not issecretvalue(bandwidthIn) and not issecretvalue(bandwidthOut))) then
+		GameTooltip:AddDoubleLine("Download / Upload", format("%.1f / %.1f KB/s", bandwidthIn, bandwidthOut), 0.85, 0.85, 0.85, 1, 1, 1)
+	end
 
-	GameTooltip:AddLine(Language["Latency:"], 1, 0.7, 0)
-	GameTooltip:AddLine(format(Language["%s ms (home)"], HomeLatency), 1, 1, 1)
-	GameTooltip:AddLine(format(Language["%s ms (world)"], WorldLatency), 1, 1, 1)
-
+	if UpdateAddOnMemoryUsage and GetAddOnMemoryUsage then
+		UpdateAddOnMemoryUsage()
+		local kb = GetAddOnMemoryUsage("YxUI")
+		if type(kb) == "number" and (not issecretvalue or not issecretvalue(kb)) then
+			GameTooltip:AddDoubleLine("YxUI memory", format("%.2f MB", kb / 1024), 0.85, 0.85, 0.85, 1, 1, 1)
+		end
+	end
 	GameTooltip:Show()
 end
 

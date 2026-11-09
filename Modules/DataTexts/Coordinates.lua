@@ -2,6 +2,7 @@ local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetBestMapForUnit = C_Map.GetBestMapForUnit
 local GetPlayerMapPosition = C_Map.GetPlayerMapPosition
+local IsReadable = YxUI.IsDataTextReadable
 local IsModernZonePVP = C_PvP and type(C_PvP.GetZonePVPInfo) == "function"
 local GetZonePVPInfo = IsModernZonePVP and C_PvP.GetZonePVPInfo or GetZonePVPInfo
 
@@ -9,6 +10,7 @@ local OnEnter = function(self)
 	if not self:SetTooltip() then
 		return
 	end
+	GameTooltip:ClearLines()
 
 	-- Location
 	local ZoneText = GetRealZoneText()
@@ -26,7 +28,7 @@ local OnEnter = function(self)
 		Label = ZoneText
 	end
 
-	GameTooltip:AddLine(Label, Color[1], Color[2], Color[3])
+	GameTooltip:AddLine(Label, 1, 0.82, 0)
 
 	if PVPType == "friendly" or PVPType == "hostile" then
 		GameTooltip:AddLine(format(FACTION_CONTROLLED_TERRITORY, Faction), Color[1], Color[2], Color[3])
@@ -38,20 +40,6 @@ local OnEnter = function(self)
 		GameTooltip:AddLine(CONTESTED_TERRITORY, Color[1], Color[2], Color[3])
 	end
 
-	-- Coordinates
-	local MapID = GetBestMapForUnit("player")
-
-	if MapID then
-		local Position = GetPlayerMapPosition(MapID, "player")
-
-		if Position then
-			local X, Y = Position:GetXY()
-
-			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine(Language["Coordinates"])
-			GameTooltip:AddLine(format("%.2f, %.2f", X * 100, Y * 100), 1, 1, 1)
-		end
-	end
 
 	self.TooltipShown = true
 
@@ -65,18 +53,20 @@ end
 
 local Update = function(self)
 	local MapID = GetBestMapForUnit("player")
-	local Position = MapID and GetPlayerMapPosition(MapID, "player")
+	local Position = IsReadable(MapID) and GetPlayerMapPosition(MapID, "player")
+	local X, Y
+	if IsReadable(Position) then
+		X, Y = Position:GetXY()
+	end
 
-	if Position then
-		local X, Y = Position:GetXY()
-
-		self.Text:SetFormattedText("|cFF%s%.2f|r, |cFF%s%.2f|r", YxUI.ValueColor, X * 100, YxUI.ValueColor, Y * 100)
+	local Values = YxUI.GetDataTextLastValue(self, IsReadable(X) and IsReadable(Y) and {X, Y} or nil)
+	if Values then
+		self.Text:SetFormattedText("|cFF%s%.2f|r, |cFF%s%.2f|r", YxUI.ValueColor, Values[1] * 100, YxUI.ValueColor, Values[2] * 100)
 	else
 		self.Text:SetText("--, --")
 	end
 
 	if self.TooltipShown then
-		GameTooltip:ClearLines()
 		OnEnter(self)
 	end
 end

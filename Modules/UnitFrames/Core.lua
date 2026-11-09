@@ -473,6 +473,9 @@ end
 
 function UnitFrames:SetNamePlateUnit(frame, unit, deferRefresh)
 	if not unit then
+		if frame.Castbar and frame.Castbar.ForceClear then
+			frame.Castbar:ForceClear()
+		end
 		for event in next, frame._unitEvents do
 			frame._unregisterEvent(frame, event)
 		end

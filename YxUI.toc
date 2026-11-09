@@ -53,6 +53,7 @@ Modules\Popup.lua
 Modules\Gold.lua
 Modules\Announcements.lua
 Modules\Fonts.lua
+Modules\Chat.lua
 Modules\Chat\History.lua
 Modules\Chat\Links.lua
 Modules\Chat\Window.lua
@@ -86,6 +87,8 @@ Modules\AuraTemplate.xml
 Modules\Auras.lua
 Modules\AurasMainline.lua
 Modules\DataTexts\DataTexts.lua
+Modules\DataTexts\Specialization.lua
+Modules\DataTexts\InstanceLockouts.lua
 Modules\DataTexts\Armor.lua
 Modules\DataTexts\BagSlots.lua
 Modules\DataTexts\CombatTime.lua
@@ -112,6 +115,8 @@ Modules\DataTexts\System.lua
 Modules\DataTexts\TimeLocal.lua
 Modules\DataTexts\TimeRealm.lua
 Modules\DataTexts\Versatility.lua
+Modules\DataTexts\Leech.lua
+Modules\DataTexts\Avoidance.lua
 Modules\DataTexts\Mail.lua
 Modules\Tooltips.lua
 Modules\ActionBars\MicroMenu.lua

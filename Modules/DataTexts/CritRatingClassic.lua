@@ -24,6 +24,31 @@ local OnMouseUp = function()
 	ToggleCharacter("PaperDollFrame")
 end
 
+
+local OnLeave = function()
+	GameTooltip:Hide()
+end
+
+local OnEnter = function(self)
+	if not self:SetTooltip() then return end
+
+	GameTooltip:AddLine(CRIT_ABBR or "Critical Strike", 1, 0.82, 0)
+	GameTooltip:AddLine(" ")
+	local melee = GetCritChance()
+	local ranged = GetRangedCritChance()
+	if YxUI.IsDataTextReadable(melee) then
+		GameTooltip:AddDoubleLine(MELEE or "Melee", format("%.2f%%", melee), 1, 1, 1, 1, 1, 1)
+	end
+	if YxUI.IsDataTextReadable(ranged) then
+		GameTooltip:AddDoubleLine(RANGED or "Ranged", format("%.2f%%", ranged), 1, 1, 1, 1, 1, 1)
+	end
+	local Spell = GetSpellCrit()
+	if YxUI.IsDataTextReadable(Spell) then
+		GameTooltip:AddDoubleLine(SPELLS or "Spells", format("%.2f%%", Spell), 1, 1, 1, 1, 1, 1)
+	end
+	GameTooltip:Show()
+end
+
 local Update = function(self, event, unit)
 	if unit and unit ~= "player" then
 		return
@@ -51,6 +76,8 @@ local OnEnable = function(self)
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
 	self:SetScript("OnEvent", Update)
 	self:SetScript("OnMouseUp", OnMouseUp)
+	self:SetScript("OnEnter", OnEnter)
+	self:SetScript("OnLeave", OnLeave)
 
 	self:Update(nil, "player")
 end
@@ -62,6 +89,8 @@ local OnDisable = function(self)
 	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
 	self:SetScript("OnEvent", nil)
 	self:SetScript("OnMouseUp", nil)
+	self:SetScript("OnEnter", nil)
+	self:SetScript("OnLeave", nil)
 
 	self.Text:SetText("")
 end

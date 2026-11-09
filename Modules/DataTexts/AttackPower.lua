@@ -12,6 +12,32 @@ local OnMouseUp = function()
 	ToggleCharacter("PaperDollFrame")
 end
 
+
+local OnLeave = function()
+	GameTooltip:Hide()
+end
+
+local OnEnter = function(self)
+	if not self:SetTooltip() then return end
+
+	GameTooltip:AddLine(Label, 1, 0.82, 0)
+	GameTooltip:AddLine(" ")
+	local meleeBase, meleePositive, meleeNegative = UnitAttackPower("player")
+	local rangedBase, rangedPositive, rangedNegative = UnitRangedAttackPower("player")
+	local function AddPower(label, base, positive, negative)
+		if not (YxUI.IsDataTextReadable(base) and YxUI.IsDataTextReadable(positive) and YxUI.IsDataTextReadable(negative)) then
+			return
+		end
+		GameTooltip:AddDoubleLine(label, YxUI:Comma(base + positive + negative), 1, 1, 1, 1, 1, 1)
+		if positive ~= 0 or negative ~= 0 then
+			GameTooltip:AddDoubleLine("    " .. (BONUS or "Bonuses") .. " / " .. (PENALTY or "Penalties"), format("%+d / %d", positive, negative), 0.75, 0.75, 0.75, 1, 1, 1)
+		end
+	end
+	AddPower(MELEE or "Melee", meleeBase, meleePositive, meleeNegative)
+	AddPower(RANGED or "Ranged", rangedBase, rangedPositive, rangedNegative)
+	GameTooltip:Show()
+end
+
 local Update = function(self, event, unit)
 	if unit and unit ~= "player" then
 		return
@@ -41,6 +67,8 @@ local OnEnable = function(self)
 	self:RegisterEvent("UNIT_AURA")
 	self:SetScript("OnEvent", Update)
 	self:SetScript("OnMouseUp", OnMouseUp)
+	self:SetScript("OnEnter", OnEnter)
+	self:SetScript("OnLeave", OnLeave)
 
 	self:Update(nil, "player")
 end
@@ -52,6 +80,8 @@ local OnDisable = function(self)
 	self:UnregisterEvent("UNIT_AURA")
 	self:SetScript("OnEvent", nil)
 	self:SetScript("OnMouseUp", nil)
+	self:SetScript("OnEnter", nil)
+	self:SetScript("OnLeave", nil)
 
 	self.Text:SetText("")
 end

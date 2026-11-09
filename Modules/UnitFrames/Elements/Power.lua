@@ -2,6 +2,11 @@ local _, ns = ...
 local YxUI = ns:get()
 local UF = YxUI:GetModule("Unit Frames")
 
+local function IsReadablePowerToken(value)
+	return type(value) == "string" and not (YxUI.IsMainline and issecretvalue and issecretvalue(value)
+		and (not canaccessvalue or not canaccessvalue(value)))
+end
+
 local PowerEvents = {
 	"UNIT_MAXPOWER",
 	"UNIT_DISPLAYPOWER",
@@ -54,13 +59,17 @@ local function SetPowerColor(frame, bar, unit, powerType, token, altR, altG, alt
 	return r, g, b
 end
 
-local function UpdatePower(frame, event, unit)
+local function UpdatePower(frame, event, unit, powerToken)
 	if unit ~= frame.unit then
 		return
 	end
 
 	local bar = frame.Power
 	local isValueEvent = event == "UNIT_POWER_UPDATE" or event == "UNIT_POWER_FREQUENT"
+	if isValueEvent and bar._powerToken and not bar.displayAltPower
+		and IsReadablePowerToken(powerToken) and powerToken ~= bar._powerToken then
+		return
+	end
 	local refreshRange = not bar._powerStateReady or bar._powerStateUnit ~= unit or not (isValueEvent or event == "UNIT_CONNECTION"
 		or event == "UNIT_FACTION" or event == "UNIT_FLAGS" or event == "UNIT_THREAT_LIST_UPDATE")
 	local displayType, minimum, maximum = bar.displayType, bar.min, bar.max
@@ -95,6 +104,7 @@ local function UpdatePower(frame, event, unit)
 
 	if not isValueEvent then
 		local powerType, token, altR, altG, altB = UnitPowerType(unit)
+		bar._powerToken = IsReadablePowerToken(token) and token or nil
 		local r, g, b = SetPowerColor(frame, bar, unit, powerType, token, altR, altG, altB)
 
 		if bar.PostUpdateColor then
@@ -117,6 +127,7 @@ local function EnablePower(frame)
 	bar.__owner = frame
 	bar._powerStateReady = nil
 	bar._powerStateUnit = nil
+	bar._powerToken = nil
 	bar.ForceUpdate = UF:CreateForceUpdate(bar, UpdatePower)
 	frame:RegisterEvent(bar.frequentUpdates and "UNIT_POWER_FREQUENT" or "UNIT_POWER_UPDATE", UpdatePower)
 
@@ -132,6 +143,7 @@ end
 local function DisablePower(frame)
 	frame.Power._powerStateReady = nil
 	frame.Power._powerStateUnit = nil
+	frame.Power._powerToken = nil
 	frame.Power:Hide()
 	frame:UnregisterEvent("UNIT_POWER_UPDATE", UpdatePower)
 	frame:UnregisterEvent("UNIT_POWER_FREQUENT", UpdatePower)

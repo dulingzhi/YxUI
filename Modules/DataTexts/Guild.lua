@@ -43,11 +43,11 @@ local OnEnter = function(self)
 		NumOnlineAndMobile = NumOnline
 	end
 
-	GameTooltip:AddDoubleLine(GuildName, format("%s/%s", NumOnlineAndMobile, NumTotal), nil, nil, nil, 1, 1, 1)
+	GameTooltip:AddDoubleLine(GuildName, format("%s/%s", NumOnlineAndMobile, NumTotal), 1, 0.82, 0, 1, 1, 1)
 	GameTooltip:AddLine(" ")
 
 	if GuildMessage and GuildMessage ~= "" then
-		GameTooltip:AddLine(GUILD_MOTD_LABEL2)
+		GameTooltip:AddLine(GUILD_MOTD_LABEL2, 1, 0.82, 0)
 		GameTooltip:AddLine(GuildMessage, 1, 1, 1, true)
 		GameTooltip:AddLine(" ")
 	end
@@ -101,7 +101,7 @@ local OnEnter = function(self)
 
 	if NumOnlineAndMobile > MaxCharacters then
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(NumOnlineAndMobile - MaxCharacters .. Language[" more characters not shown"], 1, 1, 1)
+		GameTooltip:AddLine(NumOnlineAndMobile - MaxCharacters .. Language[" more characters not shown"], 0.75, 0.75, 0.75)
 	end
 
 	self.TooltipShown = true

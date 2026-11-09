@@ -4,7 +4,226 @@ if YxUI.IsMainline then
 	local LastAnchors
 	local HookedTracker
 	local HookedContainer
+	local HookedManager
+	local HookedFonts
 	local Editing
+
+	local function ApplyTrackerFonts()
+		if InCombatLockdown() then
+			return
+		end
+
+		local function SetTrackerFont(FontObject, Setting)
+			if not FontObject then
+				return
+			end
+
+			local Current, Size, Flags = FontObject:GetFont()
+			local Desired = YxUI:GetDisplayFontPath(Settings[Setting])
+			if Desired and Size and Current ~= Desired then
+				FontObject:SetFont(Desired, Size, Flags or "")
+			end
+		end
+
+		SetTrackerFont(ObjectiveTrackerHeaderFont, "ui-header-font")
+		SetTrackerFont(ObjectiveTrackerLineFont, "ui-widget-font")
+	end
+
+	local function StyleTrackerHeader(Header)
+		if not Header or Header.YxUIStyled or InCombatLockdown() then
+			return
+		end
+
+		for _, Key in ipairs({"Background", "Shine", "Glow"}) do
+			local Texture = Header[Key]
+			if Texture then
+				Texture:SetTexture(nil)
+			end
+		end
+
+		Header.YxUIStyled = true
+	end
+
+	local function GetTrackerColor(Key)
+		return YxUI:HexToRGB(Settings[Key] or Defaults[Key])
+	end
+
+	local function GetTrackerPixel(Region)
+		local Scale = Region:GetEffectiveScale()
+		if PixelUtil and PixelUtil.GetPixelToUIUnitFactor and Scale and Scale > 0 then
+			return PixelUtil.GetPixelToUIUnitFactor() / Scale
+		end
+		return 1
+	end
+
+	local function RoundToPixel(Value, Pixel)
+		return math.floor(Value / Pixel + 0.5) * Pixel
+	end
+
+	local function EvenPixelSize(Value, Pixel)
+		return math.max(2, math.floor(Value / Pixel / 2 + 0.5) * 2) * Pixel
+	end
+
+	local function AlignMinimizePanel(Panel, ResetAnchor)
+		local Button = Panel:GetParent()
+		local Header = Button:GetParent()
+		local Pixel = GetTrackerPixel(Button)
+
+		if Panel.YxUIPixelSize ~= Pixel then
+			-- Even physical-pixel dimensions avoid half-pixel edges on center-aligned UI.
+			Button:SetSize(EvenPixelSize(22, Pixel), EvenPixelSize(24, Pixel))
+			Panel.Fill:ClearAllPoints()
+			Panel.Fill:SetPoint("TOPLEFT", Panel, "TOPLEFT", Pixel, -Pixel)
+			Panel.Fill:SetPoint("BOTTOMRIGHT", Panel, "BOTTOMRIGHT", -Pixel, Pixel)
+			Panel.YxUIPixelSize = Pixel
+			ResetAnchor = true
+		end
+
+		if ResetAnchor then
+			Button:ClearAllPoints()
+			Button:SetPoint("TOPRIGHT", Header, "TOPRIGHT", RoundToPixel(-4, Pixel), RoundToPixel(-4, Pixel))
+		end
+
+		local Left, Top = Button:GetLeft(), Button:GetTop()
+		if Left and Top then
+			local DX = RoundToPixel(Left, Pixel) - Left
+			local DY = RoundToPixel(Top, Pixel) - Top
+			if math.abs(DX) > Pixel * 0.001 or math.abs(DY) > Pixel * 0.001 then
+				local Point, RelativeTo, RelativePoint, X, Y = Button:GetPoint(1)
+				if Point == "TOPRIGHT" and RelativeTo == Header then
+					Button:ClearAllPoints()
+					Button:SetPoint(Point, RelativeTo, RelativePoint, X + DX, Y + DY)
+				end
+			end
+		end
+	end
+
+	local function RefreshMinimizePanel(Panel)
+		AlignMinimizePanel(Panel)
+		local R, G, B = GetTrackerColor("ui-window-main-color")
+		Panel.Fill:SetColorTexture(R, G, B, 1)
+		Panel.Fill:SetAlpha(1)
+	end
+
+	local function StyleMinimizeButton(Header, IsMainHeader)
+		if not Header or InCombatLockdown() then
+			return
+		end
+
+		local Button = Header.MinimizeButton
+		if not Button or not Header.SetCollapsed then
+			return
+		end
+
+		if Header.YxUIMinimizeStyled then
+			if Header.YxUIMinimizePanel then
+				RefreshMinimizePanel(Header.YxUIMinimizePanel)
+			end
+			local Glyph = Header.YxUIMinimizeGlyph
+			if Glyph then
+				YxUI:SetFontInfo(Glyph, Settings["ui-widget-font"] or Defaults["ui-widget-font"], IsMainHeader and 18 or 16)
+				Glyph:SetTextColor(GetTrackerColor("ui-widget-color"))
+			end
+			return
+		end
+
+		-- Blizzard changes these atlases on every collapse, so hide the textures instead.
+		for _, Texture in ipairs({Button:GetNormalTexture(), Button:GetPushedTexture(), Button:GetHighlightTexture(), Button:GetDisabledTexture()}) do
+			if Texture then
+				Texture:SetAlpha(0)
+			end
+		end
+
+		local TextParent = Button
+		if IsMainHeader then
+			local Panel = CreateFrame("Frame", nil, Button)
+			Panel:SetAllPoints(Button)
+			Panel:EnableMouse(false)
+
+			-- Keep the fill above the border regardless of texture creation order.
+			Panel.Border = Panel:CreateTexture(nil, "BACKGROUND")
+			Panel.Border:SetAllPoints(Panel)
+			Panel.Border:SetColorTexture(0, 0, 0, 1)
+
+			Panel.Fill = Panel:CreateTexture(nil, "ARTWORK")
+			for _, Texture in ipairs({Panel.Border, Panel.Fill}) do
+				if Texture.SetSnapToPixelGrid then
+					Texture:SetSnapToPixelGrid(true)
+				end
+			end
+
+			Header.YxUIMinimizePanel = Panel
+			RefreshMinimizePanel(Panel)
+			Button:HookScript("OnShow", function()
+				RefreshMinimizePanel(Panel)
+			end)
+			TextParent = Panel
+		end
+
+		local Glyph = TextParent:CreateFontString(nil, "OVERLAY")
+		Glyph:SetPoint("CENTER", TextParent, 0, 0)
+		YxUI:SetFontInfo(Glyph, Settings["ui-widget-font"] or Defaults["ui-widget-font"], IsMainHeader and 18 or 16)
+		Glyph:SetTextColor(GetTrackerColor("ui-widget-color"))
+		Header.YxUIMinimizeGlyph = Glyph
+
+		hooksecurefunc(Header, "SetCollapsed", function(_, Collapsed)
+			Glyph:SetText(Collapsed and "+" or "-")
+		end)
+		Button:HookScript("OnEnter", function()
+			Glyph:SetTextColor(GetTrackerColor("ui-widget-bright-color"))
+		end)
+		Button:HookScript("OnLeave", function()
+			Glyph:SetTextColor(GetTrackerColor("ui-widget-color"))
+		end)
+
+		local Owner = Header:GetParent()
+		if Owner and Owner.IsCollapsed then
+			Glyph:SetText(Owner:IsCollapsed() and "+" or "-")
+		end
+		Header.YxUIMinimizeStyled = true
+	end
+
+	local function StyleMainlineTracker()
+		if InCombatLockdown() then
+			return
+		end
+
+		local Frame = ObjectiveTrackerFrame
+		if not Frame then
+			return
+		end
+
+		StyleMinimizeButton(Frame.Header, true)
+		StyleTrackerHeader(Frame.Header)
+
+		for _, Module in ipairs(Frame.modules or {}) do
+			StyleMinimizeButton(Module.Header)
+			StyleTrackerHeader(Module.Header)
+		end
+		ApplyTrackerFonts()
+
+		local Manager = ObjectiveTrackerManager
+		if Manager and Manager ~= HookedManager then
+			if Manager.SetModuleContainer then
+				hooksecurefunc(Manager, "SetModuleContainer", function(_, Module, Container)
+					StyleMinimizeButton(Module.Header)
+					if Container == ObjectiveTrackerFrame then
+						StyleTrackerHeader(Module.Header)
+					end
+				end)
+			end
+			if Manager.SetTextSize then
+				hooksecurefunc(Manager, "SetTextSize", ApplyTrackerFonts)
+			end
+			HookedManager = Manager
+		end
+
+		local Fonts = YxUI:GetModule("Fonts")
+		if Fonts and Fonts ~= HookedFonts and Fonts.ApplyUIFonts then
+			hooksecurefunc(Fonts, "ApplyUIFonts", ApplyTrackerFonts)
+			HookedFonts = Fonts
+		end
+	end
 
 	local function ShiftTracker()
 		local Frame = ObjectiveTrackerFrame
@@ -52,6 +271,10 @@ if YxUI.IsMainline then
 		for i = 1, Frame:GetNumPoints() do
 			LastAnchors[i] = {Frame:GetPoint(i)}
 		end
+
+		if Frame.Header and Frame.Header.YxUIMinimizePanel then
+			RefreshMinimizePanel(Frame.Header.YxUIMinimizePanel)
+		end
 	end
 
 	local function RestoreTrackerAnchor()
@@ -90,6 +313,12 @@ if YxUI.IsMainline then
 			hooksecurefunc(Frame, "ApplySystemAnchor", ShiftTracker)
 			hooksecurefunc(Frame, "OnEditModeEnter", RestoreTrackerAnchor)
 			hooksecurefunc(Frame, "OnEditModeExit", FinishEditing)
+			if Frame.AddModule then
+				hooksecurefunc(Frame, "AddModule", function(_, Module)
+					StyleMinimizeButton(Module.Header)
+					StyleTrackerHeader(Module.Header)
+				end)
+			end
 			HookedTracker = Frame
 		end
 
@@ -100,11 +329,13 @@ if YxUI.IsMainline then
 		end
 
 		ShiftTracker()
+		StyleMainlineTracker()
 	end
 
 	local Events = CreateFrame("Frame")
 	Events:RegisterEvent("PLAYER_ENTERING_WORLD")
 	Events:RegisterEvent("PLAYER_REGEN_ENABLED")
+	Events:RegisterEvent("UI_SCALE_CHANGED")
 	Events:RegisterEvent("ADDON_LOADED")
 	Events:SetScript("OnEvent", function(_, Event, AddOn)
 		if Event ~= "ADDON_LOADED" or AddOn == "Blizzard_ObjectiveTracker" then

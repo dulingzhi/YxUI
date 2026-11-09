@@ -412,6 +412,12 @@ function UF:UpdateGroupFonts(prefix)
 		}
 		self:ForEachHeaderChild(YxUI.UnitFrames[prefix], RefreshGroupFont, fontSettings)
 		self:ForEachHeaderChild(YxUI.UnitFrames[prefix .. "-pets"], RefreshGroupFont, fontSettings)
+		if YxUI.IsForever then
+			local descriptor = prefix == "party" and YxUI.PartyPreviewDescriptor or YxUI.RaidPreviewDescriptor
+			if descriptor and descriptor.preview then
+				self:ForEachHeaderChild(descriptor.preview.root, RefreshGroupFont, fontSettings)
+			end
+		end
 	end)
 end
 
@@ -428,6 +434,12 @@ function UF:UpdateGroupRange(prefix, field, value)
 	local data = {field = field, value = value / 100}
 	self:ForEachHeaderChild(YxUI.UnitFrames[prefix], RefreshGroupRange, data)
 	self:ForEachHeaderChild(YxUI.UnitFrames[prefix .. "-pets"], RefreshGroupRange, data)
+	if YxUI.IsForever then
+		local descriptor = prefix == "party" and YxUI.PartyPreviewDescriptor or YxUI.RaidPreviewDescriptor
+		if descriptor and descriptor.preview then
+			self:ForEachHeaderChild(descriptor.preview.root, RefreshGroupRange, data)
+		end
+	end
 end
 
 function UF:UpdateGroupFrames(descriptor, operation, value)
@@ -457,9 +469,96 @@ function UF:UpdateGroupFrames(descriptor, operation, value)
 		self:ForEachHeaderChild(YxUI.UnitFrames[descriptor.petHeader], Operations.highlight, value, descriptor)
 	end
 
+	if descriptor.preview then
+		self:ForEachHeaderChild(descriptor.preview.root, Operations[operation], value, descriptor)
+		self:LayoutGroupPreview(descriptor)
+	end
+
 	if descriptor.afterUpdate then
 		descriptor.afterUpdate(operation)
 	end
+end
+
+local function OppositePoint(point)
+	if point == "LEFT" then return "RIGHT" end
+	if point == "RIGHT" then return "LEFT" end
+	if point == "TOP" then return "BOTTOM" end
+	return "TOP"
+end
+
+local function PointOffset(point, value)
+	if point == "LEFT" then return value, 0 end
+	if point == "RIGHT" then return -value, 0 end
+	if point == "TOP" then return 0, -value end
+	return 0, value
+end
+
+function UF:LayoutGroupPreview(descriptor)
+	local preview = descriptor.preview
+	if not preview or InCombatLockdown() then return end
+
+	local raid = descriptor.header == "raid"
+	local point = Setting(descriptor, "-point")
+	local width = Setting(descriptor, "-width")
+	local height = Setting(descriptor, "-health-height") + Setting(descriptor, "-power-height") + 3
+	local spacing = raid and 0 or Setting(descriptor, "-spacing")
+	local perColumn = raid and math.max(1, Setting(descriptor, "-units-per-column")) or #preview.frames
+	local maxColumns = raid and math.max(1, Setting(descriptor, "-max-columns")) or 1
+	local columnPoint = raid and Setting(descriptor, "-column-anchor") or "TOP"
+	local xOffset, yOffset
+
+	if raid then
+		xOffset, yOffset = Setting(descriptor, "-x-offset"), Setting(descriptor, "-y-offset")
+	else
+		xOffset, yOffset = self:GetGrowthOffsets(point, spacing)
+	end
+
+	for index, frame in ipairs(preview.frames) do
+		frame:SetSize(width, height)
+		frame:ClearAllPoints()
+		local column = math.floor((index - 1) / perColumn)
+		if column >= maxColumns then
+			frame:Hide()
+		elseif index == 1 then
+			frame:Show()
+			frame:SetPoint(point, preview.root, point)
+		else
+			frame:Show()
+			if (index - 1) % perColumn == 0 then
+				local x, y = PointOffset(columnPoint, Setting(descriptor, "-column-spacing") or 0)
+				frame:SetPoint(columnPoint, preview.frames[index - perColumn], OppositePoint(columnPoint), x, y)
+			else
+				local x = (point == "LEFT" or point == "RIGHT") and xOffset or 0
+				local y = (point == "TOP" or point == "BOTTOM") and yOffset or 0
+				frame:SetPoint(point, preview.frames[index - 1], OppositePoint(point), x, y)
+			end
+		end
+	end
+end
+
+local function CreateGroupPreview(descriptor)
+	local raid = descriptor.header == "raid"
+	local anchor = raid and UF.RaidAnchor or UF.PartyAnchor
+	if not anchor then return end
+
+	local root = CreateFrame("Frame", nil, YxUI.UIParent)
+	root:SetAllPoints(anchor)
+	root:Hide()
+
+	local frames = {}
+	for index = 1, raid and 25 or 5 do
+		local name = "YxUI" .. (raid and "Raid" or "Party") .. "TestPreview" .. index
+		local frame = CreateFrame("Button", name, root, "SecureUnitButtonTemplate")
+		frame:SetSize(Setting(descriptor, "-width"), Setting(descriptor, "-health-height") + Setting(descriptor, "-power-height") + 3)
+		frame:SetAttribute("unit", "player")
+		YxUI.UnitFrames:InitializeHeaderChild(frame, "player", YxUI.StyleFuncs[descriptor.header])
+		frame:EnableMouse(false)
+		frames[index] = frame
+	end
+
+	descriptor.preview = {root = root, frames = frames}
+	UF:LayoutGroupPreview(descriptor)
+	return descriptor.preview
 end
 
 local function SetTestFrame(frame, shown, pet)
@@ -485,6 +584,22 @@ function UF:ToggleGroupTest(descriptor)
 	if InCombatLockdown() then
 		YxUI:print(ERR_NOT_IN_COMBAT)
 
+		return
+	end
+
+	if YxUI.IsForever then
+		local preview = descriptor.preview or CreateGroupPreview(descriptor)
+		if not preview then return end
+
+		if preview.root:IsShown() then
+			preview.root:Hide()
+		else
+			self:LayoutGroupPreview(descriptor)
+			preview.root:Show()
+			for _, frame in ipairs(preview.frames) do
+				frame:Refresh("TestPreview")
+			end
+		end
 		return
 	end
 

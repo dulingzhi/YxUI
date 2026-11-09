@@ -4,38 +4,33 @@ local GetRangedCritChance = GetRangedCritChance
 local GetSpellCritChance = GetSpellCritChance
 local GetCritChance = GetCritChance
 local Label = CRIT_ABBR
-local LastCrit, LastCritType, LastRatingIndex
+local IsReadable = YxUI.IsDataTextReadable
 
-local IsSecret = function(value)
-	return YxUI.IsForever and issecretvalue and issecretvalue(value)
-end
+local GetCritData = function(anchor)
+	local Crit, CritType, RatingIndex
 
-local GetCritData = function()
 	if YxUI.UserClass == "HUNTER" then
-		local Crit = GetRangedCritChance()
-
-		if IsSecret(Crit) then
-			return LastCrit, LastCritType, LastRatingIndex
+		local Ranged = GetRangedCritChance()
+		if IsReadable(Ranged) then
+			Crit, CritType, RatingIndex = Ranged, RANGED_CRIT_CHANCE, CR_CRIT_RANGED
 		end
-
-		LastCrit, LastCritType, LastRatingIndex = Crit, RANGED_CRIT_CHANCE, CR_CRIT_RANGED
-		return LastCrit, LastCritType, LastRatingIndex
-	end
-
-	local Spell = GetSpellCritChance()
-	local Melee = GetCritChance()
-
-	if IsSecret(Spell) or IsSecret(Melee) then
-		return LastCrit, LastCritType, LastRatingIndex
-	end
-
-	if Spell > Melee then
-		LastCrit, LastCritType, LastRatingIndex = Spell, SPELL_CRIT_CHANCE, CR_CRIT_SPELL
 	else
-		LastCrit, LastCritType, LastRatingIndex = Melee, MELEE_CRIT_CHANCE, CR_CRIT_MELEE
+		local Spell = GetSpellCritChance()
+		local Melee = GetCritChance()
+		if IsReadable(Spell) and IsReadable(Melee) then
+			if Spell > Melee then
+				Crit, CritType, RatingIndex = Spell, SPELL_CRIT_CHANCE, CR_CRIT_SPELL
+			else
+				Crit, CritType, RatingIndex = Melee, MELEE_CRIT_CHANCE, CR_CRIT_MELEE
+			end
+		end
 	end
 
-	return LastCrit, LastCritType, LastRatingIndex
+	local Current = Crit and {Crit, CritType, RatingIndex} or nil
+	local Data = YxUI.GetDataTextLastValue(anchor, Current)
+	if Data then
+		return Data[1], Data[2], Data[3]
+	end
 end
 
 local OnEnter = function(self)
@@ -43,18 +38,21 @@ local OnEnter = function(self)
 		return
 	end
 
-	local Crit, CritType, RatingIndex = GetCritData()
+	local Crit, CritType, RatingIndex = GetCritData(self)
 
+	GameTooltip:AddLine(Label, 1, 0.82, 0)
+	GameTooltip:AddLine(" ")
 	if Crit == nil then
-		GameTooltip:AddLine(format("%s: --", Label))
+		GameTooltip:AddDoubleLine(Label, "--", 1, 1, 1, 1, 1, 1)
 	else
-		GameTooltip:AddLine(format("%s %.2f%%", CritType, Crit))
+		GameTooltip:AddDoubleLine(CritType, format("%.2f%%", Crit), 1, 1, 1, 1, 1, 1)
 
 		local Rating = GetCombatRating(RatingIndex)
 		local Bonus = GetCombatRatingBonus(RatingIndex)
 
-		if not IsSecret(Rating) and not IsSecret(Bonus) then
-			GameTooltip:AddLine(format(CR_CRIT_TOOLTIP, Rating, Bonus), 1, 1, 1)
+		if IsReadable(Rating) and IsReadable(Bonus) then
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddLine(format(CR_CRIT_TOOLTIP, Rating, Bonus), 0.75, 0.75, 0.75, true)
 		end
 	end
 
@@ -78,7 +76,7 @@ local Update = function(self, event, unit)
 		return
 	end
 
-	local Crit = GetCritData()
+	local Crit = GetCritData(self)
 
 	if Crit == nil then
 		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s--|r", Settings["data-text-label-color"], Label, YxUI.ValueColor)

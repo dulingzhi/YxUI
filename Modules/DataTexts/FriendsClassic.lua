@@ -86,6 +86,7 @@ local ProjectIDToName = {
 	[5] = EXPANSION_NAME1,
 	[11] = EXPANSION_NAME2,
 	[14] = EXPANSION_NAME3,
+	[18] = Language["World of Warcraft: Forever"],
 	[19] = EXPANSION_NAME4,
 }
 
@@ -216,7 +217,7 @@ local OnEnter = function(self)
 		ID = 11
 	end
 
-	GameTooltip:AddDoubleLine(Label, format("%s/%s", NumBNOnline + NumFriendsOnline, NumFriends + NumBNFriends), nil, nil, nil, 1, 1, 1)
+	GameTooltip:AddDoubleLine(Label, format("%s/%s", NumBNOnline + NumFriendsOnline, NumFriends + NumBNFriends), 1, 0.82, 0, 1, 1, 1)
 	GameTooltip:AddLine(" ")
 
 	-- B.Net friends
@@ -278,7 +279,7 @@ local OnEnter = function(self)
 	end
 
 	for client, info in next, FriendList do
-		GameTooltip:AddLine(client)
+		GameTooltip:AddLine(client, 1, 0.82, 0)
 		ClientCount = ClientCount + 1
 
 		for i = 1, #info do

@@ -42,31 +42,48 @@ function Bubbles:PrepareSettings()
 end
 
 function Bubbles:RefreshBubble(bubble)
-	local Child = bubble:GetChildren()
-
-	if not Child or Child:IsForbidden() or not Child.String or not bubble.Backdrop then
+	if not bubble or bubble:IsForbidden() then
 		return
 	end
 
-	YxUI:SetFontInfo(Child.String, self.Font, self.FontSize, self.FontFlags)
-	bubble.Backdrop:SetBackdropColor(self.WindowColorR, self.WindowColorG, self.WindowColorB, self.Opacity)
+	local Child = bubble:GetChildren()
+	if not Child or Child:IsForbidden() then
+		return
+	end
+
+	local String = Child.String
+	local Backdrop = bubble.Backdrop
+	if not String or String:IsForbidden() or not Backdrop or Backdrop:IsForbidden() then
+		return
+	end
+
+	YxUI:SetFontInfo(String, self.Font, self.FontSize, self.FontFlags)
+	Backdrop:SetBackdropColor(self.WindowColorR, self.WindowColorG, self.WindowColorB, self.Opacity)
 end
 
 function Bubbles:SkinBubble(bubble)
-	local Child = bubble:GetChildren()
-
-	if not Child or Child:IsForbidden() or not Child.String then
+	if not bubble or bubble:IsForbidden() then
 		return
 	end
 
-	if Child.Tail then Child.Tail:Hide() end
+	local Child = bubble:GetChildren()
+	if not Child or Child:IsForbidden() then
+		return
+	end
+
+	local String = Child.String
+	if not String or String:IsForbidden() then
+		return
+	end
+
+	if Child.Tail and not Child.Tail:IsForbidden() then Child.Tail:Hide() end
 	Child:DisableDrawLayer("BORDER")
 
 	if Child.SetBackdrop then
 		Child:SetBackdrop(nil)
 	end
 
-	YxUI:SetFontInfo(Child.String, self.Font, self.FontSize, self.FontFlags)
+	YxUI:SetFontInfo(String, self.Font, self.FontSize, self.FontFlags)
 
 	bubble.Backdrop = CreateFrame("Frame", nil, Child, "BackdropTemplate")
 	bubble.Backdrop:SetPoint("TOPLEFT", Child, 4, -4)
@@ -90,11 +107,13 @@ function Bubbles:OnUpdate(elapsed)
 		local FoundUnskinned = false
 
 		for Index, Bubble in next, GetAllChatBubbles() do
-			if not Bubble.Skinned then
-				self:SkinBubble(Bubble)
-				FoundUnskinned = FoundUnskinned or Bubble.Skinned
-			elseif self.NeedsRefresh then
-				self:RefreshBubble(Bubble)
+			if Bubble and not Bubble:IsForbidden() then
+				if not Bubble.Skinned then
+					self:SkinBubble(Bubble)
+					FoundUnskinned = FoundUnskinned or Bubble.Skinned
+				elseif self.NeedsRefresh then
+					self:RefreshBubble(Bubble)
+				end
 			end
 		end
 

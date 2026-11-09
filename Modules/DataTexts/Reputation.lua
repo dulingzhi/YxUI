@@ -1,6 +1,8 @@
 local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local format = format
+local IsReadable = YxUI.IsDataTextReadable
+local IsSecret = function(v) return issecretvalue and issecretvalue(v) end
 local floor = math.floor
 local GetWatchedFactionInfo = GetWatchedFactionInfo
 local GetWatchedFactionData = C_Reputation and C_Reputation.GetWatchedFactionData
@@ -10,6 +12,9 @@ local GetFriendshipReputation = YxUI.IsMainline and C_GossipInfo and C_GossipInf
 local GetFriendshipReputationRanks = YxUI.IsMainline and C_GossipInfo and C_GossipInfo.GetFriendshipReputationRanks
 
 local GetProgress = function(minimum, maximum, current)
+	if IsSecret(minimum) or IsSecret(maximum) or IsSecret(current) then
+		return 0, 0, 0, 0
+	end
 	minimum = minimum or 0
 	local Range = math.max(0, (maximum or minimum) - minimum)
 
@@ -28,7 +33,10 @@ local GetWatchedProgress = function()
 
 	if GetWatchedFactionData then
 		local Data = GetWatchedFactionData()
-		if Data then
+		if IsSecret(Data) then
+			return nil, true
+		end
+		if IsReadable(Data) then
 			Name = Data.name
 			StandingID = Data.reaction
 			Min = Data.currentReactionThreshold
@@ -40,14 +48,17 @@ local GetWatchedProgress = function()
 		Name, StandingID, Min, Max, Value, FactionID = GetWatchedFactionInfo()
 	end
 
-	if not Name then
-		return nil
+	if not IsReadable(Name) or IsSecret(StandingID) or IsSecret(Min) or IsSecret(Max) or IsSecret(Value) or IsSecret(FactionID) then
+		return nil, IsSecret(Name) or IsSecret(StandingID) or IsSecret(Min) or IsSecret(Max) or IsSecret(Value) or IsSecret(FactionID)
 	end
 
 	if FactionID and GetMajorFactionData then
 		local Data = GetMajorFactionData(FactionID)
-		if Data and Data.renownLevel then
+		if IsReadable(Data) and IsReadable(Data.renownLevel) and not IsSecret(Data.maxLevel) and not IsSecret(Data.renownReputationEarned) and not IsSecret(Data.renownLevelThreshold) then
 			local AtMax = (Data.maxLevel and Data.renownLevel >= Data.maxLevel) or (HasMaximumRenown and HasMaximumRenown(FactionID))
+			if IsSecret(AtMax) then
+				return nil, true
+			end
 			local Current = Data.renownReputationEarned or 0
 			local Threshold = Data.renownLevelThreshold or 0
 			if AtMax then
@@ -59,8 +70,12 @@ local GetWatchedProgress = function()
 
 	if FactionID and GetFriendshipReputation then
 		local Data = GetFriendshipReputation(FactionID)
-		if Data and Data.friendshipFactionID and Data.friendshipFactionID > 0 then
+		if IsReadable(Data) and IsReadable(Data.friendshipFactionID) and Data.friendshipFactionID > 0
+			and not IsSecret(Data.reactionThreshold) and not IsSecret(Data.nextThreshold) and not IsSecret(Data.standing) and not IsSecret(Data.reaction) then
 			local Rank = GetFriendshipReputationRanks and GetFriendshipReputationRanks(FactionID)
+			if IsSecret(Rank) or (Rank and (IsSecret(Rank.currentLevel) or IsSecret(Rank.maxLevel))) then
+				return nil, true
+			end
 			local Minimum = Data.reactionThreshold or 0
 			local Maximum = Data.nextThreshold or Minimum
 			return Name, "friendship", Minimum, Maximum, Data.standing or Minimum, Data.reaction, Rank and Rank.currentLevel, Rank and Rank.maxLevel
@@ -71,6 +86,9 @@ local GetWatchedProgress = function()
 end
 
 local OnMouseUp = function()
+	if InCombatLockdown() then
+		return
+	end
 	ToggleCharacter("ReputationFrame")
 end
 
@@ -118,16 +136,19 @@ end
 local Update = function(self)
 	local Name, Kind, Min, Max, Value, Standing = GetWatchedProgress()
 	if not Name then
-		self.Text:SetText("")
+		local Cached = Kind == true and YxUI.GetDataTextLastValue(self, nil)
+		self.Text:SetText(Cached or "")
 		return
 	end
 
 	local _, _, Percent = GetProgress(Min, Max, Value)
+	local Display
 	if Kind == "renown" then
-		self.Text:SetText(format("|cff%sR%s: %s%%|r", YxUI.ValueColor, Standing, Percent))
+		Display = format("|cff%sR%s: %s%%|r", YxUI.ValueColor, Standing, Percent)
 	else
-		self.Text:SetText(format("|cff%s%s%%|r", YxUI.ValueColor, Percent))
+		Display = format("|cff%s%s%%|r", YxUI.ValueColor, Percent)
 	end
+	self.Text:SetText(YxUI.GetDataTextLastValue(self, Display))
 end
 
 local OnEnable = function(self)

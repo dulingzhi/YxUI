@@ -23,6 +23,21 @@ local UpdateElapsed = function(self)
 	end
 end
 
+local OnEnter = function(self)
+	if not self:SetTooltip() then return end
+
+	local now = GetTime()
+	local current = self.CombatStart and math.max(0, now - self.CombatStart) or 0
+	GameTooltip:AddLine("Combat Time", 1, 0.82, 0)
+	GameTooltip:AddLine(" ")
+	GameTooltip:AddDoubleLine("Current combat", SecondsToTime(current), 1, 1, 1, 1, 1, 1)
+	GameTooltip:Show()
+end
+
+local OnLeave = function()
+	GameTooltip:Hide()
+end
+
 local StartCombat = function(self)
 	if self.Ticker then
 		self.Ticker:Cancel()
@@ -45,8 +60,8 @@ local Update = function(self, event)
 			self.Ticker = nil
 		end
 
-		UpdateElapsed(self)
 		self.CombatStart = nil
+		self.Text:SetText(SecondsToTime(0))
 		self.Text:SetTextColor(1, 1, 1)
 	end
 end
@@ -55,7 +70,8 @@ local OnEnable = function(self)
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:SetScript("OnEvent", Update)
-
+	self:SetScript("OnEnter", OnEnter)
+	self:SetScript("OnLeave", OnLeave)
 	self.Text:SetText(SecondsToTime(0))
 	self.Text:SetTextColor(1, 1, 1)
 
@@ -73,6 +89,8 @@ local OnDisable = function(self)
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	self:SetScript("OnEvent", nil)
+	self:SetScript("OnEnter", nil)
+	self:SetScript("OnLeave", nil)
 	self.CombatStart = nil
 	self.Text:SetText("")
 	self.Text:SetTextColor(1, 1, 1)

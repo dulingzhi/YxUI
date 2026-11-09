@@ -5,8 +5,13 @@ local UF = YxUI:GetModule("Unit Frames")
 local Hider = assert(UF.Hider, "unit-frame core must create the hider")
 local AuraButtons = setmetatable({}, {__mode = "k"})
 
+local function IsInaccessible(value)
+	return YxUI.IsMainline and issecretvalue and issecretvalue(value) and not (canaccessvalue and canaccessvalue(value))
+end
+
 local UnregisterAuraTimer = function(button)
 	YxUI.DurationText:Unregister(button)
+	button.__auraTimerExpiration = nil
 	button.LastAuraTime = nil
 
 	if button.Time then
@@ -23,6 +28,7 @@ local function FormatAuraRemaining(remaining)
 end
 
 local function ClearAuraTimer(button)
+	button.__auraTimerExpiration = nil
 	button.LastAuraTime = nil
 	button.Time:Hide()
 end
@@ -33,6 +39,7 @@ local RegisterAuraTimer = function(button, expiration)
 		return
 	end
 	button.Time:Show()
+	button.__auraTimerExpiration = expiration
 	YxUI.DurationText:Register(button, button.Time, FormatAuraRemaining, GetAuraRemaining, ClearAuraTimer)
 end
 
@@ -63,6 +70,62 @@ UF.NPThreatPostUpdate = function(self, unit, status, r, g, b)
 	end
 end
 
+local function UpdateAuraAppearance(self, button, duration, expiration, debuffType, isStealable)
+	local cooldown = button.cd
+	if cooldown then
+		if duration and duration > 0 and expiration then
+			local start = expiration - duration
+			if button.__cooldownStart ~= start or button.__cooldownDuration ~= duration or not cooldown:IsShown() then
+				cooldown:SetCooldown(start, duration)
+				button.__cooldownStart, button.__cooldownDuration = start, duration
+			end
+			if not cooldown:IsShown() then
+				cooldown:Show()
+			end
+		else
+			button.__cooldownStart, button.__cooldownDuration = nil, nil
+			if cooldown:IsShown() then
+				cooldown:Hide()
+			end
+		end
+	end
+
+	local color = debuffType and debuffType ~= "" and self.__owner.colors.debuff[debuffType]
+	local borderKind = color and debuffType or (button.__container.showStealableBuffs and isStealable and "stealable")
+	if not button.__auraBorderValid or button.__auraBorderKind ~= borderKind then
+		button.__auraBorderValid = true
+		button.__auraBorderKind = borderKind
+		if color then
+			button.DebuffType:SetBackdropBorderColor(color[1], color[2], color[3])
+			button.DebuffType:Show()
+		elseif borderKind == "stealable" then
+			button.DebuffType:SetBackdropBorderColor(0.2, 0.6, 1)
+			button.DebuffType:Show()
+		else
+			button.DebuffType:Hide()
+		end
+	end
+
+	local desaturated = not not (button.filter == "HARMFUL" and not button.isPlayer and debuffType and debuffType ~= "")
+	if button.__auraDesaturated ~= desaturated then
+		button.icon:SetDesaturated(desaturated)
+		button.__auraDesaturated = desaturated
+	end
+
+	if expiration and expiration ~= 0 then
+		button.Expiration = expiration
+		if Settings["unitframes-display-aura-timers"] and button.__auraTimerExpiration ~= expiration then
+			UnregisterAuraTimer(button)
+			RegisterAuraTimer(button, expiration)
+		end
+	else
+		button.Expiration = nil
+		if button.__auraTimerExpiration then
+			UnregisterAuraTimer(button)
+		end
+	end
+end
+
 if YxUI.IsVanilla then
 	local LCD = LibStub("LibClassicDurations")
 	local UnitAura = UnitAura
@@ -70,77 +133,16 @@ if YxUI.IsVanilla then
 	LCD:Register("YxUI")
 
 	UF.PostUpdateIcon = function(self, unit, button, index, position, duration, expiration, debuffType, isStealable)
-		UnregisterAuraTimer(button)
-
-		local Name, _, _, _, Duration, Expiration, Caster, _, _, SpellID = UnitAura(unit, index, button.filter)
-		local DurationNew, ExpirationNew = LCD:GetAuraDurationByUnit(unit, SpellID, Caster, Name)
-
-		if Duration == 0 and DurationNew then
-			Duration = DurationNew
-			Expiration = ExpirationNew
+		local name, _, _, _, auraDuration, auraExpiration, caster, _, _, spellID = UnitAura(unit, index, button.filter)
+		local estimatedDuration, estimatedExpiration = LCD:GetAuraDurationByUnit(unit, spellID, caster, name)
+		if auraDuration == 0 and estimatedDuration then
+			auraDuration, auraExpiration = estimatedDuration, estimatedExpiration
 		end
-
-		if button.cd then
-			if Duration and Duration > 0 then
-				button.cd:SetCooldown(Expiration - Duration, Duration)
-				button.cd:SetDrawEdge(false)
-				button.cd:Show()
-			else
-				button.cd:Hide()
-			end
-		end
-
-		if debuffType then
-			local Color = self.__owner.colors.debuff[debuffType]
-
-			button.DebuffType:SetBackdropBorderColor(Color[1], Color[2], Color[3])
-			button.DebuffType:Show()
-		else
-			button.DebuffType:Hide()
-		end
-
-		if (button.filter == "HARMFUL") and (not button.isPlayer) and debuffType then
-			button.icon:SetDesaturated(true)
-		else
-			button.icon:SetDesaturated(false)
-		end
-
-		if Expiration and Expiration ~= 0 then
-			RegisterAuraTimer(button, Expiration)
-		end
+		UpdateAuraAppearance(self, button, auraDuration, auraExpiration, debuffType, isStealable)
 	end
 else
 	UF.PostUpdateIcon = function(self, unit, button, index, position, duration, expiration, debuffType, isStealable)
-		UnregisterAuraTimer(button)
-
-		if button.cd then
-			if duration and duration > 0 then
-				button.cd:SetCooldown(expiration - duration, duration)
-				button.cd:SetDrawEdge(false)
-				button.cd:Show()
-			else
-				button.cd:Hide()
-			end
-		end
-
-		if debuffType and debuffType ~= "" then
-			local Color = self.__owner.colors.debuff[debuffType]
-
-			button.DebuffType:SetBackdropBorderColor(Color[1], Color[2], Color[3])
-			button.DebuffType:Show()
-		else
-			button.DebuffType:Hide()
-		end
-
-		if (button.filter == "HARMFUL") and (not button.isPlayer) and debuffType then
-			button.icon:SetDesaturated(true)
-		else
-			button.icon:SetDesaturated(false)
-		end
-
-		if expiration and expiration ~= 0 then
-			RegisterAuraTimer(button, expiration)
-		end
+		UpdateAuraAppearance(self, button, duration, expiration, debuffType, isStealable)
 	end
 end
 
@@ -155,7 +157,10 @@ end
 UF.PostCreateIcon = function(unit, button)
 	AuraButtons[button] = true
 	UnregisterAuraTimer(button)
-	button:HookScript("OnHide", UnregisterAuraTimer)
+	button:HookScript("OnHide", function(self)
+		UnregisterAuraTimer(self)
+		self.__auraPostValid = nil
+	end)
 	button:SetScript("OnMouseUp", CancelAuraOnMouseUp)
 
 	button.bg = button:CreateTexture(nil, "BACKGROUND")
@@ -183,6 +188,7 @@ UF.PostCreateIcon = function(unit, button)
 	YxUI:SetFontInfo(button.count, Settings["unitframes-font"], Settings["unitframes-font-size"], "OUTLINE")
 
 	button.Time = button.cd:CreateFontString(nil, "OVERLAY")
+	button.Time:Hide()
 	YxUI:SetFontInfo(button.Time, Settings["unitframes-font"], Settings["unitframes-font-size"], "OUTLINE")
 	button.Time:SetPoint("TOPLEFT", -1, -1)
 	button.Time:SetJustifyH("LEFT")
@@ -516,6 +522,41 @@ local function LayoutAura(container, button, position, columns, stride, anchor, 
 	button:SetPoint(anchor, container, anchor, column * stride * growthX, row * stride * growthY)
 end
 
+local function UpdateAuraButton(frame, container, button, position, index, filter, icon, count, debuffType, duration, expiration, caster, stealable, spellID, instanceID)
+	local isPlayer = caster == "player" or caster == "pet" or caster == "vehicle"
+	local displayCount = count and count > 1 and count or ""
+	local first = not button.__auraPostValid or button.__auraSpellID ~= spellID or button.__auraInstanceID ~= instanceID
+
+	button.__index, button.filter, button.isPlayer, button.__auraPosition = index, filter, isPlayer, position
+
+	if first or button.__auraIcon ~= icon then
+		button.icon:SetTexture(icon)
+		button.__auraIcon = icon
+	end
+	if first or button.__auraCount ~= displayCount then
+		button.count:SetText(displayCount)
+		button.__auraCount = displayCount
+	end
+
+	if container.PostUpdateIcon and (YxUI.IsVanilla or first or button.__auraDuration ~= duration
+		or button.__auraExpiration ~= expiration or button.__auraDebuffType ~= debuffType
+		or button.__auraStealable ~= stealable or button.__auraPlayer ~= isPlayer
+		or button.__auraStealableEnabled ~= container.showStealableBuffs) then
+		container:PostUpdateIcon(frame.unit, button, index, position, duration, expiration, debuffType, stealable)
+	end
+
+	button.__auraPostValid = true
+	button.__auraSpellID, button.__auraInstanceID = spellID, instanceID
+	button.__auraDuration, button.__auraExpiration = duration, expiration
+	button.__auraDebuffType, button.__auraStealable = debuffType, stealable
+	button.__auraPlayer, button.__auraCaster = isPlayer, caster
+	button.__auraStealableEnabled = container.showStealableBuffs
+
+	if not button:IsShown() then
+		button:Show()
+	end
+end
+
 local function UpdateAuraContainer(frame, container, filter)
 	local position, limit = 0, container.num or 32
 	local size, spacing = container.size, container.spacing or 0
@@ -537,6 +578,14 @@ local function UpdateAuraContainer(frame, container, filter)
 	end
 
 	local layoutVersion = container.__layoutVersion
+	local lookup = container.__auraLookup
+	if not lookup then
+		lookup = {}
+		container.__auraLookup = lookup
+	end
+	for instanceID in pairs(lookup) do
+		lookup[instanceID] = nil
+	end
 
 	EnumerateAuras(frame.unit, filter, function(index, name, icon, count, debuffType, duration, expiration, caster, stealable, spellID, auraData)
 		local isPlayer = caster == "player" or caster == "pet" or caster == "vehicle"
@@ -546,12 +595,15 @@ local function UpdateAuraContainer(frame, container, filter)
 		end
 
 		if container.CustomFilter then
-			local aura = {
-				name = name,
-				spellId = spellID,
-				sourceUnit = caster,
-				isFromPlayerOrPlayerPet = isPlayer,
-			}
+			local aura = container.__filterAura
+			if not aura then
+				aura = {}
+				container.__filterAura = aura
+			end
+			aura.name = name
+			aura.spellId = spellID
+			aura.sourceUnit = caster
+			aura.isFromPlayerOrPlayerPet = isPlayer
 
 			if not container:CustomFilter(frame.unit, aura, frame) then
 				return
@@ -563,11 +615,14 @@ local function UpdateAuraContainer(frame, container, filter)
 		end
 
 		position = position + 1
-
 		local button = AcquireAuraButton(container, position)
-		button.__index, button.filter, button.isPlayer = index, filter, isPlayer
-		button.icon:SetTexture(icon)
-		button.count:SetText(count and count > 1 and count or "")
+		local instanceID = auraData and auraData.auraInstanceID
+		if not IsInaccessible(instanceID) and instanceID then
+			lookup[instanceID] = button
+		else
+			instanceID = nil
+		end
+
 		if button.__layoutVersion ~= layoutVersion then
 			if button.__auraSize ~= size then
 				button:SetSize(size, size)
@@ -576,25 +631,126 @@ local function UpdateAuraContainer(frame, container, filter)
 			LayoutAura(container, button, position, columns, stride, anchor, growthX, growthY)
 			button.__layoutVersion = layoutVersion
 		end
-		button:Show()
 
-		if container.showStealableBuffs and stealable then
-			button.DebuffType:SetBackdropBorderColor(0.2, 0.6, 1)
-			button.DebuffType:Show()
-		end
-
-		if container.PostUpdateIcon then
-			container:PostUpdateIcon(frame.unit, button, index, position, duration, expiration, debuffType, stealable)
-		end
+		UpdateAuraButton(frame, container, button, position, index, filter, icon, count, debuffType, duration, expiration, caster, stealable, spellID, instanceID)
 	end)
 
 	for index = position + 1, #container do
-		container[index]:Hide()
-		UnregisterAuraTimer(container[index])
+		local button = container[index]
+		if button:IsShown() then
+			button:Hide()
+		elseif button.__auraTimerExpiration then
+			UnregisterAuraTimer(button)
+		end
 	end
+
+	local guid = UnitGUID(frame.unit)
+	container.__auraUnitGUID = not IsInaccessible(guid) and guid or nil
 end
 
-local function UpdateAuras(frame, event, unit)
+local function IsReadableAura(aura)
+	if IsInaccessible(aura) or not aura then
+		return false
+	end
+	return not IsInaccessible(aura.auraInstanceID)
+		and not IsInaccessible(aura.name) and not IsInaccessible(aura.icon)
+		and not IsInaccessible(aura.applications) and not IsInaccessible(aura.dispelName)
+		and not IsInaccessible(aura.duration) and not IsInaccessible(aura.expirationTime)
+		and not IsInaccessible(aura.sourceUnit) and not IsInaccessible(aura.isStealable)
+		and not IsInaccessible(aura.spellId) and not IsInaccessible(aura.isHelpful)
+		and not IsInaccessible(aura.isHarmful)
+end
+
+local function TryIncrementalAuraContainer(frame, container, filter, updateInfo)
+	if not YxUI.IsMidnight or IsInaccessible(updateInfo) or not updateInfo
+		or IsInaccessible(updateInfo.isFullUpdate) or updateInfo.isFullUpdate
+		or IsInaccessible(updateInfo.addedAuras) or IsInaccessible(updateInfo.removedAuraInstanceIDs)
+		or (updateInfo.removedAuraInstanceIDs and #updateInfo.removedAuraInstanceIDs > 0)
+		or not (C_UnitAuras and C_UnitAuras.GetAuraDataByAuraInstanceID) then
+		return false
+	end
+
+	local added = updateInfo.addedAuras
+	if added then
+		for i = 1, #added do
+			local aura = added[i]
+			if IsInaccessible(aura) or not aura or IsInaccessible(aura.isHelpful) or IsInaccessible(aura.isHarmful)
+				or not ((filter == "HELPFUL" and aura.isHarmful == true and aura.isHelpful == false)
+					or (filter == "HARMFUL" and aura.isHelpful == true and aura.isHarmful == false)) then
+				return false
+			end
+		end
+	end
+
+	if C_Secrets and C_Secrets.ShouldAurasBeSecret and C_Secrets.ShouldAurasBeSecret() then
+		return false
+	end
+
+	local guid = UnitGUID(frame.unit)
+	if IsInaccessible(guid) or not guid or container.__auraUnitGUID ~= guid then
+		return false
+	end
+
+	local updated = updateInfo.updatedAuraInstanceIDs
+	if IsInaccessible(updated) then
+		return false
+	end
+	if not updated or #updated == 0 then
+		return true
+	end
+
+	local lookup = container.__auraLookup
+	if not lookup then
+		return false
+	end
+
+	for i = 1, #updated do
+		local instanceID = updated[i]
+		if IsInaccessible(instanceID) then
+			return false
+		end
+		local aura = C_UnitAuras.GetAuraDataByAuraInstanceID(frame.unit, instanceID)
+		if not IsReadableAura(aura) then
+			return false
+		end
+
+		if (filter == "HELPFUL" and aura.isHarmful) or (filter == "HARMFUL" and aura.isHelpful) then
+			-- The other aura container owns this instance.
+		elseif not lookup[instanceID] then
+			-- A hidden aura might now pass a custom filter.
+			return false
+		else
+			local button = lookup[instanceID]
+			local indexedAura = C_UnitAuras.GetAuraDataByIndex(frame.unit, button.__index, filter)
+			if IsInaccessible(indexedAura) or not indexedAura or IsInaccessible(indexedAura.auraInstanceID)
+				or indexedAura.auraInstanceID ~= instanceID then
+				return false
+			end
+			local isPlayer = aura.sourceUnit == "player" or aura.sourceUnit == "pet" or aura.sourceUnit == "vehicle"
+			if button.__auraCaster ~= aura.sourceUnit or (container.onlyShowPlayer and not isPlayer) then
+				return false
+			end
+			if container.CustomFilter then
+				local filterAura = container.__filterAura
+				filterAura.name = aura.name
+				filterAura.spellId = aura.spellId
+				filterAura.sourceUnit = aura.sourceUnit
+				filterAura.isFromPlayerOrPlayerPet = isPlayer
+				if not container:CustomFilter(frame.unit, filterAura, frame) then
+					return false
+				end
+			end
+
+			UpdateAuraButton(frame, container, button, button.__auraPosition, button.__index, filter, aura.icon,
+				aura.applications, aura.dispelName, aura.duration, aura.expirationTime,
+				aura.sourceUnit, aura.isStealable, aura.spellId, instanceID)
+		end
+	end
+
+	return true
+end
+
+local function UpdateAuras(frame, event, unit, updateInfo)
 	if unit and unit ~= frame.unit then
 		return
 	end
@@ -604,11 +760,11 @@ local function UpdateAuras(frame, event, unit)
 		return
 	end
 
-	if frame.Buffs then
+	if frame.Buffs and not (event == "UNIT_AURA" and TryIncrementalAuraContainer(frame, frame.Buffs, "HELPFUL", updateInfo)) then
 		UpdateAuraContainer(frame, frame.Buffs, "HELPFUL")
 	end
 
-	if frame.Debuffs then
+	if frame.Debuffs and not (event == "UNIT_AURA" and TryIncrementalAuraContainer(frame, frame.Debuffs, "HARMFUL", updateInfo)) then
 		UpdateAuraContainer(frame, frame.Debuffs, "HARMFUL")
 	end
 end
@@ -653,8 +809,15 @@ local function DisableAuraContainer(container)
 
 	container:Hide()
 
+	container.__auraUnitGUID = nil
+	if container.__auraLookup then
+		for instanceID in pairs(container.__auraLookup) do
+			container.__auraLookup[instanceID] = nil
+		end
+	end
 	for i = 1, #container do
 		UnregisterAuraTimer(container[i])
+		container[i].__auraPostValid = nil
 	end
 end
 

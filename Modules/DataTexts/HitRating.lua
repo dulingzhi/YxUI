@@ -16,15 +16,20 @@ local OnEnter = function(self)
 		return
 	end
 
+	GameTooltip:AddLine(Label, 1, 0.82, 0)
+	GameTooltip:AddLine(" ")
 	if YxUI.UserClass == "HUNTER" then
-		GameTooltip:AddLine(format("%s %s", COMBAT_RATING_NAME6, GetCombatRating(CR_HIT_RANGED)))
-		GameTooltip:AddLine(format(CR_HIT_MELEE_TOOLTIP, UnitLevel("player"), GetCombatRatingBonus(CR_HIT_RANGED), GetArmorPenetration(), GetCombatRatingBonus(CR_ARMOR_PENETRATION)), 1, 1, 1)
+		GameTooltip:AddDoubleLine(COMBAT_RATING_NAME6, tostring(GetCombatRating(CR_HIT_RANGED)), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddLine(format(CR_HIT_MELEE_TOOLTIP, UnitLevel("player"), GetCombatRatingBonus(CR_HIT_RANGED), GetArmorPenetration(), GetCombatRatingBonus(CR_ARMOR_PENETRATION)), 0.75, 0.75, 0.75, true)
 	elseif GetCombatRatingBonus(CR_HIT_SPELL) > GetCombatRatingBonus(CR_HIT_MELEE) then
-		GameTooltip:AddLine(format("%s %s", COMBAT_RATING_NAME6, GetCombatRating(CR_HIT_SPELL)))
-		GameTooltip:AddLine(format(CR_HIT_SPELL_TOOLTIP, UnitLevel("player"), GetCombatRatingBonus(CR_HIT_SPELL), GetSpellPenetration(), GetSpellPenetration()), 1, 1, 1)
+		GameTooltip:AddDoubleLine(COMBAT_RATING_NAME6, tostring(GetCombatRating(CR_HIT_SPELL)), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddLine(format(CR_HIT_SPELL_TOOLTIP, UnitLevel("player"), GetCombatRatingBonus(CR_HIT_SPELL), GetSpellPenetration(), GetSpellPenetration()), 0.75, 0.75, 0.75, true)
 	else
-		GameTooltip:AddLine(format("%s %s", COMBAT_RATING_NAME6, GetCombatRating(CR_HIT_MELEE)))
-		GameTooltip:AddLine(format(CR_HIT_MELEE_TOOLTIP, UnitLevel("player"), GetCombatRatingBonus(CR_HIT_MELEE), GetArmorPenetration(), GetCombatRatingBonus(CR_ARMOR_PENETRATION)), 1, 1, 1)
+		GameTooltip:AddDoubleLine(COMBAT_RATING_NAME6, tostring(GetCombatRating(CR_HIT_MELEE)), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddLine(format(CR_HIT_MELEE_TOOLTIP, UnitLevel("player"), GetCombatRatingBonus(CR_HIT_MELEE), GetArmorPenetration(), GetCombatRatingBonus(CR_ARMOR_PENETRATION)), 0.75, 0.75, 0.75, true)
 	end
 
 	GameTooltip:Show()

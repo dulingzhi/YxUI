@@ -8,32 +8,44 @@ local GetCoinTextureString = (C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureSt
 local floor = math.floor
 local format = format
 local Label = Language["Durability"]
+local IsReadable = YxUI.IsDataTextReadable
 
 local ScanTooltip = CreateFrame("GameTooltip", nil, UIParent, "GameTooltipTemplate")
+local PreviousMinimumWidth, PreviousMinimumForce
 
 local OnEnter = function(self)
 	if not self:SetTooltip() then
 		return
 	end
 
+	if YxUI.IsMainline and GameTooltip.AddTexture then
+		PreviousMinimumWidth, PreviousMinimumForce = GameTooltip:GetMinimumWidth()
+		GameTooltip:SetMinimumWidth(340, true)
+	end
+	GameTooltip:ClearLines()
+
 	local TotalCost = 0
+	local Broken = 0
 	local Current, Max
 
 	for i = 1, #Slots do
 		Current, Max = GetInventoryItemDurability(Slots[i])
 
-		if Current and Max and Max > 0 then
+		if IsReadable(Current) and IsReadable(Max) and Max > 0 then
+			if Current == 0 then
+				Broken = Broken + 1
+			end
 			local RepairCost
 
 			if C_TooltipInfo and C_TooltipInfo.GetInventoryItem then
 				local Data = C_TooltipInfo.GetInventoryItem("player", Slots[i], true)
-				RepairCost = Data and Data.repairCost
+				RepairCost = IsReadable(Data) and Data.repairCost or nil
 			else
 				local HasItem, _, Cost = ScanTooltip:SetInventoryItem("player", Slots[i], true)
-				RepairCost = HasItem and Cost
+				RepairCost = IsReadable(HasItem) and HasItem and Cost or nil
 			end
 
-			if type(RepairCost) == "number" and RepairCost > 0 then
+			if IsReadable(RepairCost) and type(RepairCost) == "number" and RepairCost > 0 then
 				TotalCost = TotalCost + RepairCost
 			end
 		end
@@ -41,20 +53,41 @@ local OnEnter = function(self)
 
 	ScanTooltip:ClearLines()
 
-	GameTooltip:AddLine(Label)
+	GameTooltip:AddLine(Label, 1, 0.82, 0)
 	GameTooltip:AddLine(" ")
 
 	for i = 1, #Slots do
 		Current, Max = GetInventoryItemDurability(Slots[i])
 
-		if Current and Max and Max > 0 then
-			GameTooltip:AddDoubleLine(format("|T%s:14:14:0:0:64:64:4:60:4:60|t  %s", GetInventoryItemTexture("player", Slots[i]), GetInventoryItemLink("player", Slots[i])), format("%s%%", floor(Current / Max * 100)), 1, 1, 1, 1, 1, 1)
+		if IsReadable(Current) and IsReadable(Max) and Max > 0 then
+			local Texture = GetInventoryItemTexture("player", Slots[i])
+			local Link = GetInventoryItemLink("player", Slots[i])
+			local Name = IsReadable(Link) and Link or format("Slot %d", Slots[i])
+			local Icon = IsReadable(Texture) and Texture or 134400
+			local Percent = format("%s%%", floor(Current / Max * 100))
+
+			if YxUI.IsMainline and GameTooltip.AddTexture then
+				GameTooltip:AddDoubleLine(Name, Percent, 1, 1, 1, 1, 1, 1)
+				GameTooltip:AddTexture(Icon, {
+					width = 14,
+					height = 14,
+					margin = {left = 0, right = 5, top = 0, bottom = 0},
+					texCoords = {left = 0.0625, right = 0.9375, top = 0.0625, bottom = 0.9375},
+				})
+			else
+				GameTooltip:AddDoubleLine(format("|T%s:14:14:0:0:64:64:4:60:4:60|t  %s", Icon, Name), Percent, 1, 1, 1, 1, 1, 1)
+			end
 		end
+	end
+
+	if Broken > 0 then
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddDoubleLine("Broken equipment", tostring(Broken), 1, 1, 1, 1, 0.4, 0.4)
 	end
 
 	if TotalCost > 0 then
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(format("%s %s", REPAIR_COST, GetCoinTextureString(TotalCost)), 1, 1, 1)
+		GameTooltip:AddDoubleLine(REPAIR_COST, GetCoinTextureString(TotalCost), 1, 1, 1, 1, 1, 1)
 	end
 
 	GameTooltip:Show()
@@ -62,6 +95,10 @@ end
 
 local OnLeave = function()
 	GameTooltip:Hide()
+	if PreviousMinimumWidth then
+		GameTooltip:SetMinimumWidth(PreviousMinimumWidth, PreviousMinimumForce)
+		PreviousMinimumWidth, PreviousMinimumForce = nil, nil
+	end
 end
 
 local OnMouseUp = function()
@@ -74,12 +111,15 @@ end
 
 local Update = function(self)
 	local Total, Count = 0, 0
+	local Unavailable = false
 	local Current, Max
 
 	for i = 1, #Slots do
 		Current, Max = GetInventoryItemDurability(Slots[i])
 
-		if Current and Max and Max > 0 then
+		if issecretvalue and (issecretvalue(Current) or issecretvalue(Max)) then
+			Unavailable = true
+		elseif IsReadable(Current) and IsReadable(Max) and Max > 0 then
 			Total = Total + (Current / Max)
 			Count = Count + 1
 		end
@@ -87,11 +127,16 @@ local Update = function(self)
 
 	local Percent
 
-	if Count > 0 then
-		Percent = floor(Total / Count * 100)
+	if Unavailable then
+		Percent = YxUI.GetDataTextLastValue(self, nil)
+	else
+		Percent = YxUI.GetDataTextLastValue(self, Count > 0 and floor(Total / Count * 100) or nil)
+	end
+
+	if Percent ~= nil then
 		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s%%|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Percent)
 	else
-		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, NOT_APPLICABLE)
+		self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Unavailable and "--" or NOT_APPLICABLE)
 	end
 
 	if Percent and Percent < 25 then

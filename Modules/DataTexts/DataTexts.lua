@@ -21,23 +21,51 @@ Defaults["data-text-hover-tooltips"] = true
 Defaults["data-text-24-hour"] = false
 Defaults["data-text-classcolor"] = false
 
+for _, name in ipairs({"Chat-Left", "Chat-Middle", "Chat-Right", "Window-Left", "Window-Middle", "Window-Right", "Minimap-Top", "Minimap-Bottom"}) do
+	Defaults["data-text-currency-" .. name] = 0
+end
+
 DT.Anchors = {}
 DT.Types = {}
 DT.List = {}
 YxUI.ValueColor = "ffffff"
 
+YxUI.IsDataTextReadable = function(value)
+	if issecretvalue and issecretvalue(value) then
+		return false
+	end
+	return value ~= nil and value ~= false
+end
+
+YxUI.GetDataTextLastValue = function(anchor, value, key)
+	if not YxUI.IsMainline then
+		return value
+	end
+
+	key = key or 1
+	if YxUI.IsDataTextReadable(value) then
+		anchor.DataTextLastValues = anchor.DataTextLastValues or {}
+		anchor.DataTextLastValues[key] = value
+		return value
+	end
+
+	anchor.DataTextNeedsRefresh = true
+	return anchor.DataTextLastValues and anchor.DataTextLastValues[key]
+end
+
 local CharacterDataTexts = {
     ["Armor"] = true,
     ["Crit"] = true,
+    ["Defense"] = true,
+    ["Dodge"] = true,
+    ["Hit Chance"] = true,
+    ["Attack Power"] = true,
+    ["Spell Power"] = true,
     ["Durability"] = true,
-    ["Haste"] = true,
     ["Item Level"] = true,
     ["Level"] = true,
     ["Mana Regen"] = true,
-    ["Mastery"] = true,
     ["Primary Stat"] = true,
-    ["Speed"] = true,
-    ["Versatility"] = true,
 }
 
 if POWER_TYPE_EXPERIENCE then
@@ -145,8 +173,43 @@ function DT:CreateCharacterClickButton(anchor)
 	anchor.CharacterClickButton = Button
 end
 
+local AnchorSettings = {
+	["Chat-Left"] = "data-text-chat-left",
+	["Chat-Middle"] = "data-text-chat-middle",
+	["Chat-Right"] = "data-text-chat-right",
+	["Window-Left"] = "data-text-extra-left",
+	["Window-Middle"] = "data-text-extra-middle",
+	["Window-Right"] = "data-text-extra-right",
+	["Minimap-Top"] = "data-text-minimap-top",
+	["Minimap-Bottom"] = "data-text-minimap-bottom",
+}
+
 function DT:SetDataText(anchor, name)
-	if (not self.Anchors[anchor]) or (not self.Types[name]) then
+	if not self.Anchors[anchor] then
+		return
+	end
+
+	if name == "Hearthstone" or name == "Tracked Item" then
+		local setting = AnchorSettings[anchor]
+		if setting and Settings[setting] == name then
+			Settings[setting] = "Empty"
+		end
+		name = "Empty"
+	end
+
+	if name == "Instance Lockouts" then
+		name = "Lockouts"
+		local setting = AnchorSettings[anchor]
+		if setting and Settings[setting] == "Instance Lockouts" then
+			Settings[setting] = name
+			local profile = YxUI:GetActiveProfileName()
+			if profile then
+				YxUI:SetProfileValue(profile, setting, name)
+			end
+		end
+	end
+
+	if not self.Types[name] then
 		return
 	end
 
@@ -155,6 +218,12 @@ function DT:SetDataText(anchor, name)
 
 	if Anchor.Disable then
 		Anchor:Disable()
+	end
+
+	if Anchor.DataTextType ~= name then
+		Anchor.DataTextLastValues = nil
+		Anchor.DataTextNeedsRefresh = nil
+		Anchor.DataTextType = name
 	end
 
 	Anchor.Enable = Type.Enable
@@ -226,19 +295,26 @@ end
 function DT:Load()
 	YxUI.ValueColor = Settings["data-text-classcolor"] and YxUI.ClassColors[YxUI.UserClass].Hex or Settings["data-text-value-color"]
 
-	if YxUI.IsForever then
+	if YxUI.IsMainline then
 		self:RegisterEvent("PLAYER_REGEN_ENABLED")
 		self:SetScript("OnEvent", function(self)
 			for _, Anchor in next, self.Anchors do
-				if Anchor.CharacterClickPending and Anchor.CharacterClick and not Anchor.CharacterClickButton and CharacterMicroButton then
-					self:CreateCharacterClickButton(Anchor)
+				if YxUI.IsForever then
+					if Anchor.CharacterClickPending and Anchor.CharacterClick and not Anchor.CharacterClickButton and CharacterMicroButton then
+						self:CreateCharacterClickButton(Anchor)
+					end
+
+					if Anchor.CharacterClickButton then
+						Anchor.CharacterClickButton:SetShown(Anchor.CharacterClick)
+					end
+
+					Anchor.CharacterClickPending = nil
 				end
 
-				if Anchor.CharacterClickButton then
-					Anchor.CharacterClickButton:SetShown(Anchor.CharacterClick)
+				if Anchor.DataTextNeedsRefresh and Anchor.Update then
+					Anchor.DataTextNeedsRefresh = nil
+					Anchor:Update(nil, "player")
 				end
-
-				Anchor.CharacterClickPending = nil
 			end
 		end)
 	end
@@ -453,7 +529,19 @@ YxUI:GetModule("GUI"):AddWidgetsID("General", "Data Texts", function(left, right
 	--left:CreateHeader(Language["Misc."])
 	--left:CreateSlider("data-text-max-lines", Settings["data-text-max-lines"], 5, 50, 1, "Max Lines", "Set the maximum number of players shown in the guild or friends data text tooltips")
 end)
-YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "Data Texts", {
+local CurrencySelectionCallbacks = {}
+for _, name in ipairs({"Chat-Left", "Chat-Middle", "Chat-Right", "Window-Left", "Window-Middle", "Window-Right", "Minimap-Top", "Minimap-Bottom"}) do
+	local anchorName = name
+	CurrencySelectionCallbacks[#CurrencySelectionCallbacks + 1] = {"data-text-currency-" .. anchorName, function()
+		local anchor = DT:GetAnchor(anchorName)
+		if anchor and anchor.DataTextType == "Currency" then
+			anchor.DataTextLastValues = nil
+			anchor:Update()
+		end
+	end}
+end
+
+local DataTextSettings = {
 	{"data-text-chat-left", UpdateChatLeftText},
 	{"data-text-chat-middle", UpdateChatMiddleText},
 	{"data-text-chat-right", UpdateChatRightText},
@@ -470,5 +558,9 @@ YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "Data Texts", {
 	{"data-text-classcolor", UpdateClassColor},
 	{"data-text-enable-tooltips", function(value) UpdateEnableTooltips(value); UpdateDataTextDependencies() end},
 	{"data-text-24-hour", UpdateTimeFormat},
-}, nil)
+}
+for _, entry in ipairs(CurrencySelectionCallbacks) do
+	DataTextSettings[#DataTextSettings + 1] = entry
+end
+YxUI:GetModule("GUI"):RegisterPageSettingsID("General", "Data Texts", DataTextSettings, nil)
 

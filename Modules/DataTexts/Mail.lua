@@ -9,13 +9,15 @@ local OnEnter = function(self)
 
 	local Senders = {GetLatestThreeSenders()}
 	local HasSender
+	GameTooltip:AddLine(Label, 1, 0.82, 0)
+	GameTooltip:AddLine(" ")
 
 	for Index = 1, 3 do
 		local Sender = Senders[Index]
 
-		if Sender and Sender ~= "" then
+		if Sender and (not issecretvalue or not issecretvalue(Sender)) and Sender ~= "" then
 			if not HasSender then
-				GameTooltip:AddLine(HAVE_MAIL_FROM)
+				GameTooltip:AddLine(HAVE_MAIL_FROM, 1, 0.82, 0)
 			end
 
 			GameTooltip:AddLine(Sender, 1, 1, 1)
@@ -23,12 +25,17 @@ local OnEnter = function(self)
 		end
 	end
 
-	if HasSender then
-		GameTooltip:Show()
-	elseif HasNewMail() then
-		GameTooltip:AddLine(HAVE_MAIL)
-		GameTooltip:Show()
+	if not HasSender then
+		local Pending = HasNewMail()
+		if issecretvalue and issecretvalue(Pending) then
+			GameTooltip:AddLine("Mail status unavailable", 0.75, 0.75, 0.75)
+		elseif Pending then
+			GameTooltip:AddLine(HAVE_MAIL, 1, 1, 1)
+		else
+			GameTooltip:AddLine("No new mail", 0.75, 0.75, 0.75)
+		end
 	end
+	GameTooltip:Show()
 end
 
 local OnLeave = function()

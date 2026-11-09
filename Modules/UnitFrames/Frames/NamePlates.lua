@@ -339,7 +339,7 @@ function UF:CreateNamePlateDriver()
 		suppressedArtwork[object] = true
 		local updating = false
 		hooksecurefunc(object, "SetAlpha", function()
-			if updating then
+			if updating or (object.IsForbidden and object:IsForbidden()) then
 				return
 			end
 			updating = true
@@ -358,7 +358,11 @@ function UF:CreateNamePlateDriver()
 			return
 		end
 		hiddenArtwork[frame] = true
-		frame:HookScript("OnShow", function(self) self:Hide() end)
+		frame:HookScript("OnShow", function(self)
+			if not self:IsForbidden() then
+				self:Hide()
+			end
+		end)
 		frame:Hide()
 	end
 
@@ -464,6 +468,9 @@ function UF:CreateNamePlateDriver()
 		if not plate then
 			return
 		end
+		if plate._suppressionAncestors then
+			wipe(plate._suppressionAncestors)
+		end
 		YxUI.UnitFrames:SetNamePlateUnit(plate, nil)
 		self.NamePlatesByUnit[unit] = nil
 	end
@@ -495,7 +502,7 @@ function UF:CreateNamePlateDriver()
 			Removed(unit)
 		else
 			local plate = C_NamePlate.GetNamePlateForUnit("target")
-			plate = plate and plate._unitFrame
+			plate = plate and not plate:IsForbidden() and plate._unitFrame
 			if plate then
 				plate:Refresh(event)
 			end
@@ -595,8 +602,12 @@ local RunForAllNamePlates = function(func, value)
 
 	if NamePlates then
 		for i = 1, #NamePlates do
-			if NamePlates[i]._unitFrame then
-				func(NamePlates[i]._unitFrame, value)
+			local base = NamePlates[i]
+			if base and not base:IsForbidden() then
+				local plate = base._unitFrame
+				if plate then
+					func(plate, value)
+				end
 			end
 		end
 	end

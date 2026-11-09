@@ -7,21 +7,23 @@ local InCombatLockdown = InCombatLockdown
 local NOT_APPLICABLE = NOT_APPLICABLE
 local Label = MANA_REGEN
 local ManaID = Enum.PowerType.Mana
+local IsReadable = YxUI.IsDataTextReadable
 
 local OnEnter = function(self)
-	if not self:SetTooltip() then
-		return
+	if not self:SetTooltip() then return end
+
+	GameTooltip:AddLine(Label, 1, 0.82, 0)
+	GameTooltip:AddLine(" ")
+	local maxMana = UnitPowerMax("player", ManaID)
+	if IsReadable(maxMana) and maxMana > 0 then
+		local base, casting = GetManaRegen()
+		if IsReadable(base) then
+			GameTooltip:AddDoubleLine("Not casting", format("%s / 5s", YxUI:Comma(floor(base * 5))), 1, 1, 1, 1, 1, 1)
+		end
+		if IsReadable(casting) then
+			GameTooltip:AddDoubleLine("While casting", format("%s / 5s", YxUI:Comma(floor(casting * 5))), 1, 1, 1, 1, 1, 1)
+		end
 	end
-
-	if UnitPowerMax("player", ManaID) == 0 then
-		return
-	end
-
-	local Base, Combat = GetManaRegen()
-
-	GameTooltip:AddLine(format("%s %s", Label, YxUI:Comma(floor(Combat * 5))), 1, 1, 1)
-	GameTooltip:AddLine(format(MANA_REGEN_TOOLTIP, YxUI:Comma(floor(Base * 5))))
-
 	GameTooltip:Show()
 end
 
@@ -44,17 +46,18 @@ local Update = function(self, event, unit)
 
 	local Result
 
-	if UnitPowerMax("player", ManaID) > 0 then
-		local Base, Combat = GetManaRegen()
-
-		if InCombatLockdown() then
-			Result = floor(Combat * 5)
+	local MaxMana = UnitPowerMax("player", ManaID)
+	if IsReadable(MaxMana) then
+		if MaxMana > 0 then
+			local Base, Combat = GetManaRegen()
+			local Regen = InCombatLockdown() and Combat or Base
+			Result = IsReadable(Regen) and floor(Regen * 5) or nil
 		else
-			Result = floor(Base * 5)
+			Result = NOT_APPLICABLE
 		end
-	else
-		Result = NOT_APPLICABLE
 	end
+
+	Result = YxUI.GetDataTextLastValue(self, Result) or "--"
 
 	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Result)
 end

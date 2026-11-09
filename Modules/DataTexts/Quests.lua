@@ -4,6 +4,7 @@ local select = select
 local GetMaxNumQuestsCanAccept = C_QuestLog.GetMaxNumQuestsCanAccept
 local GetQuestDifficultyColor = GetQuestDifficultyColor
 local Label = QUESTS_LABEL
+local IsReadable = YxUI.IsDataTextReadable
 local DungeonLabel = TRACKER_HEADER_DUNGEON or "Dungeon"
 local EliteLabel = ELITE or "Elite"
 local DungeonQuestTagID = Enum and Enum.QuestTag and Enum.QuestTag.Dungeon or 81
@@ -31,13 +32,20 @@ else
 end
 
 local GetQuestTags = function(QuestID)
-	if not GetQuestTagInfo or not QuestID then
+	if not GetQuestTagInfo or not IsReadable(QuestID) then
 		return false, false
 	end
 
 	local TagInfo = GetQuestTagInfo(QuestID)
 
+	if not IsReadable(TagInfo) then
+		return false, false
+	end
+
 	if type(TagInfo) == "table" then
+		if not IsReadable(TagInfo.tagID) or (issecretvalue and issecretvalue(TagInfo.isElite)) then
+			return false, false
+		end
 		return TagInfo.tagID == DungeonQuestTagID, TagInfo.isElite or TagInfo.tagID == EliteQuestTagID
 	end
 
@@ -45,6 +53,9 @@ local GetQuestTags = function(QuestID)
 end
 
 local OnMouseUp = function()
+	if InCombatLockdown() then
+		return
+	end
 	ToggleFrame(YxUI.IsMainline and QuestMapFrame or QuestLogFrame)
 end
 
@@ -56,9 +67,23 @@ local OnEnter = function(self)
 	local Header
 	local HasQuest
 
-	for Index = 1, GetNumQuests() do
-		local Info = GetQuestInfo(Index)
+	local Count, QuestCount = GetNumQuests()
+	if not IsReadable(Count) then
+		GameTooltip:AddLine(Label, 1, 0.82, 0)
+		GameTooltip:Show()
+		return
+	end
 
+	GameTooltip:AddLine(Label, 1, 0.82, 0)
+	GameTooltip:AddLine(" ")
+	for Index = 1, Count do
+		local Info = GetQuestInfo(Index)
+		if not IsReadable(Info) then
+			Info = nil
+		elseif (issecretvalue and issecretvalue(Info.isHeader)) or not IsReadable(Info.title)
+			or (not Info.isHeader and (not IsReadable(Info.level) or (issecretvalue and issecretvalue(Info.isComplete)))) then
+			Info = nil
+		end
 		if Info and Info.isHeader then
 			Header = Info.title
 		elseif Info then
@@ -67,7 +92,7 @@ local OnEnter = function(self)
 					GameTooltip:AddLine(" ")
 				end
 
-				GameTooltip:AddLine(Header, 0.6, 0.6, 0.6)
+				GameTooltip:AddLine(Header, 1, 0.82, 0)
 				Header = nil
 			end
 
@@ -100,6 +125,14 @@ local OnEnter = function(self)
 		end
 	end
 
+	if IsReadable(QuestCount) then
+		local Limit = GetMaxNumQuestsCanAccept()
+		if HasQuest then
+			GameTooltip:AddLine(" ")
+		end
+		GameTooltip:AddDoubleLine("Quest log", IsReadable(Limit) and format("%s / %s", QuestCount, Limit) or tostring(QuestCount), 1, 1, 1, 1, 1, 1)
+	end
+
 	GameTooltip:Show()
 end
 
@@ -108,7 +141,11 @@ local OnLeave = function()
 end
 
 local Update = function(self)
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s/%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, select(2, GetNumQuests()), GetMaxNumQuestsCanAccept())
+	local Count = select(2, GetNumQuests())
+	local Limit = GetMaxNumQuestsCanAccept()
+	local Values = YxUI.GetDataTextLastValue(self, IsReadable(Count) and IsReadable(Limit) and {Count, Limit} or nil)
+	Count, Limit = Values and Values[1], Values and Values[2]
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s/%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, IsReadable(Count) and Count or "--", IsReadable(Limit) and Limit or "--")
 end
 
 local OnEnable = function(self)

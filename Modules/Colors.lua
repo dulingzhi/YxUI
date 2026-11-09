@@ -253,6 +253,9 @@ function YxUI:UpdateColors()
 
 	if not self.IsMainline then
 		self:UpdateHappinessColors()
+	end
+
+	if not self.IsMainline or self.IsForever then
 		self:UpdateTotemColors()
 	end
 end

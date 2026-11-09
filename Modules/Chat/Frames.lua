@@ -91,11 +91,68 @@ local OnMouseWheel = function(self, delta)
 end
 
 local EnableMouseWheel = function(frame)
-	-- Blizzard can reset mouse-wheel input while restoring chat windows or
-	-- applying chat CVars. Styling only runs once, so restore both pieces of
-	-- state whenever the frames are laid out again.
+	frame:EnableMouse(true)
 	frame:EnableMouseWheel(true)
 	frame:SetScript("OnMouseWheel", OnMouseWheel)
+end
+
+local HideNativeScrollControls = function(frame)
+	for _, control in ipairs({frame.ScrollBar, frame.ScrollToBottomButton}) do
+		if control then
+			control:EnableMouse(false)
+			if UIFrameFadeRemoveFrame then UIFrameFadeRemoveFrame(control) end
+			control:SetAlpha(0)
+		end
+	end
+end
+
+function Chat:NormalizeDockTabs(dock)
+	if dock ~= GENERAL_CHAT_DOCK or not (dock and dock.DOCKED_CHAT_FRAMES and dock.scrollFrame and PanelTemplates_TabResize) then
+		return
+	end
+
+	local static, dynamic = {}, {}
+	local dynamicWidth = 0
+	for _, frame in ipairs(dock.DOCKED_CHAT_FRAMES) do
+		local tab = _G[frame:GetName() .. "Tab"]
+		local label = tab and (tab.Text or tab.TabText)
+		if not (label and tab.Left and tab.Right) or (FCF_HasSecretName and FCF_HasSecretName(frame)) then
+			return
+		end
+
+		local width = label.GetUnboundedStringWidth and label:GetUnboundedStringWidth() or label:GetStringWidth()
+		if type(width) ~= "number" or (issecretvalue and issecretvalue(width)) or width < 0 then
+			return
+		end
+
+		local minimum = tab.Left:GetWidth() + tab.Right:GetWidth()
+		if (issecretvalue and issecretvalue(minimum)) then return end
+		local desired = math.max(minimum, math.ceil(width) + 22)
+		local entry = {tab = tab, width = desired}
+		if frame.isStaticDocked then
+			static[#static + 1] = entry
+		else
+			dynamic[#dynamic + 1] = entry
+			dynamicWidth = dynamicWidth + desired + 1
+		end
+	end
+
+	for _, entry in ipairs(static) do
+		PanelTemplates_TabResize(entry.tab, -8, entry.width)
+	end
+
+	local available = dock.scrollFrame:GetWidth()
+	if (dock.overflowButton and dock.overflowButton:IsShown()) or type(available) ~= "number"
+		or (issecretvalue and issecretvalue(available)) or dynamicWidth > available then
+		return
+	end
+
+	for _, entry in ipairs(dynamic) do
+		PanelTemplates_TabResize(entry.tab, -8, entry.width)
+	end
+	if #dynamic > 0 and dock.scrollFrame:GetHorizontalScroll() ~= 0 then
+		dock.scrollFrame:SetHorizontalScroll(0)
+	end
 end
 
 local UpdateHeader = function(editbox)
@@ -217,11 +274,37 @@ local JumpButtonOnFinished = function(self)
 	self.Parent:Hide()
 end
 
+function Chat:ApplyTabFont(Tab)
+	local TabText = Tab and Tab.TabText
+	if not TabText then
+		return
+	end
+
+	YxUI:SetFontInfo(TabText, Settings["chat-tab-font"], Settings["chat-tab-font-size"], Settings["chat-tab-font-flags"])
+
+	if YxUI.IsMists then
+		local FontObject = TabText:GetFontObject()
+		if FontObject then
+			Tab:SetNormalFontObject(FontObject)
+			Tab:SetHighlightFontObject(FontObject)
+			Tab:SetDisabledFontObject(FontObject)
+		end
+	end
+end
+
+local RestoreMistsTabFont = function(Tab)
+	if YxUI.IsMists then
+		Chat:ApplyTabFont(Tab)
+	end
+end
+
 local TabOnEnter = function(self)
+	RestoreMistsTabFont(self)
 	self.TabText:_SetTextColor(YxUI:HexToRGB(Settings["chat-tab-font-color-mouseover"]))
 end
 
 local TabOnLeave = function(self)
+	RestoreMistsTabFont(self)
 	self.TabText:_SetTextColor(YxUI:HexToRGB(Settings["chat-tab-font-color"]))
 end
 
@@ -285,9 +368,11 @@ function Chat:StyleChatFrame(frame)
 	local Minimize = _G[FrameName.."MinimizeButton"]
 
 	if frame.ScrollBar then
-		Disable(frame.ScrollBar)
-		Disable(frame.ScrollToBottomButton)
-		Disable(_G[FrameName.."ThumbTexture"])
+		HideNativeScrollControls(frame)
+		frame.ScrollBar:HookScript("OnShow", function() HideNativeScrollControls(frame) end)
+		if frame.ScrollToBottomButton then
+			frame.ScrollToBottomButton:HookScript("OnShow", function() HideNativeScrollControls(frame) end)
+		end
 	end
 
 	if Tab.conversationIcon then
@@ -321,7 +406,7 @@ function Chat:StyleChatFrame(frame)
 	Tab:HookScript("OnLeave", TabOnLeave)
 
 	if TabText then
-		YxUI:SetFontInfo(TabText, Settings["chat-tab-font"], Settings["chat-tab-font-size"], Settings["chat-tab-font-flags"])
+		Chat:ApplyTabFont(Tab)
 		TabText._SetFont = TabText.SetFont
 		TabText.SetFont = NoCall
 
@@ -340,8 +425,11 @@ function Chat:StyleChatFrame(frame)
 	frame:SetClampRectInsets(0, 0, 0, 0)
 	frame:SetClampedToScreen(false)
 	frame:SetFading(false)
-	frame:EnableMouse(true)
 	EnableMouseWheel(frame)
+	frame:HookScript("OnShow", function(self)
+		EnableMouseWheel(self)
+		HideNativeScrollControls(self)
+	end)
 	frame:SetSize(self:GetWidth() - 8, self:GetHeight() - 8)
 	frame:SetFrameLevel(self:GetFrameLevel() + 1)
 	frame:SetFrameStrata("MEDIUM")
@@ -507,6 +595,7 @@ function Chat:MoveChatFrames()
 
 	for Frame in pairs(self.StyledFrames) do
 		EnableMouseWheel(Frame)
+		HideNativeScrollControls(Frame)
 
 		Frame:SetFrameLevel(self.Middle:GetFrameLevel() + 1)
 		Frame:SetFrameStrata("MEDIUM")
@@ -585,6 +674,8 @@ function Chat:MoveChatFrames()
 		ChatAlertFrame:SetPoint("BOTTOMLEFT", self.Top, "TOPLEFT", 0, 27)
 		PositionShardTransfer()
 	end
+
+	self:NormalizeDockTabs(GENERAL_CHAT_DOCK)
 end
 
 function Chat:StyleChatFrames()
@@ -631,6 +722,17 @@ end
 
 function Chat:InstallFrameHooks()
 	hooksecurefunc("ChatEdit_UpdateHeader", UpdateHeader)
+
+	if FCFDock_UpdateTabs then
+		hooksecurefunc("FCFDock_UpdateTabs", function(dock)
+			Chat:NormalizeDockTabs(dock)
+		end)
+	end
+	if FCF_FadeInScrollbar then
+		hooksecurefunc("FCF_FadeInScrollbar", function(frame)
+			if frame and frame.Styled then HideNativeScrollControls(frame) end
+		end)
+	end
 
 	local hooks = self.TemporaryWindowHooks
 	hooks.FCF_OpenTemporaryWindow = OpenTemporaryWindow

@@ -356,6 +356,18 @@ function AB:Load()
 		hooksecurefunc("ActionButton_UpdateRangeIndicator", AB.UpdateButtonStatus)
 	end
 
+	if YxUI.IsForever and ActionButton_UpdateRangeIndicator then
+		hooksecurefunc("ActionButton_UpdateRangeIndicator", function(button)
+			local hotkey = button.Styled and button.HotKey
+			if hotkey then
+				local text = hotkey:GetText()
+				if (not issecretvalue or not issecretvalue(text)) and text == RANGE_INDICATOR then
+					hotkey:Hide()
+				end
+			end
+		end)
+	end
+
 	if ActionButton_UpdateFlyout then
 		hooksecurefunc("ActionButton_UpdateFlyout", AB.UpdateFlyout)
 	end

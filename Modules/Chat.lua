@@ -273,11 +273,20 @@ local UpdateChatTabFont = function()
 	local R, G, B = YxUI:HexToRGB(Settings["chat-tab-font-color"])
 
 	Chat:ForEachStyledFrame(function(Frame)
-		local TabText = _G[Frame:GetName() .. "TabText"]
-		local Font, IsPixel = Assets:GetFont(Settings["chat-tab-font"])
+		local Tab = _G[Frame:GetName() .. "Tab"]
+		local TabText = Tab and Tab.TabText
+		if not TabText then
+			return
+		end
+
+		if YxUI.IsMists then
+			Chat:ApplyTabFont(Tab)
+			TabText:_SetTextColor(R, G, B)
+			return
+		end
 
 		TabText:_SetTextColor(R, G, B)
-
+		local Font, IsPixel = Assets:GetFont(Settings["chat-tab-font"])
 		if IsPixel then
 			TabText:_SetFont(Font, Settings["chat-tab-font-size"], "MONOCHROME, OUTLINE")
 			TabText:SetShadowColor(0, 0, 0, 0)
@@ -287,6 +296,8 @@ local UpdateChatTabFont = function()
 			TabText:SetShadowOffset(1, -1)
 		end
 	end)
+
+	Chat:NormalizeDockTabs(GENERAL_CHAT_DOCK)
 end
 
 local RunChatInstall = function()

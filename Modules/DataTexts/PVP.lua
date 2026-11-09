@@ -8,6 +8,9 @@ local OnEnter = function(self)
 		return
 	end
 
+	GameTooltip:AddLine(HONOR or "Honor", 1, 0.82, 0)
+	GameTooltip:AddLine(" ")
+
 	local HK = GetPVPSessionStats()
 	local Rank = UnitPVPRank("player")
 
@@ -22,15 +25,17 @@ local OnEnter = function(self)
 			GameTooltip:AddLine(" ")
 		end
 
-		GameTooltip:AddLine(HONOR_TODAY)
+		GameTooltip:AddLine(HONOR_TODAY, 1, 0.82, 0)
 		GameTooltip:AddDoubleLine(HONORABLE_KILLS, YxUI:Comma(HK), 1, 1, 1, 1, 1, 1)
 	end
 
 	local LHK = GetPVPLifetimeStats()
 
 	if LHK > 0 then
-		--GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(HONOR_LIFETIME)
+		if HK > 0 or Rank > 0 then
+			GameTooltip:AddLine(" ")
+		end
+		GameTooltip:AddLine(HONOR_LIFETIME, 1, 0.82, 0)
 		GameTooltip:AddDoubleLine(HONORABLE_KILLS, YxUI:Comma(LHK), 1, 1, 1, 1, 1, 1)
 	end
 

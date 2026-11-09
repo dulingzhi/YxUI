@@ -2,6 +2,7 @@ local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local UnitArmor = UnitArmor
 local Label = Language["Armor"]
+local IsReadable = YxUI.IsDataTextReadable
 
 local OnEnter
 
@@ -12,34 +13,35 @@ if YxUI.IsMainline then
 		end
 
 		local Base, EffectiveArmor = UnitArmor("player")
+		EffectiveArmor = YxUI.GetDataTextLastValue(self, EffectiveArmor)
 		local AttackerLevel = UnitEffectiveLevel("player")
-		local ArmorSecret = issecretvalue and issecretvalue(EffectiveArmor)
+		local ArmorReadable = IsReadable(EffectiveArmor)
 		local ArmorReduction, AgainstTarget
 
-		if not ArmorSecret and not (issecretvalue and issecretvalue(AttackerLevel)) then
+		if ArmorReadable and IsReadable(AttackerLevel) then
 			local Effectiveness = C_PaperDollInfo.GetArmorEffectiveness(EffectiveArmor, AttackerLevel)
-			if not (issecretvalue and issecretvalue(Effectiveness)) then
+			if IsReadable(Effectiveness) then
 				ArmorReduction = Effectiveness * 100
 			end
 
 			local TargetEffectiveness = C_PaperDollInfo.GetArmorEffectivenessAgainstTarget(EffectiveArmor)
-			if TargetEffectiveness and not (issecretvalue and issecretvalue(TargetEffectiveness)) then
+			if IsReadable(TargetEffectiveness) then
 				AgainstTarget = TargetEffectiveness * 100
 			end
 		end
 
-		if ArmorSecret then
-			GameTooltip:AddLine(Label, 1, 1, 1)
-		else
-			GameTooltip:AddLine(format("%s %s", Label, YxUI:Comma(EffectiveArmor)), 1, 1, 1)
-		end
+		GameTooltip:AddLine(Label, 1, 0.82, 0)
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddDoubleLine(Label, ArmorReadable and YxUI:Comma(EffectiveArmor) or "--", 1, 1, 1, 1, 1, 1)
 
+		if ArmorReduction or AgainstTarget then
+			GameTooltip:AddLine(" ")
+		end
 		if ArmorReduction then
-			GameTooltip:AddLine(format(STAT_ARMOR_TOOLTIP, ArmorReduction), nil, nil, nil, true)
+			GameTooltip:AddLine(format(STAT_ARMOR_TOOLTIP, ArmorReduction), 0.75, 0.75, 0.75, true)
 		end
-
 		if AgainstTarget then
-			GameTooltip:AddLine(format(STAT_ARMOR_TARGET_TOOLTIP, AgainstTarget))
+			GameTooltip:AddLine(format(STAT_ARMOR_TARGET_TOOLTIP, AgainstTarget), 0.75, 0.75, 0.75, true)
 		end
 
 		GameTooltip:Show()
@@ -55,8 +57,11 @@ else
 		local ArmorReduction = EffectiveArmor / ((85 * Level) + 400)
 		ArmorReduction = 100 * (ArmorReduction / (ArmorReduction + 1))
 
-		GameTooltip:AddLine(format("%s %s", Label, YxUI:Comma(EffectiveArmor)), 1, 1, 1)
-		GameTooltip:AddLine(format(STAT_ARMOR_TOOLTIP, ArmorReduction), nil, nil, nil, true)
+		GameTooltip:AddLine(Label, 1, 0.82, 0)
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddDoubleLine(Label, YxUI:Comma(EffectiveArmor), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddLine(format(STAT_ARMOR_TOOLTIP, ArmorReduction), 0.75, 0.75, 0.75, true)
 
 		GameTooltip:Show()
 	end
@@ -80,12 +85,17 @@ local Update = function(self, event, unit)
 	end
 
 	local Base, EffectiveArmor = UnitArmor("player")
+	local Armor = YxUI.GetDataTextLastValue(self, IsReadable(EffectiveArmor) and EffectiveArmor or nil)
+	local Value = Armor and YxUI:Comma(Armor) or "--"
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, YxUI:Comma(EffectiveArmor))
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Value)
 end
 
 local OnEnable = function(self)
 	self:RegisterEvent("UNIT_STATS")
+	if YxUI.IsMainline then
+		self:RegisterEvent("PLAYER_REGEN_ENABLED")
+	end
 	self:SetScript("OnEvent", Update)
 	self:SetScript("OnMouseUp", OnMouseUp)
 	self:SetScript("OnEnter", OnEnter)
@@ -96,6 +106,9 @@ end
 
 local OnDisable = function(self)
 	self:UnregisterEvent("UNIT_STATS")
+	if YxUI.IsMainline then
+		self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+	end
 	self:SetScript("OnEvent", nil)
 	self:SetScript("OnMouseUp", nil)
 	self:SetScript("OnEnter", nil)

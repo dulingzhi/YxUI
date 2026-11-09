@@ -8,25 +8,18 @@ local floor = math.floor
 
 -- Select the spell-info adapter once.  The hot event path is shared by every client and does not repeatedly inspect the project version.
 local CastingInfo, ChannelInfo
+local NativeCastTimers = YxUI.IsMainline and UnitCastingDuration and UnitChannelDuration
 if YxUI.IsMainline then
 	CastingInfo = function(unit)
-		local name,text,texture,startTime,endTime,isTradeSkill,castID,notInterruptible,spellID = UnitCastingInfo(unit)
+		local name,text,texture,startTime,endTime,isTradeSkill,castID,notInterruptible,spellID,castBarID = UnitCastingInfo(unit)
 
-		if (issecretvalue(startTime) and not canaccessvalue(startTime)) or (issecretvalue(endTime) and not canaccessvalue(endTime)) then
-			return
-		end
-
-		return name,text,texture,startTime,endTime,isTradeSkill,castID,notInterruptible,spellID
+		return name,text,texture,startTime,endTime,isTradeSkill,castID,notInterruptible,spellID,nil,nil,castBarID
 	end
 
 	ChannelInfo = function(unit)
-		local name,text,texture,startTime,endTime,isTradeSkill,notInterruptible,spellID,isEmpowered,numStages = UnitChannelInfo(unit)
+		local name,text,texture,startTime,endTime,isTradeSkill,notInterruptible,spellID,isEmpowered,numStages,castBarID = UnitChannelInfo(unit)
 
-		if (issecretvalue(startTime) and not canaccessvalue(startTime)) or (issecretvalue(endTime) and not canaccessvalue(endTime)) then
-			return
-		end
-
-		return name,text,texture,startTime,endTime,isTradeSkill,nil,notInterruptible,spellID,isEmpowered,numStages
+		return name,text,texture,startTime,endTime,isTradeSkill,nil,notInterruptible,spellID,isEmpowered,numStages,castBarID
 	end
 else
 	CastingInfo = UnitCastingInfo
@@ -40,18 +33,30 @@ end
 local function UpdateCastColor(bar)
 	local r, g, b
 
-	if bar.notInterruptible then
-		r, g, b = YxUI:HexToRGB(Settings["color-casting-uninterruptible"])
-	elseif bar.ClassColor and UnitIsPlayer(bar.__owner.unit) then
-		local _, class = UnitClass(bar.__owner.unit)
-		local color = class and YxUI.ClassColors[class]
-
-		if color then
-			r, g, b = color[1], color[2], color[3]
+	if YxUI.IsMainline and issecretvalue and issecretvalue(bar.notInterruptible) then
+		local normalR, normalG, normalB = YxUI:HexToRGB(Settings["color-casting-start"])
+		local lockedR, lockedG, lockedB = YxUI:HexToRGB(Settings["color-casting-uninterruptible"])
+		if C_CurveUtil and C_CurveUtil.EvaluateColorValueFromBoolean then
+			r = C_CurveUtil.EvaluateColorValueFromBoolean(bar.notInterruptible, lockedR, normalR)
+			g = C_CurveUtil.EvaluateColorValueFromBoolean(bar.notInterruptible, lockedG, normalG)
+			b = C_CurveUtil.EvaluateColorValueFromBoolean(bar.notInterruptible, lockedB, normalB)
 		else
-			r, g, b = YxUI:HexToRGB(Settings["color-casting-start"])
+			r, g, b = normalR, normalG, normalB
 		end
-	else
+	elseif bar.notInterruptible then
+		r, g, b = YxUI:HexToRGB(Settings["color-casting-uninterruptible"])
+	elseif bar.ClassColor then
+		local isPlayer = UnitIsPlayer(bar.__owner.unit)
+		if (not issecretvalue or not issecretvalue(isPlayer)) and isPlayer then
+			local _, class = UnitClass(bar.__owner.unit)
+			local color = (not issecretvalue or not issecretvalue(class)) and class and YxUI.ClassColors[class]
+			if color then
+				r, g, b = color[1], color[2], color[3]
+			end
+		end
+	end
+
+	if not r then
 		r, g, b = YxUI:HexToRGB(Settings["color-casting-start"])
 	end
 
@@ -89,8 +94,34 @@ if LibCC then
 	end
 end
 
+local function UpdateNativeTime(bar, duration)
+	if not bar.Time or not C_DurationUtil or not C_DurationUtil.CreateDurationTextBinding then
+		return
+	end
+
+	local binding = bar.DurationTextBinding
+	if not binding then
+		binding = C_DurationUtil.CreateDurationTextBinding()
+		binding:SetFontString(bar.Time)
+		if C_StringUtil and C_StringUtil.CreateSecondsFormatter then
+			local formatter = C_StringUtil.CreateSecondsFormatter()
+			formatter:SetMillisecondsThreshold(5)
+			binding:SetFormatter(formatter)
+		end
+		bar.DurationTextBinding = binding
+	end
+
+	binding:SetDuration(duration)
+	binding:SetEnabled(true)
+end
+
 local function ResetCast(bar)
+	if bar.DurationTextBinding then
+		bar.DurationTextBinding:SetEnabled(false)
+	end
 	bar.castID = nil
+	bar.castBarID = nil
+	bar.__nativeTimer = nil
 	bar.casting = nil
 	bar.channeling = nil
 	bar.empowering = nil
@@ -98,10 +129,23 @@ local function ResetCast(bar)
 	bar.spellID = nil
 	bar.__lastTimeTick = nil
 	bar.__lastTimeDelay = nil
+	bar.__syncElapsed = nil
 end
 
-local function SameCast(bar, castID, spellID)
-	return bar:IsShown() and (not castID or not bar.castID or bar.castID == castID) and (not spellID or not bar.spellID or bar.spellID == spellID)
+local function SameCast(bar, castID, spellID, castBarID)
+	if not bar:IsShown() then
+		return false
+	end
+	if YxUI.IsMainline then
+		if castBarID ~= nil and bar.castBarID ~= nil then
+			return bar.castBarID == castBarID
+		end
+		if castID ~= nil and bar.castID ~= nil and (not issecretvalue or not (issecretvalue(castID) or issecretvalue(bar.castID))) then
+			return bar.castID == castID
+		end
+		return true
+	end
+	return (not castID or not bar.castID or bar.castID == castID) and (not spellID or not bar.spellID or bar.spellID == spellID)
 end
 
 local function FinishCast(bar, failed, unit, spellID)
@@ -120,7 +164,9 @@ local function FinishCast(bar, failed, unit, spellID)
 		end
 
 		bar.holdTime = bar.timeToHold or 0
-		bar:SetValue(bar.max or 0)
+		if not bar.__nativeTimer then
+			bar:SetValue(bar.max or 0)
+		end
 		ResetCast(bar)
 
 		if bar.PostCastFail then
@@ -142,7 +188,17 @@ local function FinishCast(bar, failed, unit, spellID)
 	end
 end
 
+local SyncNativeCast
+
 local function CastOnUpdate(bar, elapsed)
+	if bar.__nativeTimer then
+		bar.__syncElapsed = (bar.__syncElapsed or 0) + elapsed
+		if bar.__syncElapsed >= 0.3 then
+			bar.__syncElapsed = 0
+			SyncNativeCast(bar)
+		end
+		return
+	end
 	if bar.casting or bar.channeling or bar.empowering then
 		local increasing = bar.casting or bar.empowering
 
@@ -185,18 +241,29 @@ local function CastOnUpdate(bar, elapsed)
 	end
 end
 
-local function ReadCast(unit)
-	local name, text, texture, startMS, endMS, isTradeSkill, castID, notInterruptible, spellID = CastingInfo(unit)
+local function CastAvailable(name, castBarID)
+	if YxUI.IsMainline then
+		if issecretvalue and (issecretvalue(name) or issecretvalue(castBarID)) then
+			return true
+		end
+		return name ~= nil or castBarID ~= nil
+	end
+	return (not issecretvalue or not issecretvalue(name)) and name
+end
 
-	if name then
-		return name, text, texture, startMS, endMS, isTradeSkill, castID, notInterruptible, spellID, false, false
+local function ReadCast(unit)
+	local name, text, texture, startMS, endMS, isTradeSkill, castID, notInterruptible, spellID, _, _, castBarID = CastingInfo(unit)
+
+	if CastAvailable(name, castBarID) then
+		return name, text, texture, startMS, endMS, isTradeSkill, castID, notInterruptible, spellID, false, false, castBarID
 	end
 
 	local numStages
 
-	name, text, texture, startMS, endMS, isTradeSkill, castID, notInterruptible, spellID, _, numStages = ChannelInfo(unit)
+	local castBarID
+	name, text, texture, startMS, endMS, isTradeSkill, castID, notInterruptible, spellID, _, numStages, castBarID = ChannelInfo(unit)
 
-	return name, text, texture, startMS, endMS, isTradeSkill, castID, notInterruptible, spellID, true, numStages and numStages > 0
+	return name, text, texture, startMS, endMS, isTradeSkill, castID, notInterruptible, spellID, true, numStages and (not issecretvalue or not issecretvalue(numStages)) and numStages > 0, castBarID
 end
 
 local function StartCast(frame, event, unit)
@@ -205,32 +272,63 @@ local function StartCast(frame, event, unit)
 	end
 
 	local bar = frame.Castbar
-	local name, text, texture, startMS, endMS, isTradeSkill, castID, notInterruptible, spellID, channel, empower = ReadCast(unit)
+	local name, text, texture, startMS, endMS, isTradeSkill, castID, notInterruptible, spellID, channel, empower, castBarID = ReadCast(unit)
 
-	if not name or (isTradeSkill and not bar.showTradeSkills) then
+	local hasCast = CastAvailable(name, castBarID)
+	local safeTradeSkill = not issecretvalue or not issecretvalue(isTradeSkill)
+	if not hasCast or (safeTradeSkill and isTradeSkill and not bar.showTradeSkills) then
 		ResetCast(bar)
 		bar:Hide()
 
 		return
 	end
 
-	if empower and GetUnitEmpowerHoldAtMaxTime then
-		endMS = endMS + GetUnitEmpowerHoldAtMaxTime(unit)
-	end
-
-	bar.startTime, bar.endTime = startMS / 1000, endMS / 1000
-	bar.max = bar.endTime - bar.startTime
-	bar.casting, bar.channeling, bar.empowering = not channel, channel and not empower, empower
-	bar.duration = bar.channeling and (bar.endTime - GetTime()) or (GetTime() - bar.startTime)
 	bar.delay, bar.holdTime = 0, 0
 	bar.__lastTimeTick, bar.__lastTimeDelay = nil, nil
-	bar.castID, bar.spellID = castID, spellID
+	bar.castID, bar.castBarID, bar.spellID = castID, castBarID, spellID
 	bar.notInterruptible = notInterruptible
-	bar:SetMinMaxValues(0, bar.max)
-	bar:SetValue(bar.duration)
+	bar.casting, bar.channeling, bar.empowering = not channel, channel and not empower, empower
+	bar.__nativeTimer = nil
+
+	local protectedTimes = YxUI.IsMainline and issecretvalue and (issecretvalue(startMS) or issecretvalue(endMS))
+	if bar.DurationTextBinding then
+		bar.DurationTextBinding:SetEnabled(false)
+	end
+	if protectedTimes and not (NativeCastTimers and bar.SetTimerDuration) then
+		ResetCast(bar)
+		bar:Hide()
+		return
+	end
+
+	local nativeDuration
+	if protectedTimes then
+		local duration = channel and (empower and UnitEmpoweredChannelDuration and UnitEmpoweredChannelDuration(unit) or UnitChannelDuration(unit)) or UnitCastingDuration(unit)
+		if not duration then
+			ResetCast(bar)
+			bar:Hide()
+			return
+		end
+
+		bar.__nativeTimer = true
+		nativeDuration = duration
+		bar:SetTimerDuration(duration, nil, channel and Enum.StatusBarTimerDirection.RemainingTime or Enum.StatusBarTimerDirection.ElapsedTime)
+	else
+		if empower and GetUnitEmpowerHoldAtMaxTime then
+			endMS = endMS + GetUnitEmpowerHoldAtMaxTime(unit)
+		end
+
+		bar.startTime, bar.endTime = startMS / 1000, endMS / 1000
+		bar.max = bar.endTime - bar.startTime
+		bar.duration = bar.channeling and (bar.endTime - GetTime()) or (GetTime() - bar.startTime)
+		bar:SetMinMaxValues(0, bar.max)
+		bar:SetValue(bar.duration)
+	end
 
 	if bar.Text then
-		local castText = text ~= "" and text or name
+		local castText = name
+		if (not issecretvalue or not issecretvalue(text)) and text and text ~= "" then
+			castText = text
+		end
 		if YxUI.IsForever and not issecretvalue(spellID) and spellID == 22810 and type(castText) == "string" and not issecretvalue(castText) then
 			castText = castText:match("^(.-) %- ") or castText
 		end
@@ -238,15 +336,31 @@ local function StartCast(frame, event, unit)
 	end
 
 	if bar.Time then
-		bar.Time:SetText()
+		bar.Time:SetText("")
+		if nativeDuration then
+			UpdateNativeTime(bar, nativeDuration)
+		end
 	end
 
 	if bar.Icon then
-		bar.Icon:SetTexture(texture or FALLBACK_ICON)
+		if YxUI.IsMainline then
+			bar.Icon:SetTexture(texture)
+		else
+			bar.Icon:SetTexture(texture or FALLBACK_ICON)
+		end
 	end
 
 	if bar.Shield then
-		bar.Shield:SetShown(notInterruptible)
+		if YxUI.IsMainline and issecretvalue and issecretvalue(notInterruptible) then
+			if bar.Shield.SetAlphaFromBoolean then
+				bar.Shield:Show()
+				bar.Shield:SetAlphaFromBoolean(notInterruptible, 1, 0)
+			else
+				bar.Shield:Hide()
+			end
+		else
+			bar.Shield:SetShown(notInterruptible)
+		end
 	end
 
 	if bar.Spark then
@@ -255,7 +369,7 @@ local function StartCast(frame, event, unit)
 
 	bar:Show()
 
-	if bar.SafeZone and unit == "player" and bar.max > 0 then
+	if bar.SafeZone and unit == "player" and not bar.__nativeTimer and bar.max > 0 then
 		local horizontal = bar:GetOrientation() == "HORIZONTAL"
 		local ratio = math.min(1, (select(4, GetNetStats()) / 1000) / bar.max)
 
@@ -281,12 +395,21 @@ local function StartCast(frame, event, unit)
 	end
 end
 
-local function UpdateCast(frame, event, unit, castID, spellID)
-	if unit ~= frame.unit or not SameCast(frame.Castbar, castID, spellID) then
+local function UpdateCast(frame, event, unit, castID, spellID, castBarID)
+	if unit ~= frame.unit or not SameCast(frame.Castbar, castID, spellID, castBarID) then
 		return
 	end
 
 	local bar = frame.Castbar
+	if bar.__nativeTimer then
+		local duration = bar.channeling and UnitChannelDuration(unit) or bar.empowering and UnitEmpoweredChannelDuration and UnitEmpoweredChannelDuration(unit) or UnitCastingDuration(unit)
+		if duration then
+			bar:SetTimerDuration(duration, nil, (bar.channeling or bar.empowering) and Enum.StatusBarTimerDirection.RemainingTime or Enum.StatusBarTimerDirection.ElapsedTime)
+			UpdateNativeTime(bar, duration)
+		end
+		return
+	end
+
 	local name, _, _, startMS, endMS
 
 	if event == "UNIT_SPELLCAST_DELAYED" then
@@ -295,7 +418,7 @@ local function UpdateCast(frame, event, unit, castID, spellID)
 		name, _, _, startMS, endMS = ChannelInfo(unit)
 	end
 
-	if not name then
+	if not CastAvailable(name) then
 		return
 	end
 
@@ -324,10 +447,35 @@ local function UpdateCast(frame, event, unit, castID, spellID)
 	end
 end
 
-local function StopCast(frame, event, unit, castID, spellID)
-	local bar = frame.Castbar
+SyncNativeCast = function(bar)
+	local unit = bar.__owner.unit
+	if not unit then
+		FinishCast(bar, nil, unit)
+		return
+	end
 
-	if unit ~= frame.unit or not SameCast(bar, castID, spellID) then
+	local name, _, _, _, _, _, _, _, _, channel, empower, castBarID = ReadCast(unit)
+	if not CastAvailable(name, castBarID) then
+		FinishCast(bar, nil, unit)
+	elseif castBarID ~= nil and bar.castBarID ~= nil and castBarID ~= bar.castBarID then
+		StartCast(bar.__owner, "NativeCastChanged", unit)
+	elseif channel ~= (bar.channeling or bar.empowering) or (empower and true or false) ~= (bar.empowering or false) then
+		StartCast(bar.__owner, "NativeCastModeChanged", unit)
+	end
+end
+
+local function StopCast(frame, event, unit, castID, spellID, eventDetail, extra, finalCastBarID)
+	local bar = frame.Castbar
+	local castBarID = eventDetail
+
+	if YxUI.IsMainline then
+		if event == "UNIT_SPELLCAST_CHANNEL_STOP" or event == "UNIT_SPELLCAST_INTERRUPTED" then
+			castBarID = extra
+		elseif event == "UNIT_SPELLCAST_EMPOWER_STOP" then
+			castBarID = finalCastBarID
+		end
+	end
+	if unit ~= frame.unit or not SameCast(bar, castID, spellID, castBarID) then
 		return
 	end
 
@@ -384,6 +532,14 @@ local function EnableCast(frame)
 	bar.ForceUpdate = function()
 		StartCast(frame, "ForceUpdate", frame.unit)
 	end
+	bar.ForceClear = function()
+		ResetCast(bar)
+		bar.holdTime = 0
+		bar:Hide()
+	end
+	bar:HookScript("OnHide", function()
+		ResetCast(bar)
+	end)
 
 	bar:SetScript("OnUpdate", bar.OnUpdate or CastOnUpdate)
 
@@ -441,8 +597,13 @@ local function DisableCast(frame)
 end
 
 UF:RegisterElement("Castbar", {
-	-- Cast events drive this element directly; full frame refreshes need no work.
-	update = function()
+	update = function(frame, event)
+		if event == "OnShow" or event == "NamePlateShown" or event == "NAME_PLATE_UNIT_ADDED"
+			or event == "RefreshUnit" or event == "PLAYER_TARGET_CHANGED" or event == "PLAYER_FOCUS_CHANGED"
+			or event == "INSTANCE_ENCOUNTER_ENGAGE_UNIT" or event == "PollIdentityChanged"
+			or event == "OnAttributeChanged" then
+			StartCast(frame, event, frame.unit)
+		end
 	end,
 	enable = EnableCast,
 	disable = DisableCast,

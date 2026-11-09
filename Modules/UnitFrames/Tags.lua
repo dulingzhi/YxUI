@@ -397,7 +397,8 @@ if YxUI.IsMainline then
 	end
 end
 
-Events["Power"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_POWER_UPDATE"
+local PowerValueEvents = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_DISPLAYPOWER"
+Events["Power"] = PowerValueEvents
 Methods["Power"] = function(unit)
 	local Current = UnitPower(unit)
 
@@ -408,7 +409,7 @@ Methods["Power"] = function(unit)
 	end
 end
 
-Events["Power:Short"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_POWER_UPDATE"
+Events["Power:Short"] = PowerValueEvents
 Methods["Power:Short"] = function(unit)
 	local Current = UnitPower(unit)
 
@@ -419,7 +420,7 @@ Methods["Power:Short"] = function(unit)
 	end
 end
 
-Events["PowerValues"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_POWER_UPDATE"
+Events["PowerValues"] = PowerValueEvents
 Methods["PowerValues"] = function(unit)
 	local Current = UnitPower(unit)
 	local Max = UnitPowerMax(unit)
@@ -431,7 +432,7 @@ Methods["PowerValues"] = function(unit)
 	end
 end
 
-Events["PowerValues:Short"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_POWER_UPDATE"
+Events["PowerValues:Short"] = PowerValueEvents
 Methods["PowerValues:Short"] = function(unit)
 	local Current = UnitPower(unit)
 	local Max = UnitPowerMax(unit)
@@ -443,7 +444,7 @@ Methods["PowerValues:Short"] = function(unit)
 	end
 end
 
-Events["PowerPercent"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_POWER_UPDATE"
+Events["PowerPercent"] = PowerValueEvents
 Methods["PowerPercent"] = function(unit)
 	local Current = UnitPower(unit)
 	local Max = UnitPowerMax(unit)
@@ -455,7 +456,7 @@ Methods["PowerPercent"] = function(unit)
 	end
 end
 
-Events["PowerColor"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_POWER_UPDATE UNIT_DISPLAYPOWER"
+Events["PowerColor"] = "UNIT_DISPLAYPOWER UNIT_POWER_BAR_SHOW UNIT_POWER_BAR_HIDE"
 Methods["PowerColor"] = function(unit)
 	local _, PowerToken = UnitPowerType(unit)
 
@@ -701,6 +702,7 @@ end
 
 local function FormatTagString(binding, unit, realUnit)
 	local output, values = binding.output, binding.values
+	local hasSecret = false
 	for i = 1, #binding.parts do
 		local part = binding.parts[i]
 		if type(part) == "string" then
@@ -713,6 +715,9 @@ local function FormatTagString(binding, unit, realUnit)
 			-- formatting argument so prefixes and suffixes still work in combat.
 			local secret = YxUI.IsMainline and issecretvalue(value) and not canaccessvalue(value)
 			if secret or (value ~= nil and value ~= "") then
+				if secret then
+					hasSecret = true
+				end
 				output[#output + 1] = part.format
 				values[#values + 1] = value
 			end
@@ -724,15 +729,55 @@ local function FormatTagString(binding, unit, realUnit)
 		output[i] = nil
 	end
 
-	return text, values
+	return text, values, hasSecret
 end
 
 local function RenderTagText(fontString, binding, unit, realUnit)
-	local output, values = FormatTagString(binding, unit, realUnit)
-	if #values > 0 then
-		fontString:SetFormattedText(output, unpack(values))
-	else
-		fontString:SetText(output)
+	local output, values, hasSecret = FormatTagString(binding, unit, realUnit)
+	local count = #values
+	local changed = hasSecret or output ~= binding.lastFormat or count ~= binding.lastValueCount
+
+	if not changed then
+		for i = 1, count do
+			if values[i] ~= binding.lastValues[i] then
+				changed = true
+				break
+			end
+		end
+	end
+
+	if changed then
+		if count > 0 then
+			fontString:SetFormattedText(output, unpack(values))
+		else
+			fontString:SetText(output)
+		end
+
+		local previous = binding.lastValues
+		if hasSecret then
+			binding.lastFormat = nil
+			if previous then
+				for i = 1, binding.lastValueCount or 0 do
+					previous[i] = nil
+				end
+			end
+			binding.lastValueCount = 0
+		else
+			if not previous and count > 0 then
+				previous = {}
+				binding.lastValues = previous
+			end
+			if previous then
+				for i = 1, count do
+					previous[i] = values[i]
+				end
+				for i = count + 1, binding.lastValueCount or 0 do
+					previous[i] = nil
+				end
+			end
+			binding.lastFormat = output
+			binding.lastValueCount = count
+		end
 	end
 
 	if binding.hasName then
@@ -747,7 +792,7 @@ local function RenderTagText(fontString, binding, unit, realUnit)
 		end
 	end
 
-	-- Do not retain unit values (including retail secrets) between updates.
+	-- Clear the temporary render arguments, especially protected values.
 	for i = #values, 1, -1 do
 		values[i] = nil
 	end
@@ -763,8 +808,16 @@ function UF.PreviewTag(fontString, tagString, unit)
 	RenderTagText(fontString, {parts = parts, output = {}, values = {}}, unit)
 end
 
-local function TagEvent(frame, event, unit)
+local function TagEvent(frame, event, unit, powerToken)
 	if unit and unit ~= frame.unit and unit ~= frame.realUnit then
+		return
+	end
+	local power = frame.Power
+	if event == "UNIT_POWER_FREQUENT" and power and power._powerToken and not power.displayAltPower
+		and type(powerToken) == "string"
+		and not (YxUI.IsMainline and issecretvalue and issecretvalue(powerToken)
+			and (not canaccessvalue or not canaccessvalue(powerToken)))
+		and powerToken ~= power._powerToken then
 		return
 	end
 	local bindings = frame.__tagEvents[event]

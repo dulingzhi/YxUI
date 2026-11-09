@@ -18,6 +18,12 @@ local GetHighestSpellPower = function()
 end
 
 local GetSpecInfo = function()
+    if YxUI.IsMists and GetSpecialization then
+        return GetSpecialization()
+    end
+    if not GetTalentTabInfo then
+        return
+    end
 	local MainSpecID
 	local HighestPoints = 0
 	local Name, PointsSpent, _
@@ -42,6 +48,30 @@ local OnMouseUp = function()
 	end
 
 	ToggleCharacter("PaperDollFrame")
+end
+
+
+local OnLeave = function()
+	GameTooltip:Hide()
+end
+
+local OnEnter = function(self)
+	if not self:SetTooltip() then return end
+
+	GameTooltip:AddLine(STAT_SPELLPOWER or STAT_SPELLDAMAGE or "Spell Power", 1, 0.82, 0)
+	GameTooltip:AddLine(" ")
+	local schools = {HOLY or "Holy", FIRE or "Fire", NATURE or "Nature", FROST or "Frost", SHADOW or "Shadow", ARCANE or "Arcane"}
+	for index = 1, #schools do
+		local value = GetSpellBonusDamage(index + 1)
+		if YxUI.IsDataTextReadable(value) then
+			GameTooltip:AddDoubleLine(schools[index], YxUI:Comma(value), 1, 1, 1, 1, 1, 1)
+		end
+	end
+	local healing = GetSpellBonusHealing()
+	if YxUI.IsDataTextReadable(healing) then
+		GameTooltip:AddDoubleLine(HealingLabel or "Healing", YxUI:Comma(healing), 1, 1, 1, 1, 1, 1)
+	end
+	GameTooltip:Show()
 end
 
 local Update = function(self, event, unit)
@@ -76,6 +106,8 @@ local OnEnable = function(self)
 	self:RegisterEvent("UNIT_AURA")
 	self:SetScript("OnEvent", Update)
 	self:SetScript("OnMouseUp", OnMouseUp)
+	self:SetScript("OnEnter", OnEnter)
+	self:SetScript("OnLeave", OnLeave)
 
 	self:Update(nil, "player")
 end
@@ -85,6 +117,8 @@ local OnDisable = function(self)
 	self:UnregisterEvent("UNIT_AURA")
 	self:SetScript("OnEvent", nil)
 	self:SetScript("OnMouseUp", nil)
+	self:SetScript("OnEnter", nil)
+	self:SetScript("OnLeave", nil)
 
 	self.Text:SetText("")
 end

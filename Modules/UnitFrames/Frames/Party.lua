@@ -71,6 +71,8 @@ local PartyGroup = {
 	end,
 }
 
+YxUI.PartyPreviewDescriptor = PartyGroup
+
 YxUI.StyleFuncs["party"] = function(frame, unit)
 	UF:BuildGroupFrame(frame, unit, PartyGroup)
 end
@@ -198,6 +200,7 @@ local function UpdatePartyPoint(value)
 			end
 		end)
 		UF:UpdatePartyAnchorSize()
+		UF:LayoutGroupPreview(PartyGroup)
 	end)
 end
 
@@ -215,6 +218,7 @@ local function UpdatePartySpacing(value)
 			SetSpacing(YxUI.UnitFrames["party-pets"], value, point)
 		end
 		UF:UpdatePartyAnchorSize()
+		UF:LayoutGroupPreview(PartyGroup)
 	end)
 end
 

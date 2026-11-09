@@ -7,6 +7,7 @@ local GetItemInfo = GetItemInfo
 local GetCoinTextureString = (C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString) or GetCoinTextureString
 local NUM_BAG_SLOTS = NUM_BAG_SLOTS
 local Label = Language["Bags"]
+local IsReadable = YxUI.IsDataTextReadable
 
 if C_Item then
 	GetItemInfo = C_Item.GetItemInfo
@@ -27,20 +28,23 @@ local OnEnter = function(self)
 		return
 	end
 
-	GameTooltip:AddLine(Language["Inventory"])
+	GameTooltip:AddLine(Language["Inventory"], 1, 0.82, 0)
 	GameTooltip:AddLine(" ")
 
 	for i = 0, NUM_BAG_SLOTS do
 		local NumSlots = GetNumSlots(i)
 
-		if NumSlots then
+		if IsReadable(NumSlots) and NumSlots > 0 then
 			local FreeSlots = GetNumFreeSlots(i)
+			if not IsReadable(FreeSlots) then
+				break
+			end
 			local Name = "|cFFFFFFFF[" .. BACKPACK_TOOLTIP .. "]|r"
 
 			if i > 0 then
 				Name = GetInventoryItemLink("player", ContainerToInventoryID(i))
 
-				if Name then
+				if IsReadable(Name) then
 					local Texture = select(10, GetItemInfo(Name))
 
 					GameTooltip:AddDoubleLine(format("|T%s:14:14:0:0:64:64:4:60:4:60|t  %s", Texture, Name), format("%s/%s", NumSlots-FreeSlots, NumSlots), nil, nil, nil, 1, 1, 1)
@@ -53,7 +57,7 @@ local OnEnter = function(self)
 
 	local Total, Profit = YxUI:GetTrashValue()
 
-	if Total > 0 then
+	if IsReadable(Total) and IsReadable(Profit) and Total > 0 then
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddDoubleLine(Language["|cFF9D9D9D[Poor quality]|r item value:"], GetCoinTextureString(Profit), 1, 1, 1, 1, 1, 1)
 	end
@@ -72,13 +76,25 @@ local Update = function(self)
 	for i = 0, NUM_BAG_SLOTS do
 		local NumSlots = GetNumSlots(i)
 
-		if NumSlots then
-			FreeSlots = FreeSlots + GetNumFreeSlots(i)
+		if not IsReadable(NumSlots) then
+			local Display = YxUI.GetDataTextLastValue(self, nil) or "--"
+			self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Display)
+			return
+		end
+		if NumSlots > 0 then
+			local Free = GetNumFreeSlots(i)
+			if not IsReadable(Free) then
+				local Display = YxUI.GetDataTextLastValue(self, nil) or "--"
+				self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Display)
+				return
+			end
+			FreeSlots = FreeSlots + Free
 			TotalSlots = TotalSlots + NumSlots
 		end
 	end
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s/%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, TotalSlots-FreeSlots, TotalSlots)
+	local Display = YxUI.GetDataTextLastValue(self, format("%s/%s", TotalSlots-FreeSlots, TotalSlots))
+	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, Display)
 end
 
 local OnEnable = function(self)

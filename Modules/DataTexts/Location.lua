@@ -24,7 +24,7 @@ local OnEnter = function(self)
 		Label = ZoneText
 	end
 
-	GameTooltip:AddLine(Label, Color[1], Color[2], Color[3])
+	GameTooltip:AddLine(Label, 1, 0.82, 0)
 
 	if PVPType == "friendly" or PVPType == "hostile" then
 		GameTooltip:AddLine(format(FACTION_CONTROLLED_TERRITORY, Faction), Color[1], Color[2], Color[3])
@@ -34,6 +34,21 @@ local OnEnter = function(self)
 		GameTooltip:AddLine(FREE_FOR_ALL_TERRITORY, Color[1], Color[2], Color[3])
 	else
 		GameTooltip:AddLine(CONTESTED_TERRITORY, Color[1], Color[2], Color[3])
+	end
+
+	if GetInstanceInfo then
+		local InstanceName, InstanceType, _, DifficultyName, MaxPlayers = GetInstanceInfo()
+		local Readable = YxUI.IsDataTextReadable
+		if Readable(InstanceType) and InstanceType ~= "none" and Readable(InstanceName) and type(InstanceName) == "string" and InstanceName ~= "" then
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddDoubleLine(INSTANCE or "Instance", InstanceName, 1, 1, 1, 1, 1, 1)
+			if Readable(DifficultyName) and type(DifficultyName) == "string" and DifficultyName ~= "" then
+				GameTooltip:AddDoubleLine(DUNGEON_DIFFICULTY or "Difficulty", DifficultyName, 1, 1, 1, 1, 1, 1)
+			end
+			if Readable(MaxPlayers) and type(MaxPlayers) == "number" and MaxPlayers > 0 then
+				GameTooltip:AddDoubleLine("Maximum players", tostring(MaxPlayers), 1, 1, 1, 1, 1, 1)
+			end
+		end
 	end
 
 	self.TooltipShown = true

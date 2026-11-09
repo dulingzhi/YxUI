@@ -93,6 +93,8 @@ local RaidGroup = {
 	end,
 }
 
+YxUI.RaidPreviewDescriptor = RaidGroup
+
 YxUI.StyleFuncs["raid"] = function(frame, unit)
 	UF:BuildGroupFrame(frame, unit, RaidGroup)
 end
@@ -191,6 +193,7 @@ local function SetRaidAttribute(attribute, value)
 		end
 
 		UpdateRaidAnchorSize()
+		UF:LayoutGroupPreview(RaidGroup)
 	end)
 end
 

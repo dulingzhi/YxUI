@@ -39,7 +39,7 @@ end
 local Update = function(self)
 	local Count = 0
 
-	if GetInventoryItemID("player", 0) > 0 then -- Ammo slot
+	if GetInventoryItemID("player", 0) then -- Ammo slot
 		Count = GetInventoryItemCount("player", 0)
 	elseif GetInventoryItemCount("player", 18) and GetInventoryItemCount("player", 18) > 1 then -- Ranged slot
 		Count = GetInventoryItemCount("player", 18)

@@ -260,7 +260,6 @@ local function EnablePlayerResources(frame)
 	local descriptor = resource.Descriptor
 	if descriptor.targetBoundCombo then
 		frame:RegisterEvent("UNIT_POWER_UPDATE", UpdatePlayerResources)
-		frame:RegisterEvent("UNIT_POWER_FREQUENT", UpdatePlayerResources)
 		frame:RegisterEvent("PLAYER_TARGET_CHANGED", UpdatePlayerResources)
 		frame:RegisterEvent("COMBO_TARGET_CHANGED", UpdatePlayerResources)
 	elseif descriptor.runes then
@@ -288,7 +287,6 @@ local function DisablePlayerResources(frame)
 	local resource = frame.ClassResource
 	if resource and resource.Descriptor.targetBoundCombo then
 		frame:UnregisterEvent("UNIT_POWER_UPDATE", UpdatePlayerResources)
-		frame:UnregisterEvent("UNIT_POWER_FREQUENT", UpdatePlayerResources)
 		frame:UnregisterEvent("PLAYER_TARGET_CHANGED", UpdatePlayerResources)
 		frame:UnregisterEvent("COMBO_TARGET_CHANGED", UpdatePlayerResources)
 	elseif resource and resource.Descriptor.runes then

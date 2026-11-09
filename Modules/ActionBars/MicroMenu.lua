@@ -221,6 +221,7 @@ function MicroButtons:PositionButtons()
 	local PerRow = Settings["micro-buttons-per-row"]
 	local Spacing = Settings["micro-buttons-gap"]
 	local Width, Height = MicroButtons.Buttons[1]:GetSize()
+	local HorizontalGap = Spacing - 2
 
 	if NumButtons == 0 then
 		MicroButtons.Panel:SetSize(1, 1)
@@ -235,7 +236,7 @@ function MicroButtons:PositionButtons()
 
 	-- Bar sizing
 	if YxUI.IsForever then
-		MicroButtons.Panel:SetWidth(((Width + Spacing) * PerRow) + Spacing)
+		MicroButtons.Panel:SetWidth((Width * PerRow) + (Spacing * 2) + (HorizontalGap * (PerRow - 1)))
 	else
 		MicroButtons.Panel:SetWidth((((Width - 1.8) + Spacing) * PerRow) + Spacing)
 	end
@@ -256,9 +257,36 @@ function MicroButtons:PositionButtons()
 		elseif (i - 1) % PerRow == 0 then
 			Button:SetPoint("TOP", VisibleButtons[i - PerRow], "BOTTOM", 0, -Spacing)
 		else
-			Button:SetPoint("LEFT", VisibleButtons[i - 1], "RIGHT", YxUI.IsForever and Spacing or Spacing - 2, 0)
+			Button:SetPoint("LEFT", VisibleButtons[i - 1], "RIGHT", HorizontalGap, 0)
 		end
 	end
+end
+
+local AddForeverMicroOutline = function(button)
+	if button.HydraMicroOutline then
+		return
+	end
+
+	local Border = {}
+	local function AddEdge(point, oppositePoint, width, height)
+		local Edge = button:CreateTexture(nil, "OVERLAY")
+		Edge:SetDrawLayer("OVERLAY", 7)
+		Edge:SetColorTexture(0, 0, 0)
+		Edge:SetPoint(point, button.BG, point)
+		Edge:SetPoint(oppositePoint, button.BG, oppositePoint)
+		if width then
+			Edge:SetWidth(width)
+		else
+			Edge:SetHeight(height)
+		end
+		Border[#Border + 1] = Edge
+	end
+
+	AddEdge("TOPLEFT", "TOPRIGHT", nil, 1)
+	AddEdge("BOTTOMLEFT", "BOTTOMRIGHT", nil, 1)
+	AddEdge("TOPLEFT", "BOTTOMLEFT", 1)
+	AddEdge("TOPRIGHT", "BOTTOMRIGHT", 1)
+	button.HydraMicroOutline = Border
 end
 
 local StyleForeverMicroButton = function(button)
@@ -394,6 +422,7 @@ function MicroButtons:Load()
 
 		if YxUI.IsForever then
 			local Button = self.Buttons[i]
+			AddForeverMicroOutline(Button)
 			StyleForeverMicroButton(Button)
 
 			if Button.SetNormal then

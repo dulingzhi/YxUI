@@ -3,6 +3,7 @@ local YxUI, Language, Assets, Settings = select(2, ...):get()
 local Gold = YxUI:GetModule("Gold")
 
 local GetMoney = GetMoney
+local IsReadable = YxUI.IsDataTextReadable
 local floor = math.floor
 local GetCoinTextureString = GetCoinTextureString
 
@@ -19,7 +20,7 @@ local OnEnter = function(self)
 	local ServerInfo, ServerTotalGold = Gold:GetServerInfo()
 	local Change, _, Earned, Spent, Elapsed = Gold:GetSessionStats()
 
-	GameTooltip:AddLine(YxUI.UserRealm)
+	GameTooltip:AddLine(YxUI.UserRealm, 1, 0.82, 0)
 	GameTooltip:AddLine(" ")
 
 	if #ServerInfo > 1 then
@@ -62,7 +63,9 @@ local OnLeave = function()
 end
 
 local Update = function(self)
-	self.Text:SetFormattedText("|cFF%s%s|r", Settings["data-text-label-color"], YxUI:CopperToGold(GetMoney()))
+	local Money = YxUI.GetDataTextLastValue(self, GetMoney())
+	local Display = IsReadable(Money) and YxUI:CopperToGold(Money) or "--"
+	self.Text:SetFormattedText("|cFF%s%s|r", Settings["data-text-label-color"], Display)
 end
 
 local OnEnable = function(self)

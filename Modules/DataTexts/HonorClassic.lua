@@ -2,11 +2,15 @@ local YxUI, Language, Assets, Settings = select(2, ...):get()
 
 local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
 local Label = HONOR
+local HonorCurrencyID = YxUI.IsMists and 392 or 1901
 
 local OnEnter = function(self)
 	if not self:SetTooltip() then
 		return
 	end
+
+	GameTooltip:AddLine(HONOR or "Honor", 1, 0.82, 0)
+	GameTooltip:AddLine(" ")
 
 	local HK = GetPVPSessionStats()
 	local Rank = UnitPVPRank("player")
@@ -22,18 +26,18 @@ local OnEnter = function(self)
 			GameTooltip:AddLine(" ")
 		end
 
-		GameTooltip:AddLine(HONOR_TODAY)
+		GameTooltip:AddLine(HONOR_TODAY, 1, 0.82, 0)
 		GameTooltip:AddDoubleLine(HONORABLE_KILLS, YxUI:Comma(HK), 1, 1, 1, 1, 1, 1)
 	end
 
 	local LHK = GetPVPLifetimeStats()
 
 	if LHK > 0 then
-		if HK > 0 then
+		if HK > 0 or Rank > 0 then
 			GameTooltip:AddLine(" ")
 		end
 
-		GameTooltip:AddLine(HONOR_LIFETIME)
+		GameTooltip:AddLine(HONOR_LIFETIME, 1, 0.82, 0)
 		GameTooltip:AddDoubleLine(HONORABLE_KILLS, YxUI:Comma(LHK), 1, 1, 1, 1, 1, 1)
 	end
 
@@ -71,9 +75,13 @@ local OnMouseUp = function()
 end
 
 local Update = function(self)
-	local Info = GetCurrencyInfo(1901)
+	local Info = GetCurrencyInfo(HonorCurrencyID)
 
-	self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s |r", Settings["data-text-label-color"], Label, YxUI.ValueColor, YxUI:Comma(Info.quantity))
+    if Info and Info.quantity ~= nil then
+        self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s%s|r", Settings["data-text-label-color"], Label, YxUI.ValueColor, YxUI:Comma(Info.quantity))
+    else
+        self.Text:SetFormattedText("|cFF%s%s:|r |cFF%s--|r", Settings["data-text-label-color"], Label, YxUI.ValueColor)
+    end
 end
 
 local OnEnable = function(self)

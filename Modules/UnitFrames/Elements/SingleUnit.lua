@@ -124,7 +124,7 @@ function UF:BuildSingleUnitFrame(frame, unit, config)
 		frame.RaidTargetIndicator = self:CreateRaidTargetIndicator(health, 16)
 	end
 
-	if config.range then
+	if config.range and not YxUI.IsForever then
 		frame.Range = config.range
 	end
 
